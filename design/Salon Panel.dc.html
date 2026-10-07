@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-7225b407-bf30-4f7c-b3e7-4f936f6e62ee/styles.css">
+<script src="_ds/modernist-7225b407-bf30-4f7c-b3e7-4f936f6e62ee/_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--color-bg)} a{color:var(--color-accent-700)} a:hover{color:var(--color-accent-600)} button,input,textarea,select{font-family:inherit}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)">
+
+<sc-if value="{{ is.login }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="S0 Giriş" style="min-height:100vh;display:flex;flex-wrap:wrap">
+    <div style="flex:1 1 440px;display:flex;flex-direction:column;justify-content:center;padding:48px clamp(24px,6vw,96px);gap:24px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:22px;height:22px;background:var(--color-accent)"></span><span style="font-weight:800;font-size:20px">SalonaBOX</span><span style="font-size:12px;padding:2px 8px;border:1px solid var(--color-divider)">Kuaför Paneli</span></div>
+      <h1 style="font-size:clamp(32px,4vw,44px);margin:0">Panele giriş yap</h1>
+      <form onSubmit="{{ doLogin }}" style="display:flex;flex-direction:column;gap:16px;max-width:420px">
+        <div class="field"><label for="lg-e">E-posta</label><input id="lg-e" class="input" type="email" value="ayse@ayseyilmazstudio.com" readOnly="{{ true }}" style="min-height:44px"></div>
+        <div class="field"><label for="lg-p">Şifre</label><input id="lg-p" class="input" type="password" value="••••••••" readOnly="{{ true }}" style="min-height:44px"></div>
+        <button type="submit" class="btn btn-primary" style="height:50px;justify-content:space-between;padding:0 18px;font-size:16px">Giriş yap {{ ic.ar }}</button>
+        <a href="#" style="font-size:13px">Şifremi unuttum</a>
+      </form>
+    </div>
+    <div style="flex:1 1 440px;background:var(--color-accent);color:var(--color-bg);padding:48px clamp(24px,6vw,96px);display:flex;flex-direction:column;justify-content:flex-end;min-height:320px">
+      <div style="font-size:clamp(32px,4.4vw,60px);font-weight:800;line-height:1.02;letter-spacing:-0.03em;max-width:12ch">Randevular onay beklemeden takvimine düşer.</div>
+      <p style="font-size:16px;margin:16px 0 0;max-width:44ch">Müşterin boş saati seçer, randevu oluşur, sana bildirim gelir. Sen sadece işine odaklan.</p>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ inApp }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;min-height:100vh">
+  <sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+    <aside aria-label="Panel menüsü" style="width:{{ sideW }};flex:none;position:sticky;top:0;height:100vh;border-right:2px solid var(--color-divider);display:flex;flex-direction:column;background:var(--color-bg);z-index:25">
+      <div style="height:72px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:2px solid var(--color-divider)">
+        <span style="width:22px;height:22px;flex:none;background:var(--color-accent)"></span>
+        <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="font-weight:800;font-size:18px">SalonaBOX</span></sc-if>
+      </div>
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--color-divider);display:flex;gap:10px;align-items:center">
+          <div class="grayscale" style="width:36px;height:36px;flex:none;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 6px,var(--color-neutral-200) 6px 12px)"></div>
+          <div style="min-width:0"><div style="font-weight:800;font-size:14px">Ayşe Yılmaz Studio</div><div style="font-size:12px;color:var(--color-neutral-700)">Moda, Kadıköy</div></div>
+        </div>
+      </sc-if>
+      <nav style="display:flex;flex-direction:column;padding:{{ navPad }};gap:2px;flex:1;overflow-y:auto;overflow-x:hidden">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="8">
+          <button onClick="{{ n.onClick }}" aria-current="{{ n.current }}" aria-label="{{ n.label }}" title="{{ n.label }}" style="display:flex;align-items:center;justify-content:{{ navJustify }};gap:12px;padding:10px 12px;min-height:44px;border:0;background:{{ n.bg }};color:{{ n.fg }};font-size:14px;font-weight:600;cursor:pointer;text-align:left;position:relative" style-hover="background:{{ n.hover }}">
+            {{ n.icon }}<sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span style="flex:1">{{ n.label }}</span></sc-if>
+            <sc-if value="{{ n.badgeShown }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;background:var(--color-accent);color:var(--color-bg);font-size:11px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span></sc-if>
+          </button>
+        </sc-for>
+      </nav>
+      <div style="padding:12px;border-top:1px solid var(--color-divider);display:flex;flex-direction:column;gap:2px">
+        <a href="Customer Web.dc.html" title="Müşteri sitesi" style="display:flex;align-items:center;gap:12px;padding:10px 12px;font-size:13px;color:var(--color-text);text-decoration:none">{{ ic.ext }}<sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span>Müşteri sitesini aç</span></sc-if></a>
+        <button onClick="{{ logout }}" title="Çıkış yap" style="display:flex;align-items:center;gap:12px;padding:10px 12px;font-size:13px;background:none;border:0;color:var(--color-text);cursor:pointer">{{ ic.logout }}<sc-if value="{{ showLabels }}" hint-placeholder-val="{{ true }}"><span>Çıkış yap</span></sc-if></button>
+      </div>
+    </aside>
+  </sc-if>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="position:sticky;top:0;z-index:20;background:var(--color-bg);border-bottom:2px solid var(--color-divider);min-height:72px;display:flex;align-items:center;gap:16px;padding:12px clamp(16px,3vw,32px);flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <h1 style="font-size:24px;margin:0">{{ pageTitle }}</h1>
+        <div style="font-size:13px;color:var(--color-neutral-700)">{{ pageSub }}</div>
+      </div>
+      <button onClick="{{ goNotifs }}" aria-label="{{ bellLabel }}" class="btn btn-icon btn-secondary" style="position:relative;border-color:transparent">{{ ic.bell }}<sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;background:var(--color-accent);color:var(--color-bg);font-size:10px;font-weight:800;display:grid;place-items:center">{{ unread }}</span></sc-if></button>
+      <button onClick="{{ newAppt }}" class="btn btn-primary" style="height:42px;padding:0 16px;gap:10px">{{ ic.plus }} Yeni Randevu</button>
+    </header>
+
+    <main style="flex:1;padding:28px clamp(16px,3vw,32px) 48px;max-width:1440px;width:100%;box-sizing:border-box">
+
+<sc-if value="{{ is.dashboard }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="S1 Dashboard" style="display:flex;flex-direction:column;gap:32px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));border-top:2px solid var(--color-text)">
+      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+        <button onClick="{{ s.onClick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:20px 20px 20px 0;background:none;border:0;border-bottom:1px solid var(--color-divider);cursor:pointer;color:var(--color-text);text-align:left" style-hover="background:var(--color-surface)">
+          <span style="font-size:13px;font-weight:600;display:flex;gap:8px;align-items:center">{{ s.icon }} {{ s.label }}</span>
+          <span style="font-size:52px;font-weight:800;line-height:1;letter-spacing:-0.03em;color:{{ s.color }}">{{ s.value }}</span>
+          <span style="font-size:12px;color:var(--color-neutral-700)">{{ s.sub }}</span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+      <section style="flex:2 1 560px;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px"><h2 style="font-size:22px;margin:0">Sonraki randevular</h2><button onClick="{{ goCalendar }}" class="btn btn-ghost">Takvimde gör</button></div>
+        <div style="border-top:2px solid var(--color-divider)">
+          <sc-for list="{{ nextList }}" as="a" hint-placeholder-count="6">
+            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--color-divider);opacity:{{ a.dim }}">
+              <div style="width:64px;flex:none"><div style="font-size:18px;font-weight:800">{{ a.time }}</div><div style="font-size:12px;color:var(--color-neutral-700)">{{ a.endLabel }}</div></div>
+              <div style="flex:1 1 200px;min-width:0"><div style="font-weight:700">{{ a.name }}</div><div style="font-size:13px;color:var(--color-neutral-700)">{{ a.service }} · {{ a.durLabel }} · {{ a.priceLabel }}</div></div>
+              <span class="{{ a.tagClass }}" style="gap:5px">{{ a.statusIcon }} {{ a.statusLabel }}</span>
+              <div style="display:flex;gap:6px">
+                <sc-if value="{{ a.canComplete }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.onComplete }}" class="btn btn-secondary" style="gap:6px">{{ ic.sm.check }} Tamamlandı</button></sc-if>
+                <button onClick="{{ a.onView }}" class="btn btn-ghost" aria-label="{{ a.name }} randevusunu görüntüle">Görüntüle</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+      <aside style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:24px">
+        <div style="background:var(--color-surface);padding:20px">
+          <h6 style="margin:0 0 12px;color:var(--color-neutral-700)">Bugünün doluluğu</h6>
+          <div style="font-size:36px;font-weight:800;line-height:1">%{{ occupancy }}</div>
+          <div style="height:8px;background:var(--color-neutral-200);margin:12px 0 8px"><div style="height:100%;width:{{ occupancyW }};background:var(--color-text)"></div></div>
+          <div style="font-size:12px;color:var(--color-neutral-700)">{{ freeToday }} boş slot kaldı · 09:00–19:00</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><h2 style="font-size:18px;margin:0">Son bildirimler</h2><button onClick="{{ goNotifs }}" class="btn btn-ghost">Tümü</button></div>
+          <sc-for list="{{ notifPreview }}" as="n" hint-placeholder-count="3">
+            <div style="display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--color-divider)"><span style="color:var(--color-neutral-700)">{{ n.icon }}</span><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:{{ n.weight }}">{{ n.title }}</div><div style="font-size:12px;color:var(--color-neutral-700)">{{ n.body }}</div></div></div>
+          </sc-for>
+        </div>
+      </aside>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.calendar }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="S2 Takvim" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <div role="group" aria-label="Görünüm" style="display:flex;border:1px solid var(--color-divider)">
+        <sc-for list="{{ viewOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.pressed }}" style="padding:8px 16px;border:0;background:{{ o.bg }};color:{{ o.fg }};font-size:13px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for>
+      </div>
+      <div style="display:flex;gap:4px"><button onClick="{{ calPrev }}" aria-label="Önceki" class="btn btn-secondary btn-icon">{{ ic.cl }}</button><button onClick="{{ calNext }}" aria-label="Sonraki" class="btn btn-secondary btn-icon">{{ ic.cr }}</button></div>
+      <button onClick="{{ calToday }}" class="btn btn-secondary">Bugün</button>
+      <strong style="font-size:18px">{{ calTitle }}</strong>
+      <div style="margin-left:auto;display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--color-neutral-700)">
+        <span style="display:flex;gap:6px;align-items:center"><span style="width:14px;height:14px;border:1px dashed var(--color-neutral-500)"></span>Boş</span>
+        <span style="display:flex;gap:6px;align-items:center"><span style="width:14px;height:14px;background:var(--color-surface);border:1px solid var(--color-text)"></span>Dolu</span>
+        <span style="display:flex;gap:6px;align-items:center"><span style="width:14px;height:14px;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 3px,var(--color-bg) 3px 6px)"></span>Bloklu</span>
+        <span style="display:flex;gap:6px;align-items:center"><span style="width:14px;height:14px;background:var(--color-neutral-200)"></span>Tamamlandı</span>
+      </div>
+    </div>
+
+    <sc-if value="{{ dayView }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ dayClosed }}" hint-placeholder-val="{{ false }}">
+        <div style="border:2px solid var(--color-divider);padding:40px 28px;background:repeating-linear-gradient(135deg,var(--color-neutral-200) 0 8px,var(--color-bg) 8px 16px)"><h3 style="margin:0">Salon bu gün kapalı.</h3><p style="margin:6px 0 0;color:var(--color-neutral-700)">Çalışma saatlerinden veya özel kapalı günlerden değiştirebilirsin.</p></div>
+      </sc-if>
+      <sc-if value="{{ dayOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:64px minmax(0,1fr);border-top:2px solid var(--color-text)">
+          <div><sc-for list="{{ hourLabels }}" as="h" hint-placeholder-count="10"><div style="height:88px;font-size:12px;color:var(--color-neutral-700);padding-top:4px">{{ h }}</div></sc-for></div>
+          <div style="position:relative;height:880px;border-left:1px solid var(--color-divider)">
+            <sc-for list="{{ daySlots }}" as="s" hint-placeholder-count="20">
+              <button onClick="{{ s.onClick }}" disabled="{{ s.disabled }}" aria-label="{{ s.aria }}" style="position:absolute;left:0;right:0;top:{{ s.top }};height:44px;border:0;border-top:1px {{ s.line }} var(--color-divider);background:{{ s.bg }};cursor:{{ s.cursor }};display:flex;align-items:center;padding:0 12px;font-size:12px;color:var(--color-neutral-700);text-align:left">
+                <span style="opacity:{{ s.labelOpacity }};display:flex;gap:6px;align-items:center" style-hover="opacity:1">{{ s.label }}</span>
+              </button>
+            </sc-for>
+            <sc-for list="{{ dayBlocks }}" as="b" hint-placeholder-count="6">
+              <button onClick="{{ b.onClick }}" aria-label="{{ b.aria }}" style="position:absolute;left:8px;right:8px;top:{{ b.top }};height:{{ b.height }};background:{{ b.bg }};color:{{ b.fg }};border:1px solid {{ b.border }};padding:6px 10px;text-align:left;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;gap:1px;text-decoration:{{ b.deco }}" style-hover="box-shadow:var(--shadow-md)">
+                <span style="font-size:12px;font-weight:700;display:flex;gap:6px;align-items:center">{{ b.range }} {{ b.statusIcon }}</span>
+                <span style="font-size:14px;font-weight:800">{{ b.name }}</span>
+                <span style="font-size:12px">{{ b.service }}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ showNow }}" hint-placeholder-val="{{ false }}">
+              <div aria-hidden="true" style="position:absolute;left:-8px;right:0;top:{{ nowTop }};height:2px;background:var(--color-accent);pointer-events:none"><span style="position:absolute;left:0;top:-9px;background:var(--color-accent);color:var(--color-bg);font-size:10px;font-weight:800;padding:2px 4px">11:40</span></div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ weekView }}" hint-placeholder-val="{{ false }}">
+      <div style="overflow-x:auto;border-top:2px solid var(--color-text)">
+        <div style="min-width:880px;display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr))">
+          <div></div>
+          <sc-for list="{{ weekCols }}" as="c" hint-placeholder-count="7">
+            <button onClick="{{ c.onOpenDay }}" style="padding:10px 8px;border:0;border-left:1px solid var(--color-divider);border-bottom:2px solid var(--color-divider);background:{{ c.headBg }};color:{{ c.headFg }};text-align:left;cursor:pointer"><div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase">{{ c.wd }}</div><div style="font-size:20px;font-weight:800">{{ c.d }}</div><div style="font-size:11px">{{ c.count }}</div></button>
+          </sc-for>
+          <div><sc-for list="{{ hourLabels }}" as="h" hint-placeholder-count="10"><div style="height:66px;font-size:11px;color:var(--color-neutral-700);padding-top:4px">{{ h }}</div></sc-for></div>
+          <sc-for list="{{ weekCols }}" as="c" hint-placeholder-count="7">
+            <div style="position:relative;height:660px;border-left:1px solid var(--color-divider);background:{{ c.bodyBg }}">
+              <sc-for list="{{ c.blocks }}" as="b" hint-placeholder-count="3">
+                <button onClick="{{ b.onClick }}" aria-label="{{ b.aria }}" style="position:absolute;left:3px;right:3px;top:{{ b.top }};height:{{ b.height }};background:{{ b.bg }};color:{{ b.fg }};border:1px solid {{ b.border }};padding:3px 6px;text-align:left;cursor:pointer;overflow:hidden;font-size:11px;line-height:1.25;text-decoration:{{ b.deco }}" style-hover="box-shadow:var(--shadow-md)"><strong>{{ b.time }}</strong> {{ b.name }}<br>{{ b.service }}</button>
+              </sc-for>
+              <sc-if value="{{ c.closed }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:12px;left:8px;font-size:12px;font-weight:700">Kapalı</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.appointments }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="S3 Randevular" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <div role="tablist" aria-label="Randevu filtresi" style="display:flex;gap:4px;border-bottom:2px solid var(--color-divider);overflow-x:auto">
+        <sc-for list="{{ apTabs }}" as="t" hint-placeholder-count="4"><button role="tab" aria-selected="{{ t.selected }}" onClick="{{ t.onClick }}" style="padding:10px 12px;background:none;border:0;border-bottom:3px solid {{ t.border }};margin-bottom:-2px;font-size:14px;font-weight:700;color:{{ t.color }};cursor:pointer;white-space:nowrap">{{ t.label }}</button></sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--color-divider);background:var(--color-surface);padding:0 10px;flex:0 1 280px"><span style="color:var(--color-neutral-600)">{{ ic.search }}</span><input value="{{ apQ }}" onChange="{{ onApQ }}" placeholder="Müşteri ara" aria-label="Müşteri ara" style="flex:1;min-width:0;border:0;background:transparent;height:38px;font-size:14px;color:var(--color-text)"></div>
+    </div>
+    <sc-if value="{{ apEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="border:2px solid var(--color-divider);padding:40px 28px;display:flex;flex-direction:column;align-items:flex-start;gap:10px"><span style="color:var(--color-neutral-600)">{{ ic.lg.cal }}</span><h3 style="margin:0">Bu filtrede randevu yok.</h3><button onClick="{{ newAppt }}" class="btn btn-primary" style="gap:8px">{{ ic.plus }} Randevu ekle</button></div>
+    </sc-if>
+    <sc-if value="{{ apTable }}" hint-placeholder-val="{{ true }}">
+      <div style="overflow-x:auto">
+        <table class="table" style="min-width:900px">
+          <thead><tr><th>Müşteri</th><th>Hizmet</th><th>Tarih</th><th>Saat</th><th>Süre</th><th>Fiyat</th><th>Durum</th><th style="text-align:right">İşlemler</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ apList }}" as="a" hint-placeholder-count="8">
+              <tr style="opacity:{{ a.dim }}">
+                <td><div style="font-weight:700">{{ a.name }}</div><div style="font-size:12px;color:var(--color-neutral-700)">{{ a.phone }} · {{ a.srcLabel }}</div></td>
+                <td>{{ a.service }}</td><td>{{ a.dateShort }}</td><td style="font-weight:700">{{ a.time }}</td><td>{{ a.durLabel }}</td><td>{{ a.priceLabel }}</td>
+                <td><span class="{{ a.tagClass }}" style="gap:5px">{{ a.statusIcon }} {{ a.statusLabel }}</span></td>
+                <td><div style="display:flex;gap:2px;justify-content:flex-end">
+                  <button onClick="{{ a.onView }}" class="btn btn-icon" aria-label="Görüntüle: {{ a.name }}" title="Görüntüle">{{ ic.eye }}</button>
+                  <button onClick="{{ a.onEdit }}" disabled="{{ a.noEdit }}" class="btn btn-icon" aria-label="Düzenle: {{ a.name }}" title="Düzenle">{{ ic.edit }}</button>
+                  <button onClick="{{ a.onCancel }}" disabled="{{ a.noCancel }}" class="btn btn-icon" aria-label="İptal et: {{ a.name }}" title="İptal" style="color:var(--color-accent-700)">{{ ic.xC }}</button>
+                  <button onClick="{{ a.onComplete }}" disabled="{{ a.noComplete }}" class="btn btn-icon" aria-label="Tamamlandı olarak işaretle: {{ a.name }}" title="Tamamlandı">{{ ic.checkC }}</button>
+                </div></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:12px;color:var(--color-neutral-700);display:flex;gap:6px;align-items:center">{{ ic.sm.lock }} Geçmiş, tamamlanmış veya iptal edilmiş randevular düzenlenemez ve silinemez.</div>
+    </sc-if>
+    <sc-if value="{{ apCards }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ apList }}" as="a" hint-placeholder-count="6">
+          <div style="background:var(--color-surface);padding:16px;display:flex;flex-direction:column;gap:8px;opacity:{{ a.dim }}">
+            <div style="display:flex;justify-content:space-between;gap:8px"><strong>{{ a.name }}</strong><span class="{{ a.tagClass }}" style="gap:5px">{{ a.statusIcon }} {{ a.statusLabel }}</span></div>
+            <div style="font-size:13px">{{ a.service }} · {{ a.dateShort }} · {{ a.time }} · {{ a.priceLabel }}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><button onClick="{{ a.onView }}" class="btn btn-secondary">Görüntüle</button><sc-if value="{{ a.canEdit }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.onEdit }}" class="btn btn-secondary">Düzenle</button></sc-if><sc-if value="{{ a.canComplete }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.onComplete }}" class="btn btn-secondary">Tamamlandı</button></sc-if></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.services }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="S4 Hizmetler" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><p style="margin:0;color:var(--color-neutral-700);font-size:14px">Pasif hizmetler müşteri sitesinde görünmez ve randevuya açılmaz.</p><button onClick="{{ addSvc }}" class="btn btn-primary" style="gap:8px">{{ ic.plus }} Hizmet ekle</button></div>
+    <div style="border-top:2px solid var(--color-text)">
+      <sc-for list="{{ svcList }}" as="v" hint-placeholder-count="7">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--color-divider)">
+          <div style="flex:1 1 200px;min-width:0"><div style="font-weight:800;font-size:16px;color:{{ v.nameColor }}">{{ v.name }}</div><div style="font-size:13px;color:var(--color-neutral-700)">{{ v.durLabel }}</div></div>
+          <div style="font-weight:800;font-size:18px;min-width:100px">{{ v.priceLabel }}</div>
+          <div style="display:flex;align-items:center;gap:10px;min-width:120px"><button role="switch" aria-checked="{{ v.active }}" aria-label="{{ v.name }} aktif" onClick="{{ v.onToggle }}" style="width:44px;height:24px;flex:none;position:relative;border:0;padding:0;background:{{ v.track }};cursor:pointer"><span style="position:absolute;top:2px;left:{{ v.knob }};width:20px;height:20px;background:var(--color-bg);transition:left .15s"></span></button><span style="font-size:13px;font-weight:600">{{ v.statusLabel }}</span></div>
+          <div style="display:flex;gap:4px"><button onClick="{{ v.onEdit }}" class="btn btn-secondary" style="gap:6px">{{ ic.edit }} Düzenle</button><button onClick="{{ v.onDelete }}" class="btn btn-icon" aria-label="{{ v.name }} hizmetini sil" style="color:var(--color-accent-700)">{{ ic.trash }}</button></div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.hours }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="S5 Çalışma saatleri" style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+    <section style="flex:2 1 620px;min-width:0">
+      <h2 style="font-size:20px;margin:0 0 12px">Haftalık program</h2>
+      <div style="overflow-x:auto">
+        <table class="table" style="min-width:640px">
+          <thead><tr><th>Gün</th><th>Durum</th><th>Açılış</th><th>Kapanış</th><th>Mola</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ hoursRows }}" as="h" hint-placeholder-count="7">
+              <tr>
+                <td style="font-weight:700">{{ h.name }}</td>
+                <td><div style="display:flex;align-items:center;gap:8px"><button role="switch" aria-checked="{{ h.open }}" aria-label="{{ h.name }} açık" onClick="{{ h.onToggle }}" style="width:44px;height:24px;flex:none;position:relative;border:0;padding:0;background:{{ h.track }};cursor:pointer"><span style="position:absolute;top:2px;left:{{ h.knob }};width:20px;height:20px;background:var(--color-bg);transition:left .15s"></span></button><span style="font-size:13px">{{ h.stateLabel }}</span></div></td>
+                <td><input type="time" class="input" value="{{ h.s }}" onChange="{{ h.onS }}" disabled="{{ h.closed }}" aria-label="{{ h.name }} açılış" style="width:120px"></td>
+                <td><input type="time" class="input" value="{{ h.e }}" onChange="{{ h.onE }}" disabled="{{ h.closed }}" aria-label="{{ h.name }} kapanış" style="width:120px"></td>
+                <td><div style="display:flex;gap:6px;align-items:center"><input type="time" class="input" value="{{ h.bs }}" onChange="{{ h.onBs }}" disabled="{{ h.closed }}" aria-label="{{ h.name }} mola başlangıç" style="width:110px"><span>–</span><input type="time" class="input" value="{{ h.be }}" onChange="{{ h.onBe }}" disabled="{{ h.closed }}" aria-label="{{ h.name }} mola bitiş" style="width:110px"></div></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <button onClick="{{ saveHours }}" class="btn btn-primary" style="margin-top:16px;padding:12px 18px">Değişiklikleri kaydet</button>
+      <p style="font-size:12px;color:var(--color-neutral-700);margin-top:8px">Mevcut randevular etkilenmez; yeni saatler müşteri tarafındaki boş slotlara anında yansır.</p>
+    </section>
+    <section style="flex:1 1 300px;min-width:0">
+      <h2 style="font-size:20px;margin:0 0 12px">Özel kapalı günler</h2>
+      <div style="border-top:2px solid var(--color-text)">
+        <sc-for list="{{ closedDays }}" as="c" hint-placeholder-count="2">
+          <div style="display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--color-divider)"><div style="flex:1"><div style="font-weight:800">{{ c.label }}</div><div style="font-size:13px;color:var(--color-neutral-700)">Kapalı · {{ c.note }}</div></div><button onClick="{{ c.onRemove }}" class="btn btn-icon" aria-label="{{ c.label }} kapalı gününü kaldır">{{ ic.trash }}</button></div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;background:var(--color-surface);padding:16px">
+        <div class="field"><label for="cd-d">Tarih</label><select id="cd-d" class="input" value="{{ cdDate }}" onChange="{{ onCdDate }}"><sc-for list="{{ dateOpts }}" as="o" hint-placeholder-count="10"><option value="{{ o.value }}" selected="{{ o.cdSel }}">{{ o.label }}</option></sc-for></select></div>
+        <div class="field"><label for="cd-n">Açıklama</label><input id="cd-n" class="input" value="{{ cdNote }}" onChange="{{ onCdNote }}" placeholder="Örn. Eğitim günü"></div>
+        <button onClick="{{ addClosed }}" class="btn btn-secondary" style="gap:8px;justify-content:flex-start">{{ ic.plus }} Kapalı gün ekle</button>
+        <p style="font-size:12px;color:var(--color-neutral-700);margin:0">O günde randevu varsa önce iptal etmen istenir; müşterilere bildirim gider.</p>
+      </div>
+    </section>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.portfolio }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="S6 Portföy" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <div role="group" aria-label="Portföy filtresi" style="display:flex;border:1px solid var(--color-divider)">
+        <sc-for list="{{ pfOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" aria-pressed="{{ o.pressed }}" style="padding:8px 14px;border:0;background:{{ o.bg }};color:{{ o.fg }};font-size:13px;cursor:pointer">{{ o.label }}</button></sc-for>
+      </div>
+      <p style="margin:0;font-size:13px;color:var(--color-neutral-700);display:flex;gap:6px;align-items:center">{{ ic.sm.lock }} Paylaşım izni vermeyen müşterilerin içerikleri profilde yayınlanamaz.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px">
+      <sc-for list="{{ pfList }}" as="p" hint-placeholder-count="8">
+        <div style="background:var(--color-surface);display:flex;flex-direction:column">
+          <div style="position:relative;aspect-ratio:4/5">
+            <div class="grayscale" style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 12px,var(--color-neutral-200) 12px 24px);opacity:{{ p.imgOpacity }}"></div>
+            <span style="position:absolute;left:10px;bottom:8px;font-family:ui-monospace,monospace;font-size:10px;color:var(--color-neutral-700)">müşteri fotoğrafı</span>
+            <span class="{{ p.tagClass }}" style="position:absolute;top:0;left:0;gap:5px">{{ p.tagIcon }} {{ p.tagLabel }}</span>
+          </div>
+          <div style="padding:14px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;gap:8px"><strong>{{ p.name }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">{{ p.date }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span style="font-size:13px">{{ p.service }}</span><span style="display:flex;gap:4px;align-items:center;font-weight:800;font-size:13px"><span style="color:var(--color-accent)">{{ ic.starF }}</span>{{ p.rating }}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-top:4px;border-top:1px solid var(--color-divider)">
+              <span style="font-size:13px" id="{{ p.lid }}">Profilde göster</span>
+              <button role="switch" aria-checked="{{ p.published }}" aria-labelledby="{{ p.lid }}" disabled="{{ p.noConsent }}" onClick="{{ p.onToggle }}" title="{{ p.switchTitle }}" style="width:44px;height:24px;flex:none;position:relative;border:0;padding:0;background:{{ p.track }};cursor:{{ p.cursor }}"><span style="position:absolute;top:2px;left:{{ p.knob }};width:20px;height:20px;background:var(--color-bg);transition:left .15s"></span></button>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.notifications }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="S7 Bildirimler" style="max-width:860px">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button onClick="{{ markAll }}" disabled="{{ noUnread }}" class="btn btn-ghost">Tümünü okundu işaretle</button></div>
+    <ul style="list-style:none;margin:0;padding:0;border-top:2px solid var(--color-text)">
+      <sc-for list="{{ notifList }}" as="n" hint-placeholder-count="5">
+        <li><button onClick="{{ n.onClick }}" style="width:100%;display:flex;gap:16px;align-items:flex-start;padding:16px;border:0;border-bottom:1px solid var(--color-divider);background:{{ n.bg }};cursor:pointer;text-align:left;color:var(--color-text)" style-hover="background:var(--color-neutral-200)">
+          <span style="width:40px;height:40px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);background:var(--color-bg)">{{ n.icon }}</span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:{{ n.weight }}">{{ n.title }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ n.body }}</span></span>
+          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none"><span style="font-size:12px;color:var(--color-neutral-700)">{{ n.time }}</span><sc-if value="{{ n.unread }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:800;letter-spacing:0.08em;color:var(--color-accent-700);display:flex;gap:4px;align-items:center"><span style="width:8px;height:8px;background:var(--color-accent)"></span>YENİ</span></sc-if></span>
+        </button></li>
+      </sc-for>
+    </ul>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.profile }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="S8 Salon profili" style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+    <section style="flex:2 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+        <div class="grayscale" style="width:120px;height:120px;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 10px,var(--color-neutral-200) 10px 20px)"></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><strong style="font-size:20px">Profil görseli</strong><span style="font-size:13px;color:var(--color-neutral-700)">En az 1200×900 px, JPG veya PNG. Siyah-beyaz yayınlanır.</span><button class="btn btn-secondary" style="align-self:flex-start;gap:8px">{{ ic.camera }} Görsel yükle</button></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;padding-top:20px;border-top:2px solid var(--color-divider)">
+        <div class="field"><label for="sp-n">Salon / kuaför adı</label><input id="sp-n" class="input" value="Ayşe Yılmaz Studio"></div>
+        <div class="field"><label for="sp-e">E-posta</label><input id="sp-e" class="input" type="email" value="merhaba@ayseyilmazstudio.com"></div>
+        <div class="field"><label for="sp-p">Telefon</label><input id="sp-p" class="input" type="tel" value="0216 555 01 01"></div>
+        <div class="field"><label for="sp-l">Konum</label><input id="sp-l" class="input" value="Moda Mah. Bahariye Cad. No:24, Kadıköy / İstanbul"></div>
+      </div>
+      <div class="field"><label for="sp-b">Hakkında</label><textarea id="sp-b" class="input" style="min-height:120px">Renk ve kesimde uzmanlaşmış ekibimizle doğal görünümlü sonuçlara odaklanıyoruz. Her uygulama öncesi kısa bir saç analizi yapıyoruz.</textarea></div>
+      <div style="display:flex;gap:8px"><button onClick="{{ saveProfile }}" class="btn btn-primary" style="padding:12px 18px">Kaydet</button><a href="Customer Web.dc.html" class="btn btn-secondary" style="padding:12px 18px;gap:8px">{{ ic.ext }} Herkese açık profili gör</a></div>
+    </section>
+    <aside style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:24px">
+      <div style="background:var(--color-surface);padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><h6 style="margin:0;color:var(--color-neutral-700)">Hizmetler</h6><button onClick="{{ goServices }}" class="btn btn-ghost">Yönet</button></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"><sc-for list="{{ activeSvcNames }}" as="s" hint-placeholder-count="6"><span class="tag tag-neutral">{{ s }}</span></sc-for></div>
+      </div>
+      <div style="background:var(--color-surface);padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><h6 style="margin:0;color:var(--color-neutral-700)">Çalışma saatleri</h6><button onClick="{{ goHours }}" class="btn btn-ghost">Düzenle</button></div>
+        <sc-for list="{{ hoursSummary }}" as="h" hint-placeholder-count="7"><div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--color-divider)"><span>{{ h.name }}</span><span style="font-weight:700">{{ h.v }}</span></div></sc-for>
+      </div>
+    </aside>
+  </div>
+</sc-if>
+
+    </main>
+    <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}"><div style="height:72px"></div></sc-if>
+  </div>
+</div>
+
+<sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+  <nav aria-label="Mobil menü" style="position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--color-bg);border-top:2px solid var(--color-divider);display:grid;grid-template-columns:repeat(5,1fr)">
+    <sc-for list="{{ bottomNav }}" as="b" hint-placeholder-count="5">
+      <button onClick="{{ b.onClick }}" aria-current="{{ b.current }}" style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:0;border-top:3px solid {{ b.border }};margin-top:-2px;color:{{ b.color }};font-size:11px;font-weight:600;cursor:pointer">{{ b.icon }}{{ b.label }}</button>
+    </sc-for>
+  </nav>
+</sc-if>
+<sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeMenu }}" style="position:fixed;inset:0;z-index:60;background:color-mix(in srgb,var(--color-neutral-900) 50%,transparent)"></div>
+  <div role="dialog" aria-label="Menü" style="position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--color-bg);border-top:2px solid var(--color-text);padding:16px;display:flex;flex-direction:column">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="8"><button onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:12px;padding:14px 8px;border:0;border-bottom:1px solid var(--color-divider);background:none;color:{{ n.menuFg }};font-size:15px;font-weight:600;text-align:left;cursor:pointer">{{ n.icon }}{{ n.label }}</button></sc-for>
+  </div>
+</sc-if>
+
+<sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;z-index:60;background:color-mix(in srgb,var(--color-neutral-900) 40%,transparent)"></div>
+  <aside role="dialog" aria-modal="true" aria-labelledby="dr-t" style="position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);z-index:61;background:var(--color-bg);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:2px solid var(--color-divider)"><h6 style="margin:0;color:var(--color-neutral-700)">Randevu detayı</h6><button onClick="{{ closeDrawer }}" aria-label="Kapat" class="btn btn-icon">{{ ic.x }}</button></div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:16px;flex:1">
+      <div><span class="{{ sel.tagClass }}" style="gap:5px">{{ sel.statusIcon }} {{ sel.statusLabel }}</span><h2 id="dr-t" style="font-size:28px;margin:10px 0 2px">{{ sel.name }}</h2><a href="tel:05320000000" style="font-size:14px;color:var(--color-text);display:flex;gap:6px;align-items:center">{{ ic.sm.phone }} {{ sel.phone }}</a></div>
+      <dl style="margin:0;display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--color-text)">
+        <sc-for list="{{ sel.cells }}" as="c" hint-placeholder-count="6"><div style="padding:12px 12px 12px 0;border-bottom:1px solid var(--color-divider)"><dt style="font-size:12px;color:var(--color-neutral-700)">{{ c.k }}</dt><dd style="margin:2px 0 0;font-weight:700">{{ c.v }}</dd></div></sc-for>
+      </dl>
+      <div><div style="font-size:12px;color:var(--color-neutral-700)">Not</div><div style="font-size:14px">{{ sel.noteLabel }}</div></div>
+      <sc-if value="{{ sel.isPast }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;font-size:13px;color:var(--color-neutral-700);background:var(--color-surface);padding:12px">{{ ic.sm.lock }} Bu randevu geçmişte kaldı veya kapandı; düzenlenemez.</div></sc-if>
+    </div>
+    <div style="padding:16px 20px;border-top:2px solid var(--color-divider);display:flex;flex-direction:column;gap:8px">
+      <sc-if value="{{ sel.canComplete }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ sel.onComplete }}" class="btn btn-primary" style="justify-content:flex-start;gap:10px;padding:12px">{{ ic.checkC }} Tamamlandı olarak işaretle</button>
+        <button onClick="{{ sel.onNoShow }}" class="btn btn-secondary" style="justify-content:flex-start;gap:10px;padding:12px">{{ ic.ban }} Müşteri gelmedi</button>
+      </sc-if>
+      <sc-if value="{{ sel.canEdit }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ sel.onEdit }}" class="btn btn-secondary" style="justify-content:flex-start;gap:10px;padding:12px">{{ ic.edit }} Düzenle</button>
+        <button onClick="{{ sel.onCancel }}" class="btn btn-secondary" style="justify-content:flex-start;gap:10px;padding:12px;color:var(--color-accent-700);border-color:var(--color-accent-700)">{{ ic.xC }} Randevuyu iptal et</button>
+      </sc-if>
+    </div>
+  </aside>
+</sc-if>
+
+<sc-if value="{{ formOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:80" onClick="{{ closeForm }}">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="fm-t" onClick="{{ stop }}" onSubmit="{{ submitForm }}" style="width:min(560px,100%);max-height:92vh;overflow:auto;background:var(--color-bg);padding:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><div id="fm-t" class="dialog-title">{{ formTitle }}</div><button type="button" onClick="{{ closeForm }}" aria-label="Kapat" class="btn btn-icon">{{ ic.x }}</button></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+        <div class="field"><label for="f-n">Müşteri adı *</label><input id="f-n" class="input" value="{{ f.name }}" onChange="{{ f.onName }}" aria-invalid="{{ f.nameErr }}" style="border-color:{{ f.nameBorder }}"><sc-if value="{{ f.nameErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:var(--color-accent-700);margin-top:4px">Müşteri adı gerekli.</div></sc-if></div>
+        <div class="field"><label for="f-p">Telefon *</label><input id="f-p" class="input" type="tel" value="{{ f.phone }}" onChange="{{ f.onPhone }}" placeholder="05xx xxx xx xx" aria-invalid="{{ f.phoneErr }}" style="border-color:{{ f.phoneBorder }}"><sc-if value="{{ f.phoneErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:var(--color-accent-700);margin-top:4px">Telefon gerekli.</div></sc-if></div>
+        <div class="field"><label for="f-s">Hizmet</label><select id="f-s" class="input" value="{{ f.svc }}" onChange="{{ f.onSvc }}"><sc-for list="{{ svcOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.value }}" selected="{{ o.selected }}">{{ o.label }}</option></sc-for></select></div>
+        <div class="field"><label for="f-d">Tarih</label><select id="f-d" class="input" value="{{ f.d }}" onChange="{{ f.onDate }}"><sc-for list="{{ fDateOpts }}" as="o" hint-placeholder-count="10"><option value="{{ o.value }}" selected="{{ o.selected }}">{{ o.label }}</option></sc-for></select></div>
+      </div>
+      <div class="field">
+        <label>Saat <span style="color:var(--color-neutral-600)">· {{ f.slotHint }}</span></label>
+        <sc-if value="{{ f.noSlots }}" hint-placeholder-val="{{ false }}"><div style="padding:14px;border:1px dashed var(--color-divider);font-size:13px;color:var(--color-neutral-700)">Bu tarihte seçili hizmet için uygun saat yok. Başka bir tarih seç.</div></sc-if>
+        <div role="group" aria-label="Saat" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px">
+          <sc-for list="{{ f.slots }}" as="t" hint-placeholder-count="12"><button type="button" onClick="{{ t.onClick }}" aria-pressed="{{ t.pressed }}" style="height:38px;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.fg }};font-size:13px;font-weight:700;cursor:pointer">{{ t.time }}</button></sc-for>
+        </div>
+        <sc-if value="{{ f.timeErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:var(--color-accent-700);margin-top:4px">Bir saat seç.</div></sc-if>
+      </div>
+      <div class="field"><label for="f-note">Not</label><textarea id="f-note" class="input" value="{{ f.note }}" onChange="{{ f.onNote }}" placeholder="Örn. Hassas saç derisi" style="min-height:70px"></textarea></div>
+      <div style="display:flex;gap:8px;font-size:12px;color:var(--color-neutral-700)">{{ ic.sm.info }} Randevu doğrudan oluşturulur ve müşteriye SMS ile bilgi gider.</div>
+      <div class="dialog-actions"><button type="button" onClick="{{ closeForm }}" class="btn btn-secondary">Vazgeç</button><button type="submit" disabled="{{ f.saving }}" class="btn btn-primary">{{ f.cta }}</button></div>
+    </form>
+  </div>
+</sc-if>
+
+<sc-if value="{{ svcFormOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:80" onClick="{{ closeSvcForm }}">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="sf-t" onClick="{{ stop }}" onSubmit="{{ saveSvc }}" style="background:var(--color-bg);padding:24px">
+      <div id="sf-t" class="dialog-title">{{ sf.title }}</div>
+      <div class="field"><label for="sf-n">Hizmet adı</label><input id="sf-n" class="input" value="{{ sf.name }}" onChange="{{ sf.onName }}" placeholder="Örn. Keratin bakımı"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field"><label for="sf-d">Süre (dakika)</label><input id="sf-d" class="input" type="number" min="15" step="15" value="{{ sf.dur }}" onChange="{{ sf.onDur }}"></div>
+        <div class="field"><label for="sf-p">Fiyat (TL)</label><input id="sf-p" class="input" type="number" min="0" step="50" value="{{ sf.price }}" onChange="{{ sf.onPrice }}"></div>
+      </div>
+      <div class="dialog-actions"><button type="button" onClick="{{ closeSvcForm }}" class="btn btn-secondary">Vazgeç</button><button type="submit" disabled="{{ sf.invalid }}" class="btn btn-primary">Kaydet</button></div>
+    </form>
+  </div>
+</sc-if>
+
+<sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:85" onClick="{{ closeConfirm }}">
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="cf-t" onClick="{{ stop }}" style="background:var(--color-bg);padding:24px">
+      <div style="width:44px;height:44px;background:var(--color-accent-100);color:var(--color-accent-700);display:grid;place-items:center">{{ ic.alert }}</div>
+      <div id="cf-t" class="dialog-title">{{ cf.title }}</div>
+      <div class="dialog-body">{{ cf.body }}</div>
+      <div class="dialog-actions"><button onClick="{{ closeConfirm }}" class="btn btn-secondary">Vazgeç</button><button onClick="{{ cf.onOk }}" class="btn btn-primary">{{ cf.cta }}</button></div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" aria-live="polite" style="position:fixed;left:{{ toastLeft }};bottom:{{ toastBottom }};z-index:95;background:var(--color-neutral-900);color:var(--color-bg);padding:14px 18px;display:flex;gap:10px;align-items:center;font-size:14px;box-shadow:var(--shadow-lg);max-width:calc(100vw - 48px)"><span style="color:var(--color-accent-400)">{{ ic.check }}</span>{{ toastMsg }}</div>
+</sc-if>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Giriş&quot;,&quot;Dashboard&quot;,&quot;Takvim&quot;,&quot;Randevular&quot;,&quot;Yeni randevu formu&quot;,&quot;Hizmetler&quot;,&quot;Portföy&quot;,&quot;Bildirimler&quot;,&quot;Profil&quot;,&quot;Çalışma Saatleri&quot;],&quot;default&quot;:&quot;Dashboard&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototip&quot;}}">
+const ICONS={
+star:[{pg:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"}],
+search:[{c:[11,11,8]},"m21 21-4.3-4.3"],
+cal:[{r:[3,4,18,18,2]},"M16 2v4","M8 2v4","M3 10h18"],
+calCheck:[{r:[3,4,18,18,2]},"M16 2v4","M8 2v4","M3 10h18","m9 16 2 2 4-4"],
+clock:[{c:[12,12,10]},{pl:"12 6 12 12 16 14"}],
+bell:["M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9","M10.3 21a1.94 1.94 0 0 0 3.4 0"],
+user:["M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2",{c:[12,7,4]}],
+x:["M18 6 6 18","m6 6 12 12"],cl:["m15 18-6-6 6-6"],cr:["m9 18 6-6-6-6"],ar:["M5 12h14","m12 5 7 7-7 7"],
+check:["M20 6 9 17l-5-5"],checkC:[{c:[12,12,10]},"m9 12 2 2 4-4"],xC:[{c:[12,12,10]},"m15 9-6 6","m9 9 6 6"],ban:[{c:[12,12,10]},"m4.9 4.9 14.2 14.2"],
+alert:["m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3","M12 9v4","M12 17h.01"],
+scissors:[{c:[6,6,3]},{c:[6,18,3]},"M20 4 8.12 15.88","M14.47 14.48 20 20","M8.12 8.12 12 12"],
+dash:[{r:[3,3,7,9]},{r:[14,3,7,5]},{r:[14,12,7,9]},{r:[3,16,7,5]}],
+list:["M8 6h13","M8 12h13","M8 18h13","M3 6h.01","M3 12h.01","M3 18h.01"],
+img:[{r:[3,3,18,18,2]},{c:[9,9,2]},"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"],
+plus:["M5 12h14","M12 5v14"],
+edit:["M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"],
+trash:["M3 6h18","M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6","M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"],
+eye:["M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z",{c:[12,12,3]}],
+lock:[{r:[3,11,18,11,2]},"M7 11V7a5 5 0 0 1 10 0v4"],
+logout:["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4",{pl:"16 17 21 12 16 7"},"M21 12H9"],
+ext:["M15 3h6v6","M10 14 21 3","M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"],
+menu:["M4 6h16","M4 12h16","M4 18h16"],
+info:[{c:[12,12,10]},"M12 16v-4","M12 8h.01"],
+phone:["M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"],
+camera:["M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",{c:[12,13,3]}],
+store:["m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7","M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8","M2 7h20","M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"]
+};
+function mk(n,s,fill){const d=ICONS[n];return React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:fill?'currentColor':'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round','aria-hidden':'true',focusable:'false',style:{display:'block',flex:'none'}},d.map((e,i)=>typeof e==='string'?React.createElement('path',{key:i,d:e}):e.c?React.createElement('circle',{key:i,cx:e.c[0],cy:e.c[1],r:e.c[2]}):e.r?React.createElement('rect',{key:i,x:e.r[0],y:e.r[1],width:e.r[2],height:e.r[3],rx:e.r[4]||0}):e.pl?React.createElement('polyline',{key:i,points:e.pl}):React.createElement('polygon',{key:i,points:e.pg})));}
+const IC={};Object.keys(ICONS).forEach(n=>IC[n]=mk(n,18));
+IC.sm={check:mk('check',14),lock:mk('lock',14),info:mk('info',14),phone:mk('phone',14),checkT:mk('check',12),xT:mk('x',12),ban:mk('ban',12),cal:mk('calCheck',12),clock:mk('clock',12)};
+IC.starF=mk('star',14,true);IC.lg={cal:mk('cal',28)};
+const MONTHS=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+const WD=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];const WD_S=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+const fmt=n=>Number(n).toLocaleString('tr-TR')+' TL';const pad=n=>String(n).padStart(2,'0');
+const toMin=t=>{const [h,m]=t.split(':').map(Number);return h*60+m;};const toT=m=>pad(Math.floor(m/60))+':'+pad(m%60);
+const TODAY=7,NOW=700,DAY0=540,DAY1=1140;
+const SVCS0=[{id:'balayage',name:'Balayage',dur:180,price:2500,active:true},{id:'kesim',name:'Saç Kesimi',dur:45,price:600,active:true},{id:'boya',name:'Boya',dur:120,price:1800,active:true},{id:'ombre',name:'Ombre',dur:150,price:2200,active:true},{id:'rofle',name:'Röfle',dur:120,price:1900,active:true},{id:'fon',name:'Fön',dur:30,price:350,active:true},{id:'gelin',name:'Gelin Saçı',dur:120,price:3500,active:false}];
+const R=(id,d,time,name,svc,status,src,note)=>({id,d,time,name,phone:`053${id%10} 4${pad(id)} ${pad(10+id)} ${pad(30+id)}`,svc,status:status||'BOOKED',src:src||'online',note:note||''});
+const APPTS0=[R(1,7,'09:00','Zeynep Baş','kesim','COMPLETED'),R(2,7,'10:00','Elif Demir','boya'),R(3,7,'13:00','Mert Güneş','fon'),R(4,7,'13:30','Selin Aksoy','ombre','BOOKED','online','Önceki boyası 3 ay önce'),R(5,7,'16:00','Deniz Kara','kesim','BOOKED','manual'),R(6,7,'17:00','Ece Turan','fon'),R(7,7,'17:30','Buse Öz','kesim'),R(8,7,'18:30','İpek Yıldız','fon'),
+R(9,5,'10:00','Melis Ak','gelin','COMPLETED'),R(10,5,'14:00','Ceren Uz','kesim','COMPLETED'),R(11,5,'16:00','Aslı Er','boya','NO_SHOW'),R(12,6,'09:30','Gizem Tan','balayage','COMPLETED'),R(13,6,'13:00','Nil Sezer','fon','CANCELLED'),R(14,6,'14:00','Damla Koç','rofle','COMPLETED'),R(15,6,'17:00','Burak Ay','kesim','COMPLETED'),
+R(16,8,'09:00','Pelin Su','ombre'),R(17,8,'13:00','Tuğba Ol','kesim'),R(18,8,'15:00','Hande Ek','boya'),R(19,9,'10:00','Sena Ilgın','rofle'),R(20,9,'14:30','Ayla Kurt','fon'),R(21,9,'16:00','Merve Ön','kesim'),R(22,10,'10:00','Yasemin Ar','gelin','BOOKED','manual'),R(23,10,'13:00','Cansu Yel','balayage'),R(24,12,'10:00','Zeynep Baş','balayage'),R(25,13,'11:00','Irmak Toprak','kesim')];
+const HOURS0=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'].map((name,i)=>({name,open:i<6,s:i===5?'10:00':'09:00',e:i===4?'20:00':i===5?'18:00':'19:00',bs:'12:00',be:'13:00'}));
+const STATUS={BOOKED:{label:'Randevu alındı',cls:'tag tag-accent',icon:IC.sm.cal},COMPLETED:{label:'Tamamlandı',cls:'tag tag-neutral',icon:IC.sm.checkT},CANCELLED:{label:'İptal edildi',cls:'tag tag-outline',icon:IC.sm.xT},NO_SHOW:{label:'Gelmedi',cls:'tag tag-neutral',icon:IC.sm.ban}};
+const PF0=[['Zeynep Baş','Balayage',5,'28 Eyl',true,true],['Elif Demir','Ombre',5,'3 Eyl',true,true],['Selin Aksoy','Saç Kesimi',4,'19 Eyl',true,false],['Gizem Tan','Balayage',5,'6 Eki',true,false],['Deniz Kara','Röfle',5,'22 Ağu',false,false],['Ece Turan','Boya',5,'14 Ağu',true,true],['Melis Ak','Gelin Saçı',5,'5 Eki',false,false],['Buse Öz','Balayage',4,'9 Ağu',true,true]].map(([name,service,rating,date,consent,published],i)=>({id:i,name,service,rating,date,consent,published}));
+const NOTIFS0=[{id:1,t:'new',title:'Yeni randevu',body:'Zeynep Baş · Balayage · 12 Ekim, 10:00',time:'5 dk önce',unread:true,appt:24},{id:2,t:'cancel',title:'Randevu iptal edildi',body:'Nil Sezer · Fön · 6 Ekim, 13:00 — saat tekrar müsait.',time:'Dün',unread:true,appt:13},{id:3,t:'review',title:'Yeni değerlendirme · 5 yıldız',body:'Gizem Tan profilde paylaşmaya izin verdi. Portföye ekleyebilirsin.',time:'Dün',unread:false,go:'portfolio'},{id:4,t:'new',title:'Yeni randevu',body:'Irmak Toprak · Saç Kesimi · 13 Ekim, 11:00',time:'2 gün önce',unread:false,appt:25},{id:5,t:'remind',title:'Yarınki randevular',body:'8 Ekim için 3 randevun var.',time:'2 gün önce',unread:false}];
+const N_IC={new:IC.calCheck,cancel:IC.xC,review:mk('star',18),remind:IC.clock};
+const dateLabel=d=>`${d} ${MONTHS[9]} ${WD[new Date(2026,9,d).getDay()]}`;
+
+class Component extends DCLogic {
+  state={w:typeof window!=='undefined'?window.innerWidth:1280,screen:'dashboard',appts:APPTS0,svcs:SVCS0,hours:HOURS0,closed:[{d:15,note:'Personel eğitimi'}],pf:PF0,notifs:NOTIFS0,
+    calView:'day',calDay:TODAY,sel:null,form:null,formTried:false,saving:false,svcForm:null,confirm:null,apTab:'today',apQ:'',pfFilter:'all',menu:false,cdDate:'20',cdNote:'',toast:null};
+  componentDidMount(){this.onResize=()=>this.setState({w:window.innerWidth});window.addEventListener('resize',this.onResize);
+    this.onKey=e=>{if(e.key!=='Escape')return;const s=this.state;if(s.confirm)this.setState({confirm:null});else if(s.form)this.setState({form:null});else if(s.svcForm)this.setState({svcForm:null});else if(s.sel)this.setState({sel:null});else if(s.menu)this.setState({menu:false});};
+    window.addEventListener('keydown',this.onKey);if(this.props.startScreen)this.jump(this.props.startScreen);}
+  componentDidUpdate(pp){if(pp.startScreen!==this.props.startScreen)this.jump(this.props.startScreen);}
+  componentWillUnmount(){window.removeEventListener('resize',this.onResize);window.removeEventListener('keydown',this.onKey);clearTimeout(this.tt);}
+  jump(k){const map={'Giriş':'login','Dashboard':'dashboard','Takvim':'calendar','Randevular':'appointments','Hizmetler':'services','Portföy':'portfolio','Bildirimler':'notifications','Profil':'profile','Çalışma Saatleri':'hours'};
+    if(k==='Yeni randevu formu'){this.go('calendar');this.openForm();return;}if(map[k])this.go(map[k]);}
+  go(screen,x={}){this.setState({screen,menu:false,...x});try{window.scrollTo(0,0)}catch(e){}}
+  toast(m){clearTimeout(this.tt);this.setState({toast:m});this.tt=setTimeout(()=>this.setState({toast:null}),3200);}
+  svc(id){return this.state.svcs.find(s=>s.id===id)||SVCS0.find(s=>s.id===id);}
+  dayHours(d){const dow=(new Date(2026,9,d).getDay()+6)%7;const h=this.state.hours[dow];const closed=!h.open||this.state.closed.some(c=>c.d===d);return {...h,closed,S:toMin(h.s),E:toMin(h.e),BS:toMin(h.bs),BE:toMin(h.be)};}
+  busy(d,exceptId){return this.state.appts.filter(a=>a.d===d&&a.id!==exceptId&&a.status!=='CANCELLED').map(a=>{const s=toMin(a.time);return [s,s+this.svc(a.svc).dur];});}
+  freeStarts(d,dur,exceptId){const h=this.dayHours(d);if(h.closed)return [];const b=this.busy(d,exceptId);const out=[];
+    for(let m=h.S;m+dur<=h.E;m+=30){if(d===TODAY&&m<=NOW)continue;const e=m+dur;if(m<h.BE&&e>h.BS)continue;if(b.some(([s,x])=>m<x&&e>s))continue;out.push(toT(m));}return out;}
+  openForm(a,preset){const s=this.state;if(a)this.setState({sel:null,form:{id:a.id,name:a.name,phone:a.phone,svc:a.svc,d:a.d,time:a.time,note:a.note},formTried:false});
+    else this.setState({form:{id:null,name:'',phone:'',svc:'kesim',d:preset?preset.d:(()=>{let d=Math.max(s.calDay,TODAY);while(d<31&&(this.dayHours(d).closed||this.freeStarts(d,45).length===0))d++;return d;})(),time:preset?preset.time:null,note:''},formTried:false});}
+  setStatus(id,status,msg){this.setState(s=>({appts:s.appts.map(a=>a.id===id?{...a,status}:a),sel:null,confirm:null}));this.toast(msg);}
+  askCancel(a){this.setState({confirm:{title:'Randevu iptal edilsin mi?',body:`${a.name} · ${this.svc(a.svc).name} · ${a.d} Ekim, ${a.time}. Bu işlem geri alınamaz; müşteriye bildirim gönderilir ve saat tekrar müsait olur.`,cta:'Randevuyu iptal et',ok:()=>this.setStatus(a.id,'CANCELLED','Randevu iptal edildi. Müşteriye bildirim gönderildi.')}});}
+  view(a){const v=this.svc(a.svc),st=STATUS[a.status],s=toMin(a.time);const past=a.d<TODAY||a.status!=='BOOKED';const started=a.d<TODAY||(a.d===TODAY&&s<=NOW);
+    const canComplete=a.status==='BOOKED'&&started,canEdit=a.status==='BOOKED'&&!started;
+    return {...a,service:v.name,dur:v.dur,durLabel:v.dur+' dk',priceLabel:fmt(v.price),start:s,endLabel:'– '+toT(s+v.dur),statusLabel:st.label,tagClass:st.cls,statusIcon:st.icon,
+      dateShort:`${a.d} Eki ${WD_S[new Date(2026,9,a.d).getDay()]}`,srcLabel:a.src==='manual'?'Manuel':'Online',isPast:past&&!canComplete,canComplete,canEdit,noEdit:!canEdit,noCancel:!canEdit,noComplete:!canComplete,
+      dim:a.status==='CANCELLED'||a.status==='NO_SHOW'?'0.6':'1',
+      onView:()=>this.setState({sel:a.id}),onEdit:()=>this.openForm(a),onCancel:()=>this.askCancel(a),
+      onComplete:()=>this.setStatus(a.id,'COMPLETED',`${a.name} · ${v.name} tamamlandı. Müşteriden değerlendirme istendi.`),
+      onNoShow:()=>this.setStatus(a.id,'NO_SHOW',`${a.name} gelmedi olarak işaretlendi.`)};}
+  block(a,pxPerMin,compact){const v=this.view(a);const top=(v.start-DAY0)*pxPerMin,h=Math.max(v.dur*pxPerMin-2,compact?18:40);const sel=this.state.sel===a.id;
+    const c=a.status==='COMPLETED'?{bg:'var(--color-neutral-200)',fg:'var(--color-neutral-800)',border:'var(--color-neutral-300)'}:a.status==='BOOKED'?{bg:'var(--color-surface)',fg:'var(--color-text)',border:'var(--color-text)'}:{bg:'var(--color-bg)',fg:'var(--color-neutral-600)',border:'var(--color-neutral-300)'};
+    if(sel)Object.assign(c,{bg:'var(--color-accent)',fg:'var(--color-bg)',border:'var(--color-accent)'});
+    return {...v,...c,top:top+'px',height:h+'px',range:`${a.time}–${toT(v.start+v.dur)}`,deco:a.status==='CANCELLED'?'line-through':'none',aria:`${a.time} ${a.name}, ${v.service}, ${v.statusLabel}`,onClick:()=>this.setState({sel:a.id})};}
+  renderVals(){
+    const st=this.state,w=st.w,mob=w<768,rail=w>=768&&w<1100;const A='var(--color-accent)',T='var(--color-text)',BG='var(--color-bg)';
+    const unread=st.notifs.filter(n=>n.unread).length;
+    const NAV=[['Dashboard','dashboard','dash'],['Takvim','calendar','cal'],['Randevular','appointments','list'],['Hizmetler','services','scissors'],['Portföy','portfolio','img'],['Bildirimler','notifications','bell'],['Profil','profile','store'],['Çalışma Saatleri','hours','clock']];
+    const navItems=NAV.map(([label,k,i])=>{const on=st.screen===k;return {label,icon:IC[i],current:on?'page':undefined,bg:on?T:'transparent',fg:on?BG:T,hover:on?T:'var(--color-neutral-200)',menuFg:on?A:T,badge:k==='notifications'&&unread?unread:null,badgeShown:k==='notifications'&&unread>0&&!rail,onClick:()=>this.go(k)};});
+    const bottomNav=[['Panel','dashboard','dash'],['Takvim','calendar','cal'],['Randevular','appointments','list'],['Bildirim','notifications','bell'],['Menü','menu','menu']].map(([label,k,i])=>{const on=k==='menu'?st.menu:st.screen===k;
+      return {label,icon:IC[i],current:on?'page':undefined,color:on?A:T,border:on?A:'transparent',onClick:()=>k==='menu'?this.setState({menu:true}):this.go(k)};});
+    const titles={dashboard:['Dashboard','Çarşamba, 7 Ekim 2026'],calendar:['Takvim','Randevular, boş ve bloklu saatler'],appointments:['Randevular','Tüm randevular'],services:['Hizmetler',`${st.svcs.filter(s=>s.active).length} aktif hizmet`],portfolio:['Portföy','Herkese açık profilde gösterilen işler'],notifications:['Bildirimler',`${unread} okunmamış`],profile:['Salon profili','Müşterilerin gördüğü bilgiler'],hours:['Çalışma saatleri','Boş slotlar bu saatlerden üretilir']};
+    const views=st.appts.map(a=>this.view(a));
+    const today=views.filter(a=>a.d===TODAY&&a.status!=='CANCELLED').sort((a,b)=>a.start-b.start);
+    const upcoming=views.filter(a=>a.status==='BOOKED'&&(a.d>TODAY||(a.d===TODAY&&a.start>NOW)));
+    const week=views.filter(a=>a.d>=5&&a.d<=11);
+    const stats=[['Bugünkü Randevular',today.length,'7 Ekim','calCheck','appointments','today'],['Yaklaşan',upcoming.length,'Bugün ve sonrası','clock','appointments','up'],['Tamamlanan',week.filter(a=>a.status==='COMPLETED').length,'Bu hafta','checkC','appointments','past'],['İptal',week.filter(a=>a.status==='CANCELLED').length,'Bu hafta','xC','appointments','past']]
+      .map(([label,value,sub,i,k,tab],idx)=>({label,value,sub,icon:IC[i],color:idx===3&&value?'var(--color-accent-700)':T,onClick:()=>this.go(k,{apTab:tab})}));
+    const h7=this.dayHours(TODAY);const bookedMin=today.reduce((s,a)=>s+a.dur,0);const openMin=(h7.E-h7.S)-(h7.BE-h7.BS);const occ=Math.round(bookedMin/openMin*100);
+    // calendar day
+    const PX=88/60;const dh=this.dayHours(st.calDay);const dayAppts=st.appts.filter(a=>a.d===st.calDay);const busy=this.busy(st.calDay);
+    const daySlots=[];for(let m=DAY0;m<DAY1;m+=30){const inBreak=m>=dh.BS&&m<dh.BE,outside=m<dh.S||m>=dh.E,past=st.calDay<TODAY||(st.calDay===TODAY&&m<NOW);const taken=busy.some(([s,e])=>m<e&&m+30>s);
+      const blocked=inBreak||outside;const t=toT(m);
+      daySlots.push({top:(m-DAY0)*PX+'px',line:m%60?'dashed':'solid',disabled:blocked||taken||past,bg:blocked?'repeating-linear-gradient(135deg,var(--color-neutral-200) 0 6px,var(--color-bg) 6px 12px)':'transparent',cursor:blocked||taken||past?'default':'pointer',
+        label:blocked?(inBreak?'Mola · bloklu':'Kapalı'):taken?'':past?'':React.createElement(React.Fragment,null,IC.plus,`${t} · Randevu ekle`),labelOpacity:blocked?'1':'0',
+        aria:blocked?`${t} bloklu`:taken?`${t} dolu`:`${t} boş, randevu ekle`,onClick:()=>this.openForm(null,{d:st.calDay,time:t})});}
+    const wkStart=st.calDay-((new Date(2026,9,st.calDay).getDay()+6)%7);
+    const weekCols=[0,1,2,3,4,5,6].map(i=>{const d=wkStart+i;const hh=this.dayHours(d);const list=st.appts.filter(a=>a.d===d);const isT=d===TODAY;
+      return {d,wd:WD_S[new Date(2026,9,d).getDay()],count:hh.closed?'Kapalı':`${list.filter(a=>a.status!=='CANCELLED').length} randevu`,closed:hh.closed,headBg:isT?T:'transparent',headFg:isT?BG:T,
+        bodyBg:hh.closed?'repeating-linear-gradient(135deg,var(--color-neutral-200) 0 6px,var(--color-bg) 6px 12px)':'transparent',
+        blocks:list.map(a=>this.block(a,66/60,true)),onOpenDay:()=>this.setState({calView:'day',calDay:d})};});
+    const step=st.calView==='day'?1:7;
+    // appointments list
+    const q=st.apQ.trim().toLocaleLowerCase('tr');
+    const tabF={today:a=>a.d===TODAY,up:a=>a.status==='BOOKED'&&a.d>=TODAY,past:a=>a.d<TODAY||a.status!=='BOOKED',all:()=>true};
+    const apList=views.filter(tabF[st.apTab]).filter(a=>!q||a.name.toLocaleLowerCase('tr').includes(q)).sort((a,b)=>st.apTab==='past'?(b.d-a.d)||(b.start-a.start):(a.d-b.d)||(a.start-b.start));
+    const apTabs=[['Bugün','today'],['Yaklaşan','up'],['Geçmiş','past'],['Tümü','all']].map(([l,k])=>({label:`${l} (${views.filter(tabF[k]).length})`,selected:st.apTab===k,border:st.apTab===k?A:'transparent',color:st.apTab===k?T:'var(--color-neutral-700)',onClick:()=>this.setState({apTab:k})}));
+    // selected
+    const sa=st.sel?views.find(a=>a.id===st.sel):null;
+    const sel=sa?{...sa,noteLabel:sa.note||'—',cells:[{k:'Hizmet',v:sa.service},{k:'Fiyat',v:sa.priceLabel},{k:'Tarih',v:dateLabel(sa.d)},{k:'Saat',v:`${sa.time} ${sa.endLabel}`},{k:'Süre',v:sa.durLabel},{k:'Kaynak',v:sa.srcLabel}]}:{};
+    // form
+    const f0=st.form;let f={};
+    if(f0){const v=this.svc(f0.svc);const starts=this.freeStarts(Number(f0.d),v.dur,f0.id);const upd=x=>this.setState(s=>({form:{...s.form,...x}}));const tried=st.formTried;
+      f={...f0,nameErr:tried&&!f0.name.trim(),phoneErr:tried&&!f0.phone.trim(),timeErr:tried&&!f0.time,saving:st.saving,cta:st.saving?'Kaydediliyor…':f0.id?'Değişiklikleri kaydet':'Randevuyu oluştur',
+        noSlots:starts.length===0,slotHint:`${v.dur} dk · ${starts.length} uygun başlangıç`,
+        onName:e=>upd({name:e.target.value}),onPhone:e=>upd({phone:e.target.value}),onSvc:e=>upd({svc:e.target.value,time:null}),onDate:e=>upd({d:Number(e.target.value),time:null}),onNote:e=>upd({note:e.target.value}),
+        slots:starts.map(t=>({time:t,pressed:f0.time===t,bg:f0.time===t?A:BG,fg:f0.time===t?BG:T,border:f0.time===t?A:'var(--color-divider)',onClick:()=>upd({time:t})}))};
+      f.nameBorder=f.nameErr?'var(--color-accent-700)':'var(--color-divider)';f.phoneBorder=f.phoneErr?'var(--color-accent-700)':'var(--color-divider)';}
+    const dateOpts=[];for(let d=TODAY;d<=31;d++){if(!this.dayHours(d).closed)dateOpts.push({value:String(d),label:dateLabel(d)+(d===TODAY?' (bugün)':'')});}
+    const sf0=st.svcForm;const sfU=x=>this.setState(s=>({svcForm:{...s.svcForm,...x}}));
+    const tog=on=>({track:on?A:'var(--color-neutral-400)',knob:on?'22px':'2px'});
+    const pfList=st.pf.filter(p=>st.pfFilter==='all'||(st.pfFilter==='pub'?p.published:!p.consent)).map(p=>({...p,lid:'pf-'+p.id,noConsent:!p.consent,...tog(p.published&&p.consent),cursor:p.consent?'pointer':'not-allowed',
+      imgOpacity:p.consent?'1':'0.5',tagClass:p.consent?(p.published?'tag tag-accent':'tag tag-neutral'):'tag tag-neutral',tagIcon:p.consent?(p.published?IC.sm.checkT:null):IC.sm.lock,tagLabel:p.consent?(p.published?'Yayında':'Gizli'):'İzin yok',
+      switchTitle:p.consent?'Profilde göster':'Müşteri paylaşım izni vermedi',onToggle:()=>{if(!p.consent)return;this.setState(s=>({pf:s.pf.map(x=>x.id===p.id?{...x,published:!x.published}:x)}));this.toast(p.published?'Profilden kaldırıldı.':'Profilde yayınlandı.');}}));
+    const cf=st.confirm||{};
+    return {ic:IC,is:{login:st.screen==='login',dashboard:st.screen==='dashboard',calendar:st.screen==='calendar',appointments:st.screen==='appointments',services:st.screen==='services',hours:st.screen==='hours',portfolio:st.screen==='portfolio',notifications:st.screen==='notifications',profile:st.screen==='profile'},
+      inApp:st.screen!=='login',doLogin:e=>{e.preventDefault();this.go('dashboard');this.toast('Hoş geldin, Ayşe.');},logout:()=>this.go('login'),
+      isMobile:mob,showSidebar:!mob,showLabels:!rail,sideW:rail?'72px':'248px',navItems,bottomNav,menuOpen:st.menu,closeMenu:()=>this.setState({menu:false}),
+      pageTitle:(titles[st.screen]||['',''])[0],pageSub:(titles[st.screen]||['',''])[1],unread,hasUnread:unread>0,noUnread:unread===0,bellLabel:`Bildirimler, ${unread} okunmamış`,
+      goNotifs:()=>this.go('notifications'),goCalendar:()=>this.go('calendar',{calDay:TODAY,calView:'day'}),goServices:()=>this.go('services'),goHours:()=>this.go('hours'),newAppt:()=>this.openForm(),
+      stats,nextList:today,occupancy:occ,occupancyW:occ+'%',freeToday:this.freeStarts(TODAY,30).length,
+      notifPreview:st.notifs.slice(0,3).map(n=>({...n,icon:N_IC[n.t],weight:n.unread?800:500})),
+      viewOpts:[['Gün','day'],['Hafta','week']].map(([label,k])=>({label,pressed:st.calView===k,bg:st.calView===k?A:'transparent',fg:st.calView===k?BG:T,onClick:()=>this.setState({calView:k})})),
+      calPrev:()=>this.setState(s=>({calDay:Math.max(1,s.calDay-step)})),calNext:()=>this.setState(s=>({calDay:Math.min(31,s.calDay+step)})),calToday:()=>this.setState({calDay:TODAY}),
+      calTitle:st.calView==='day'?`${dateLabel(st.calDay)}, 2026`:`${Math.max(1,wkStart)}–${Math.min(31,wkStart+6)} Ekim 2026`,
+      dayView:st.calView==='day',weekView:st.calView==='week',dayClosed:dh.closed,dayOpen:!dh.closed,
+      hourLabels:[9,10,11,12,13,14,15,16,17,18].map(h=>pad(h)+':00'),daySlots,dayBlocks:dayAppts.map(a=>this.block(a,PX,false)),showNow:st.calDay===TODAY,nowTop:(NOW-DAY0)*PX+'px',weekCols,
+      apTabs,apQ:st.apQ,onApQ:e=>this.setState({apQ:e.target.value}),apList,apEmpty:apList.length===0,apTable:!mob&&apList.length>0,apCards:mob&&apList.length>0,
+      drawerOpen:!!sa,sel,closeDrawer:()=>this.setState({sel:null}),
+      formOpen:!!f0,f,formTitle:f0&&f0.id?'Randevuyu düzenle':'Yeni randevu',closeForm:()=>this.setState({form:null}),stop:e=>e.stopPropagation(),
+      svcOpts:st.svcs.filter(s=>s.active).map(s=>({value:s.id,selected:!!f0&&f0.svc===s.id,label:`${s.name} · ${s.dur} dk · ${fmt(s.price)}`})),dateOpts:dateOpts.map(o=>({...o,cdSel:o.value===String(st.cdDate)})),fDateOpts:dateOpts.map(o=>({...o,selected:!!f0&&String(f0.d)===o.value})),navPad:rail?'12px 8px':'12px',navJustify:rail?'center':'flex-start',
+      submitForm:e=>{e.preventDefault();const fm=this.state.form;if(!fm.name.trim()||!fm.phone.trim()||!fm.time){this.setState({formTried:true});return;}this.setState({saving:true});
+        setTimeout(()=>{const s=this.state;let appts;if(fm.id)appts=s.appts.map(a=>a.id===fm.id?{...a,...fm,d:Number(fm.d)}:a);else appts=[...s.appts,{...R(s.appts.length+100,Number(fm.d),fm.time,fm.name,fm.svc,'BOOKED','manual',fm.note),phone:fm.phone}];
+          this.setState({appts,form:null,saving:false,calDay:Number(fm.d)});this.toast(fm.id?'Randevu güncellendi. Müşteriye bildirim gönderildi.':'Randevu oluşturuldu. Müşteriye SMS gönderildi.');},600);},
+      svcList:st.svcs.map(s=>({...s,durLabel:s.dur+' dakika',priceLabel:fmt(s.price),statusLabel:s.active?'Aktif':'Pasif',nameColor:s.active?T:'var(--color-neutral-600)',...tog(s.active),
+        onToggle:()=>{this.setState(x=>({svcs:x.svcs.map(y=>y.id===s.id?{...y,active:!y.active}:y)}));this.toast(`${s.name} ${s.active?'pasife alındı':'aktif edildi'}.`);},
+        onEdit:()=>this.setState({svcForm:{...s}}),
+        onDelete:()=>this.setState({confirm:{title:`"${s.name}" silinsin mi?`,body:'Hizmet müşteri sitesinden kaldırılır. Mevcut randevular etkilenmez. Geçici olarak gizlemek için pasife almayı tercih edebilirsin.',cta:'Hizmeti sil',ok:()=>{this.setState(x=>({svcs:x.svcs.filter(y=>y.id!==s.id),confirm:null}));this.toast('Hizmet silindi.');}}})})),
+      addSvc:()=>this.setState({svcForm:{id:null,name:'',dur:60,price:500,active:true}}),
+      svcFormOpen:!!sf0,closeSvcForm:()=>this.setState({svcForm:null}),
+      sf:sf0?{...sf0,title:sf0.id?'Hizmeti düzenle':'Yeni hizmet',invalid:!sf0.name.trim()||!(sf0.dur>0),onName:e=>sfU({name:e.target.value}),onDur:e=>sfU({dur:Number(e.target.value)}),onPrice:e=>sfU({price:Number(e.target.value)})}:{},
+      saveSvc:e=>{e.preventDefault();const x=this.state.svcForm;if(!x.name.trim())return;this.setState(s=>({svcs:x.id?s.svcs.map(y=>y.id===x.id?x:y):[...s.svcs,{...x,id:'s'+Date.now()}],svcForm:null}));this.toast('Hizmet kaydedildi.');},
+      hoursRows:st.hours.map((h,i)=>{const u=x=>this.setState(s=>({hours:s.hours.map((y,j)=>j===i?{...y,...x}:y)}));return {...h,closed:!h.open,stateLabel:h.open?'Açık':'Kapalı',...tog(h.open),onToggle:()=>u({open:!h.open}),
+        onS:e=>u({s:e.target.value}),onE:e=>u({e:e.target.value}),onBs:e=>u({bs:e.target.value}),onBe:e=>u({be:e.target.value})};}),
+      saveHours:()=>this.toast('Çalışma saatleri kaydedildi.'),
+      closedDays:st.closed.map(c=>({label:dateLabel(c.d),note:c.note||'Kapalı',onRemove:()=>this.setState(s=>({closed:s.closed.filter(x=>x.d!==c.d)}))})),
+      cdDate:st.cdDate,onCdDate:e=>this.setState({cdDate:e.target.value}),cdNote:st.cdNote,onCdNote:e=>this.setState({cdNote:e.target.value}),
+      addClosed:()=>{const d=Number(st.cdDate);if(st.closed.some(c=>c.d===d))return;const n=st.appts.filter(a=>a.d===d&&a.status==='BOOKED').length;this.setState(s=>({closed:[...s.closed,{d,note:s.cdNote||'Kapalı'}].sort((a,b)=>a.d-b.d),cdNote:''}));this.toast(n?`Kapalı gün eklendi. O gün ${n} randevu var — iptal edilmesi gerekiyor.`:'Kapalı gün eklendi.');},
+      pfOpts:[['Tümü','all'],['Yayında','pub'],['İzin yok','nc']].map(([label,k])=>({label,pressed:st.pfFilter===k,bg:st.pfFilter===k?A:'transparent',fg:st.pfFilter===k?BG:T,onClick:()=>this.setState({pfFilter:k})})),pfList,
+      notifList:st.notifs.map(n=>({...n,icon:N_IC[n.t],bg:n.unread?'var(--color-surface)':'transparent',weight:n.unread?800:500,onClick:()=>{this.setState(s=>({notifs:s.notifs.map(x=>x.id===n.id?{...x,unread:false}:x)}));if(n.appt)this.setState({sel:n.appt});else if(n.go)this.go(n.go);else this.go('calendar',{calDay:8});}})),
+      markAll:()=>this.setState(s=>({notifs:s.notifs.map(x=>({...x,unread:false}))})),
+      saveProfile:()=>this.toast('Profil kaydedildi.'),activeSvcNames:st.svcs.filter(s=>s.active).map(s=>s.name),
+      hoursSummary:st.hours.map(h=>({name:h.name,v:h.open?`${h.s}–${h.e}`:'Kapalı'})),
+      confirmOpen:!!st.confirm,closeConfirm:()=>this.setState({confirm:null}),cf:{...cf,onOk:cf.ok},
+      hasToast:!!st.toast,toastMsg:st.toast,toastBottom:mob?'84px':'24px',toastLeft:mob?'16px':(rail?'96px':'272px')};
+  }
+}
+</script>
+</body>
+</html>

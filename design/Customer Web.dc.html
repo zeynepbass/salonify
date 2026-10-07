@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-7225b407-bf30-4f7c-b3e7-4f936f6e62ee/styles.css">
+<script src="_ds/modernist-7225b407-bf30-4f7c-b3e7-4f936f6e62ee/_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--color-bg)} a{color:var(--color-accent-700)} a:hover{color:var(--color-accent-600)} button,input,textarea,select{font-family:inherit}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);display:flex;flex-direction:column">
+
+<header style="position:sticky;top:0;z-index:30;background:var(--color-bg);border-bottom:2px solid var(--color-divider)">
+  <div style="max-width:1280px;margin:0 auto;padding:0 clamp(16px,4vw,40px);height:68px;display:flex;align-items:center;gap:32px">
+    <button onClick="{{ goHome }}" aria-label="SalonaBOX ana sayfa" style="display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;cursor:pointer;color:var(--color-text)">
+      <span style="width:22px;height:22px;background:var(--color-accent)"></span>
+      <span style="font-weight:800;font-size:20px;letter-spacing:-0.02em">SalonaBOX</span>
+    </button>
+    <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">
+      <nav aria-label="Ana menü" style="display:flex;gap:4px;align-self:stretch">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+          <button onClick="{{ n.onClick }}" aria-current="{{ n.current }}" style="padding:0 12px;background:none;border:0;border-bottom:3px solid {{ n.border }};color:{{ n.color }};font-size:14px;font-weight:600;cursor:pointer" style-hover="color:var(--color-accent)">{{ n.label }}</button>
+        </sc-for>
+      </nav>
+    </sc-if>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">
+        <a href="Salon Panel.dc.html" style="font-size:13px;font-weight:600;color:var(--color-text);text-decoration:none;padding:8px 12px;border:1px solid var(--color-divider)">Kuaför Paneli</a>
+      </sc-if>
+      <button onClick="{{ goNotifs }}" aria-label="{{ bellLabel }}" class="btn btn-secondary btn-icon" style="position:relative;border-color:transparent">
+        {{ ic.bell }}
+        <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}">
+          <span style="position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;background:var(--color-accent);color:var(--color-bg);font-size:10px;font-weight:800;display:grid;place-items:center">{{ unreadCount }}</span>
+        </sc-if>
+      </button>
+      <button onClick="{{ goProfile }}" aria-label="Profil: Elif Kaya" style="width:36px;height:36px;background:var(--color-text);color:var(--color-bg);border:0;font-size:13px;font-weight:800;cursor:pointer">EK</button>
+    </div>
+  </div>
+</header>
+
+<main style="flex:1">
+
+<sc-if value="{{ is.home }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="01 Ana sayfa" style="max-width:1280px;margin:0 auto;padding:clamp(32px,6vw,72px) clamp(16px,4vw,40px) 56px;display:flex;flex-wrap:wrap;gap:48px">
+    <div style="flex:1 1 560px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:24px">
+      <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent-700);font-weight:600">Kuaför randevusu · Onay beklemeden</div>
+      <h1 style="font-size:clamp(38px,5.2vw,68px);line-height:1.02;letter-spacing:-0.03em;margin:0;max-width:15ch;text-wrap:balance">Hayalindeki saç stiline en yakın kuaförü keşfet.</h1>
+      <p style="font-size:18px;max-width:52ch;margin:0;color:var(--color-neutral-700);text-wrap:pretty">Puanları, portföyleri ve gerçek boş saatleri karşılaştır. Uygun saati seç, randevun anında oluşsun.</p>
+      <form onSubmit="{{ onHeroSearch }}" role="search" style="display:flex;flex-wrap:wrap;border:2px solid var(--color-text);background:var(--color-surface)">
+        <div style="flex:2 1 260px;display:flex;align-items:center;gap:10px;padding:0 16px;min-height:60px;border-right:1px solid var(--color-divider)">
+          <span style="color:var(--color-neutral-600)">{{ ic.search }}</span>
+          <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="Kuaför, hizmet veya saç stili ara" aria-label="Kuaför, hizmet veya saç stili ara" style="flex:1;min-width:0;border:0;background:transparent;font-size:16px;color:var(--color-text);height:52px">
+        </div>
+        <button type="button" onClick="{{ openLoc }}" aria-label="Konum seç, şu an {{ locLabel }}" style="flex:1 1 200px;display:flex;align-items:center;gap:10px;padding:0 16px;min-height:60px;background:transparent;border:0;cursor:pointer;color:var(--color-text);font-size:15px;text-align:left" style-hover="background:var(--color-neutral-200)">
+          <span style="color:var(--color-accent)">{{ ic.pin }}</span><span style="flex:1">{{ locLabel }}</span>{{ ic.cd }}
+        </button>
+        <button type="submit" class="btn btn-primary" style="flex:0 0 auto;min-height:60px;padding:0 28px;font-size:16px;justify-content:flex-start;gap:12px">Ara {{ ic.ar }}</button>
+      </form>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px">
+        <span style="color:var(--color-neutral-700)">Popüler:</span>
+        <sc-for list="{{ popular }}" as="p" hint-placeholder-count="4">
+          <button onClick="{{ p.onClick }}" style="padding:4px 10px;border:1px solid var(--color-divider);background:transparent;cursor:pointer;font-size:13px;color:var(--color-text)" style-hover="border-color:var(--color-text)">{{ p.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="flex:1 1 360px;min-width:0;position:relative;min-height:360px">
+      <div class="grayscale" style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 14px,var(--color-neutral-200) 14px 28px)"></div>
+      <span style="position:absolute;left:12px;bottom:10px;font-family:ui-monospace,monospace;font-size:11px;color:var(--color-neutral-700)">hero görseli · salon iç mekân, siyah-beyaz</span>
+    </div>
+  </section>
+
+  <section style="max-width:1280px;margin:0 auto;padding:0 clamp(16px,4vw,40px)">
+    <div style="border-top:2px solid var(--color-divider);padding-top:24px;display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+      <h2 style="margin:0;font-size:28px">Kategoriler</h2>
+      <span style="font-size:13px;color:var(--color-neutral-700)">Bir kategori seç, sonuçlar ona göre filtrelensin.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px">
+      <sc-for list="{{ categories }}" as="c" hint-placeholder-count="8">
+        <button onClick="{{ c.onClick }}" aria-pressed="{{ c.pressed }}" style="display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:28px;padding:16px;min-height:120px;background:{{ c.bg }};color:{{ c.fg }};border:1px solid {{ c.border }};cursor:pointer;text-align:left;font-size:15px;font-weight:600" style-hover="border-color:var(--color-text)">
+          <span style="color:{{ c.iconColor }}">{{ c.icon }}</span>{{ c.label }}
+        </button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width:1280px;margin:64px auto 0;padding:0 clamp(16px,4vw,40px)">
+    <div style="border-top:2px solid var(--color-divider);padding-top:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+      <div>
+        <h2 style="margin:0;font-size:28px">Yakınındaki Kuaförler</h2>
+        <div style="font-size:13px;color:var(--color-neutral-700);margin-top:4px">{{ locLabel }} · 5 km içinde</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div role="group" aria-label="Sıralama" style="display:flex;border:1px solid var(--color-divider)">
+          <sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="3">
+            <button onClick="{{ o.onClick }}" aria-pressed="{{ o.pressed }}" style="padding:8px 12px;border:0;background:{{ o.bg }};color:{{ o.fg }};font-size:13px;cursor:pointer">{{ o.label }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ goSearch }}" class="btn btn-secondary">{{ ic.sliders }} Filtrele</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:24px">
+      <sc-for list="{{ homeSalons }}" as="s" hint-placeholder-count="8">
+        <article onClick="{{ s.onOpen }}" onKeyDown="{{ s.onKey }}" tabIndex="0" aria-label="{{ s.name }}, puan {{ s.rating }}" style="display:flex;flex-direction:column;background:var(--color-surface);cursor:pointer;transition:box-shadow .15s" style-hover="box-shadow:var(--shadow-md)">
+          <div style="position:relative;aspect-ratio:4/3;overflow:hidden">
+            <div class="grayscale" style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 14px,var(--color-neutral-200) 14px 28px)"></div>
+            <span style="position:absolute;left:10px;bottom:8px;font-family:ui-monospace,monospace;font-size:10px;color:var(--color-neutral-700)">salon fotoğrafı</span>
+            <div style="position:absolute;top:0;left:0;display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--color-bg);font-size:14px;font-weight:800">
+              <span style="color:var(--color-accent)">{{ ic.starF }}</span>{{ s.rating }}<span style="font-weight:400;color:var(--color-neutral-700);font-size:12px">({{ s.count }})</span>
+            </div>
+          </div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:10px;flex:1">
+            <h3 style="font-size:18px;margin:0">{{ s.name }}</h3>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-neutral-700)">{{ ic.sm.pin }}{{ s.place }} · {{ s.distLabel }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ s.svc }}" as="t" hint-placeholder-count="3"><span class="tag tag-neutral">{{ t }}</span></sc-for></div>
+            <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--color-divider);display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="display:flex;flex-direction:column;line-height:1.25"><span style="font-size:11px;color:var(--color-neutral-700)">Başlangıç</span><span style="font-weight:800;font-size:16px">{{ s.fromLabel }}</span></div>
+              <button class="btn btn-primary" onClick="{{ s.onBook }}" style="padding:10px 14px">Randevu Al</button>
+            </div>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+    <button onClick="{{ goSearch }}" class="btn btn-secondary" style="margin-top:24px;padding:12px 16px;gap:12px">Tüm kuaförleri gör {{ ic.ar }}</button>
+  </section>
+</sc-if>
+
+<sc-if value="{{ is.search }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="02 Arama sonuçları" style="max-width:1280px;margin:0 auto;padding:28px clamp(16px,4vw,40px) 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;padding-bottom:20px;border-bottom:2px solid var(--color-divider)">
+      <div>
+        <div style="font-size:12px;color:var(--color-neutral-700);display:flex;gap:6px;align-items:center"><button onClick="{{ goHome }}" style="background:none;border:0;padding:0;color:inherit;cursor:pointer;font-size:12px;text-decoration:underline">Ana sayfa</button><span>/</span><span>Kuaförler</span></div>
+        <h1 style="font-size:clamp(28px,3.4vw,40px);margin:6px 0 0">{{ resultTitle }}</h1>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ openDrawer }}" class="btn btn-secondary">{{ ic.sliders }} Filtrele {{ filterCountLabel }}</button>
+        </sc-if>
+        <div role="group" aria-label="Sıralama" style="display:flex;border:1px solid var(--color-divider)">
+          <sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="3">
+            <button onClick="{{ o.onClick }}" aria-pressed="{{ o.pressed }}" style="padding:8px 12px;border:0;background:{{ o.bg }};color:{{ o.fg }};font-size:13px;cursor:pointer">{{ o.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ hasActiveChips }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 0;align-items:center">
+        <sc-for list="{{ activeChips }}" as="f" hint-placeholder-count="2">
+          <button onClick="{{ f.onRemove }}" aria-label="{{ f.label }} filtresini kaldır" style="display:flex;align-items:center;gap:6px;padding:4px 8px 4px 10px;background:var(--color-text);color:var(--color-bg);border:0;font-size:12px;cursor:pointer">{{ f.label }} {{ ic.sm.x }}</button>
+        </sc-for>
+        <button onClick="{{ clearFilters }}" class="btn btn-ghost" style="font-size:12px">Tümünü temizle</button>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;gap:40px;padding-top:24px;align-items:flex-start">
+      <sc-if value="{{ drawerBackdrop }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;z-index:55;background:color-mix(in srgb,var(--color-neutral-900) 50%,transparent)"></div>
+      </sc-if>
+      <aside aria-label="Filtreler" style="{{ filterStyle }}">
+        <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid var(--color-divider)">
+            <h3 style="margin:0;font-size:20px">Filtreler</h3>
+            <button onClick="{{ closeDrawer }}" aria-label="Filtreleri kapat" class="btn btn-icon btn-secondary" style="border-color:transparent">{{ ic.x }}</button>
+          </div>
+        </sc-if>
+        <div style="padding:0 0 16px;border-bottom:1px solid var(--color-divider)">
+          <h6 style="margin:12px 0 10px;color:var(--color-neutral-700)">Konum</h6>
+          <button onClick="{{ openLoc }}" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--color-divider);background:var(--color-surface);cursor:pointer;font-size:14px;text-align:left;color:var(--color-text)" style-hover="border-color:var(--color-text)"><span style="color:var(--color-accent)">{{ ic.pin }}</span><span style="flex:1">{{ locLabel }}</span><span style="font-size:12px;color:var(--color-accent-700)">Değiştir</span></button>
+        </div>
+        <div style="padding:16px 0;border-bottom:1px solid var(--color-divider)">
+          <h6 style="margin:0 0 10px;color:var(--color-neutral-700)">Mesafe</h6>
+          <div role="group" aria-label="Mesafe" style="display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--color-divider)">
+            <sc-for list="{{ distOpts }}" as="o" hint-placeholder-count="4">
+              <button onClick="{{ o.onClick }}" aria-pressed="{{ o.pressed }}" style="padding:8px 0;border:0;background:{{ o.bg }};color:{{ o.fg }};font-size:13px;cursor:pointer">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <fieldset style="padding:16px 0;margin:0;border:0;border-bottom:1px solid var(--color-divider)">
+          <legend style="padding:16px 0 10px;float:left;width:100%"><h6 style="margin:0;color:var(--color-neutral-700)">Hizmet</h6></legend>
+          <sc-for list="{{ svcChecks }}" as="c" hint-placeholder-count="7">
+            <label style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px;cursor:pointer;clear:both"><input type="checkbox" checked="{{ c.checked }}" onChange="{{ c.onChange }}" style="width:18px;height:18px;accent-color:var(--color-accent);margin:0">{{ c.label }}<span style="margin-left:auto;font-size:12px;color:var(--color-neutral-600)">{{ c.count }}</span></label>
+          </sc-for>
+        </fieldset>
+        <div style="padding:16px 0;border-bottom:1px solid var(--color-divider)">
+          <h6 style="margin:0 0 10px;color:var(--color-neutral-700)">Saç stili</h6>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ styleChips }}" as="c" hint-placeholder-count="6">
+              <button onClick="{{ c.onClick }}" aria-pressed="{{ c.pressed }}" style="padding:6px 10px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};font-size:13px;cursor:pointer">{{ c.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div role="radiogroup" aria-label="Minimum puan" style="padding:16px 0;border-bottom:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px">
+          <h6 style="margin:0;color:var(--color-neutral-700)">Minimum puan</h6>
+          <sc-for list="{{ ratingOpts }}" as="r" hint-placeholder-count="4">
+            <label class="radio"><input type="radio" name="minrating" checked="{{ r.checked }}" onChange="{{ r.onChange }}"><span class="dot"></span>{{ r.label }}</label>
+          </sc-for>
+        </div>
+        <div role="radiogroup" aria-label="Uygunluk" style="padding:16px 0;display:flex;flex-direction:column;gap:10px">
+          <h6 style="margin:0;color:var(--color-neutral-700)">Uygunluk</h6>
+          <sc-for list="{{ availOpts }}" as="r" hint-placeholder-count="4">
+            <label class="radio"><input type="radio" name="avail" checked="{{ r.checked }}" onChange="{{ r.onChange }}"><span class="dot"></span>{{ r.label }}</label>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;padding-top:12px;border-top:2px solid var(--color-divider)">
+          <button onClick="{{ clearFilters }}" class="btn btn-secondary" style="flex:1;justify-content:flex-start">Temizle</button>
+          <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ closeDrawer }}" class="btn btn-primary" style="flex:2;justify-content:flex-start">{{ showResultsLabel }}</button>
+          </sc-if>
+        </div>
+      </aside>
+
+      <div style="flex:1;min-width:0">
+        <sc-if value="{{ showLoading }}" hint-placeholder-val="{{ false }}">
+          <div aria-busy="true" aria-label="Sonuçlar yükleniyor" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px">
+            <sc-for list="{{ skeletons }}" as="k" hint-placeholder-count="6">
+              <div style="background:var(--color-surface)"><div style="aspect-ratio:4/3;background:var(--color-neutral-200)"></div><div style="padding:16px;display:grid;gap:10px"><div style="height:18px;width:70%;background:var(--color-neutral-200)"></div><div style="height:12px;width:45%;background:var(--color-neutral-200)"></div><div style="height:22px;width:60%;background:var(--color-neutral-200)"></div><div style="height:38px;background:var(--color-neutral-200);margin-top:8px"></div></div></div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+          <div role="alert" style="border:2px solid var(--color-divider);padding:48px 32px;display:flex;flex-direction:column;align-items:flex-start;gap:12px">
+            <span style="color:var(--color-accent)">{{ ic.lg.alert }}</span>
+            <h3 style="margin:0">Bir şeyler ters gitti.</h3>
+            <p style="margin:0;color:var(--color-neutral-700);max-width:48ch">Kuaförler şu anda yüklenemedi. Bağlantını kontrol edip tekrar dene.</p>
+            <button onClick="{{ retry }}" class="btn btn-primary" style="gap:10px">{{ ic.refresh }} Tekrar Dene</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="border:2px solid var(--color-divider);padding:48px 32px;display:flex;flex-direction:column;align-items:flex-start;gap:12px">
+            <span style="color:var(--color-neutral-600)">{{ ic.lg.search }}</span>
+            <h3 style="margin:0">Bu kriterlere uygun kuaför bulunamadı.</h3>
+            <p style="margin:0;color:var(--color-neutral-700);max-width:48ch">Mesafeyi artırmayı ya da bazı filtreleri kaldırmayı dene.</p>
+            <button onClick="{{ clearFilters }}" class="btn btn-secondary">Filtreleri temizle</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showResults }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px">
+            <sc-for list="{{ results }}" as="s" hint-placeholder-count="6">
+              <article onClick="{{ s.onOpen }}" onKeyDown="{{ s.onKey }}" tabIndex="0" aria-label="{{ s.name }}, puan {{ s.rating }}" style="display:flex;flex-direction:column;background:var(--color-surface);cursor:pointer;transition:box-shadow .15s" style-hover="box-shadow:var(--shadow-md)">
+                <div style="position:relative;aspect-ratio:4/3;overflow:hidden">
+                  <div class="grayscale" style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 14px,var(--color-neutral-200) 14px 28px)"></div>
+                  <span style="position:absolute;left:10px;bottom:8px;font-family:ui-monospace,monospace;font-size:10px;color:var(--color-neutral-700)">salon fotoğrafı</span>
+                  <div style="position:absolute;top:0;left:0;display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--color-bg);font-size:14px;font-weight:800">
+                    <span style="color:var(--color-accent)">{{ ic.starF }}</span>{{ s.rating }}<span style="font-weight:400;color:var(--color-neutral-700);font-size:12px">({{ s.count }})</span>
+                  </div>
+                </div>
+                <div style="padding:16px;display:flex;flex-direction:column;gap:10px;flex:1">
+                  <h3 style="font-size:18px;margin:0">{{ s.name }}</h3>
+                  <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-neutral-700)">{{ ic.sm.pin }}{{ s.place }} · {{ s.distLabel }}</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ s.svc }}" as="t" hint-placeholder-count="3"><span class="tag tag-neutral">{{ t }}</span></sc-for></div>
+                  <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--color-divider);display:flex;align-items:center;justify-content:space-between;gap:12px">
+                    <div style="display:flex;flex-direction:column;line-height:1.25"><span style="font-size:11px;color:var(--color-neutral-700)">Başlangıç</span><span style="font-weight:800;font-size:16px">{{ s.fromLabel }}</span></div>
+                    <button class="btn btn-primary" onClick="{{ s.onBook }}" style="padding:10px 14px">Randevu Al</button>
+                  </div>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+          <nav aria-label="Sayfalar" style="display:flex;gap:4px;align-items:center;margin-top:40px;padding-top:20px;border-top:2px solid var(--color-divider);flex-wrap:wrap">
+            <button class="btn btn-secondary btn-icon" aria-label="Önceki sayfa" disabled="{{ true }}">{{ ic.cl }}</button>
+            <sc-for list="{{ pages }}" as="p" hint-placeholder-count="5">
+              <button onClick="{{ p.onClick }}" aria-current="{{ p.current }}" style="min-width:36px;height:36px;border:1px solid {{ p.border }};background:{{ p.bg }};color:{{ p.fg }};font-size:14px;font-weight:600;cursor:pointer">{{ p.label }}</button>
+            </sc-for>
+            <button class="btn btn-secondary btn-icon" aria-label="Sonraki sayfa">{{ ic.cr }}</button>
+            <span style="margin-left:auto;font-size:13px;color:var(--color-neutral-700)">Sayfa 1 / 11</span>
+          </nav>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.salon }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="03 Salon detay" style="max-width:1280px;margin:0 auto;padding:24px clamp(16px,4vw,40px) 0">
+    <button onClick="{{ goSearch }}" class="btn btn-ghost" style="padding-left:0;color:var(--color-text);gap:8px">{{ ic.al }} Kuaförler</button>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;margin-top:16px">
+      <div style="flex:1 1 480px;min-width:0;display:flex;flex-direction:column;gap:8px">
+        <div style="position:relative;aspect-ratio:4/3">
+          <div class="grayscale" style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 14px,var(--color-neutral-200) 14px 28px)"></div>
+          <span style="position:absolute;left:12px;bottom:10px;font-family:ui-monospace,monospace;font-size:11px;color:var(--color-neutral-700)">salon profil görseli</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <sc-for list="{{ thumbs }}" as="t" hint-placeholder-count="4">
+            <div class="grayscale" style="aspect-ratio:1;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 10px,var(--color-neutral-200) 10px 20px)"></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="flex:1 1 400px;min-width:0;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="tag tag-accent" style="gap:6px"><span style="width:6px;height:6px;background:var(--color-accent-700)"></span>Şu an açık · 19:00'a kadar</span><span class="tag tag-neutral">Kadın · Erkek</span></div>
+        <h1 style="font-size:clamp(32px,4vw,48px);margin:0;letter-spacing:-0.025em">{{ salon.name }}</h1>
+        <button onClick="{{ toReviews }}" style="display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;cursor:pointer;font-size:15px;color:var(--color-text);text-align:left">
+          <span style="color:var(--color-accent)">{{ ic.starM }}</span><strong style="font-size:18px">{{ salon.rating }}</strong><span style="text-decoration:underline;text-underline-offset:3px">{{ salon.count }} değerlendirme</span>
+        </button>
+        <p style="margin:0;font-size:16px;color:var(--color-neutral-800);max-width:56ch;text-wrap:pretty">{{ salon.desc }}</p>
+        <div style="display:flex;flex-direction:column">
+          <div style="display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--color-divider);font-size:14px"><span style="color:var(--color-neutral-600)">{{ ic.pin }}</span><span>{{ salon.address }}</span></div>
+          <div style="display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--color-divider);font-size:14px"><span style="color:var(--color-neutral-600)">{{ ic.phone }}</span><a href="tel:+902165550101" style="color:var(--color-text)">0216 555 01 01</a></div>
+          <div style="display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--color-divider);font-size:14px"><span style="color:var(--color-neutral-600)">{{ ic.mail }}</span><a href="mailto:merhaba@salon.com" style="color:var(--color-text)">{{ salon.email }}</a></div>
+          <div style="display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);font-size:14px"><span style="color:var(--color-neutral-600)">{{ ic.clock }}</span><span>Pzt–Cmt 09:00–19:00 · Pazar kapalı</span></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button onClick="{{ bookFromSalon }}" class="btn btn-primary" style="flex:2 1 220px;height:56px;font-size:17px;justify-content:space-between;padding:0 20px">Randevu Al {{ ic.ar }}</button>
+          <button onClick="{{ toServices }}" class="btn btn-secondary" style="flex:1 1 140px;height:56px;justify-content:flex-start;padding:0 16px">Hizmetleri gör</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-neutral-700)">{{ ic.sm.check }} Boş saati seç, randevun anında oluşur — onay beklemek yok.</div>
+      </div>
+    </div>
+
+    <nav aria-label="Salon bölümleri" style="position:sticky;top:68px;z-index:10;background:var(--color-bg);display:flex;gap:4px;margin-top:48px;border-bottom:2px solid var(--color-divider);overflow-x:auto">
+      <sc-for list="{{ salonTabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.onClick }}" style="padding:14px 12px;background:none;border:0;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--color-text)" style-hover="color:var(--color-accent)">{{ t.label }}</button>
+      </sc-for>
+    </nav>
+
+    <section id="sec-svc" style="padding-top:40px">
+      <h2 style="font-size:28px;margin:0 0 20px">Hizmetler</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px">
+        <sc-for list="{{ salonServices }}" as="v" hint-placeholder-count="7">
+          <div style="background:var(--color-surface);padding:20px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .15s" style-hover="box-shadow:var(--shadow-md)">
+            <h3 style="font-size:19px;margin:0">{{ v.name }}</h3>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-neutral-700)">{{ ic.sm.clock }} {{ v.durLabel }}</div>
+            <div style="font-size:24px;font-weight:800;margin-top:12px">{{ v.priceLabel }}</div>
+            <button onClick="{{ v.onBook }}" class="btn btn-secondary" style="margin-top:8px;justify-content:space-between;padding:10px 12px">Randevu Al {{ ic.ar }}</button>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="sec-portfolio" style="padding-top:56px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+        <h2 style="font-size:28px;margin:0">Portföy</h2>
+        <span style="font-size:13px;color:var(--color-neutral-700)">Yalnızca paylaşım izni veren müşterilerin işleri gösterilir.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px">
+        <sc-for list="{{ portfolio }}" as="p" hint-placeholder-count="8">
+          <button onClick="{{ p.onOpen }}" aria-label="{{ p.name }}, {{ p.service }} fotoğrafını büyüt" style="display:flex;flex-direction:column;gap:8px;background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--color-text)">
+            <div style="position:relative;width:100%;aspect-ratio:4/5;overflow:hidden">
+              <div class="grayscale" style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 12px,var(--color-neutral-200) 12px 24px);transition:transform .25s" style-hover="transform:scale(1.03)"></div>
+              <span style="position:absolute;left:10px;bottom:8px;font-family:ui-monospace,monospace;font-size:10px;color:var(--color-neutral-700)">saç fotoğrafı</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:8px;width:100%"><span style="font-weight:700;font-size:14px">{{ p.name }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ p.service }}</span></div>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="sec-reviews" style="padding-top:56px">
+      <h2 style="font-size:28px;margin:0 0 20px">Değerlendirmeler</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+        <div style="flex:0 1 300px;min-width:240px;border-top:2px solid var(--color-text);padding-top:20px">
+          <div style="font-size:64px;font-weight:800;line-height:1;letter-spacing:-0.03em">{{ salon.rating }}</div>
+          <div style="display:flex;gap:2px;color:var(--color-accent);margin:10px 0 6px" aria-label="5 üzerinden {{ salon.rating }} yıldız"><sc-for list="{{ five }}" as="x" hint-placeholder-count="5">{{ ic.starM }}</sc-for></div>
+          <div style="font-size:14px;color:var(--color-neutral-700)">{{ salon.count }} değerlendirme</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:20px">
+            <sc-for list="{{ ratingBars }}" as="b" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:10px;font-size:12px"><span style="width:10px">{{ b.n }}</span><div style="flex:1;height:6px;background:var(--color-neutral-200)"><div style="height:100%;width:{{ b.pct }};background:var(--color-text)"></div></div><span style="width:32px;text-align:right;color:var(--color-neutral-700)">{{ b.pct }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex:1 1 480px;min-width:0;display:flex;flex-direction:column">
+          <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="4">
+            <article style="display:flex;gap:16px;padding:20px 0;border-top:1px solid var(--color-divider)">
+              <div aria-hidden="true" style="width:44px;height:44px;flex:none;background:var(--color-neutral-300);display:grid;place-items:center;font-weight:800;font-size:14px">{{ r.initials }}</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong style="font-size:15px">{{ r.name }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">{{ r.date }}</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><div style="display:flex;gap:1px" aria-label="{{ r.rating }} yıldız"><sc-for list="{{ r.stars }}" as="st" hint-placeholder-count="5"><span style="color:{{ st.color }}">{{ ic.starF }}</span></sc-for></div><span class="tag tag-neutral">{{ r.service }}</span></div>
+                <p style="margin:0;font-size:14px;line-height:1.6;max-width:68ch">{{ r.text }}</p>
+                <sc-if value="{{ r.photo }}" hint-placeholder-val="{{ false }}">
+                  <div class="grayscale" style="width:96px;height:120px;margin-top:4px;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 8px,var(--color-neutral-200) 8px 16px)"></div>
+                </sc-if>
+              </div>
+            </article>
+          </sc-for>
+          <button class="btn btn-secondary" style="align-self:flex-start;margin-top:8px">Tüm değerlendirmeleri gör (127)</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-hours" style="padding-top:56px">
+      <h2 style="font-size:28px;margin:0 0 20px">Çalışma saatleri ve konum</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:40px">
+        <table class="table" style="flex:1 1 360px;max-width:520px">
+          <tbody>
+            <sc-for list="{{ hours }}" as="h" hint-placeholder-count="7">
+              <tr><td style="font-weight:{{ h.weight }}">{{ h.day }}</td><td style="text-align:right;font-weight:{{ h.weight }}">{{ h.time }}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <div style="flex:1 1 360px;min-height:240px;position:relative;background:var(--color-surface)">
+          <span style="position:absolute;left:12px;bottom:10px;font-family:ui-monospace,monospace;font-size:11px;color:var(--color-neutral-700)">harita</span>
+          <span style="position:absolute;left:50%;top:45%;color:var(--color-accent)">{{ ic.pin }}</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.booking }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="04 Randevu" style="max-width:1280px;margin:0 auto;padding:24px clamp(16px,4vw,40px) 0">
+    <button onClick="{{ backToSalon }}" class="btn btn-ghost" style="padding-left:0;color:var(--color-text);gap:8px">{{ ic.al }} {{ salon.name }}</button>
+    <h1 style="font-size:clamp(28px,3.4vw,40px);margin:8px 0 20px">Randevu al</h1>
+    <ol aria-label="Adımlar" style="list-style:none;margin:0 0 32px;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid var(--color-divider)">
+      <sc-for list="{{ steps }}" as="p" hint-placeholder-count="4">
+        <li aria-current="{{ p.current }}" style="display:flex;align-items:center;gap:10px;padding:14px 8px 0 0;border-top:3px solid {{ p.bar }};margin-top:-2px;font-size:14px;font-weight:{{ p.weight }};color:{{ p.fg }}">
+          <span style="width:26px;height:26px;flex:none;display:grid;place-items:center;background:{{ p.boxBg }};color:{{ p.boxFg }};border:1px solid {{ p.boxBorder }};font-size:12px;font-weight:800">{{ p.mark }}</span><span>{{ p.label }}</span>
+        </li>
+      </sc-for>
+    </ol>
+
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+      <div style="flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:40px">
+        <section aria-labelledby="h-svc">
+          <h2 id="h-svc" style="font-size:20px;margin:0 0 14px">1. Hizmet</h2>
+          <div role="radiogroup" aria-labelledby="h-svc" style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ bSvcs }}" as="v" hint-placeholder-count="7">
+              <button role="radio" aria-checked="{{ v.checked }}" onClick="{{ v.onClick }}" style="display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;background:{{ v.bg }};border:{{ v.border }};cursor:pointer;text-align:left;color:var(--color-text)" style-hover="border-color:var(--color-text)">
+                <span style="width:18px;height:18px;flex:none;border:2px solid {{ v.dotBorder }};display:grid;place-items:center"><span style="width:8px;height:8px;background:{{ v.dotFill }}"></span></span>
+                <span style="flex:1;font-weight:700;font-size:15px">{{ v.name }}</span>
+                <span style="font-size:13px;color:var(--color-neutral-700)">{{ v.durLabel }}</span>
+                <span style="font-weight:800;min-width:84px;text-align:right">{{ v.priceLabel }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+        <section aria-labelledby="h-date">
+          <h2 id="h-date" style="font-size:20px;margin:0 0 14px">2. Tarih</h2>
+          <div style="background:var(--color-surface);padding:20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <strong style="font-size:17px">{{ cal.title }}</strong>
+              <div style="display:flex;gap:4px">
+                <button onClick="{{ cal.onPrev }}" disabled="{{ cal.prevDisabled }}" aria-label="Önceki ay" class="btn btn-secondary btn-icon">{{ ic.cl }}</button>
+                <button onClick="{{ cal.onNext }}" disabled="{{ cal.nextDisabled }}" aria-label="Sonraki ay" class="btn btn-secondary btn-icon">{{ ic.cr }}</button>
+              </div>
+            </div>
+            <div role="grid" aria-label="{{ cal.title }}" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
+              <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
+                <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-700);padding:6px 0;text-align:center">{{ w }}</div>
+              </sc-for>
+              <sc-for list="{{ days }}" as="d" hint-placeholder-count="31">
+                <button onClick="{{ d.onClick }}" disabled="{{ d.disabled }}" aria-label="{{ d.aria }}" aria-pressed="{{ d.pressed }}" style="height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:{{ d.bg }};color:{{ d.fg }};border:{{ d.border }};cursor:{{ d.cursor }};font-size:15px;font-weight:{{ d.weight }};visibility:{{ d.vis }}" style-hover="border-color:var(--color-text)">
+                  <span style="text-decoration:{{ d.deco }}">{{ d.label }}</span><span style="font-size:9px;letter-spacing:0.04em;text-transform:uppercase">{{ d.sub }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--color-neutral-700)">
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border:2px solid var(--color-text)"></span>Bugün</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;background:var(--color-accent)"></span>Seçili</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="text-decoration:line-through">15</span>Kapalı / geçmiş</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="slots" aria-labelledby="h-time">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <h2 id="h-time" style="font-size:20px;margin:0">3. Boş saat</h2>
+            <span style="font-size:13px;color:var(--color-neutral-700)">{{ slotMeta }}</span>
+          </div>
+          <sc-if value="{{ noDate }}" hint-placeholder-val="{{ true }}">
+            <div style="border:1px dashed var(--color-divider);padding:28px 20px;font-size:14px;color:var(--color-neutral-700);display:flex;gap:10px;align-items:center">{{ ic.cal }} Uygun saatleri görmek için önce bir tarih seç.</div>
+          </sc-if>
+          <sc-if value="{{ slotsLoading }}" hint-placeholder-val="{{ false }}">
+            <div aria-busy="true" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px">
+              <sc-for list="{{ skeletonSlots }}" as="k" hint-placeholder-count="10"><div style="height:58px;background:var(--color-neutral-200)"></div></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ slotsReady }}" hint-placeholder-val="{{ false }}">
+            <div role="group" aria-label="Saatler" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px">
+              <sc-for list="{{ slots }}" as="t" hint-placeholder-count="20">
+                <button onClick="{{ t.onClick }}" disabled="{{ t.disabled }}" aria-pressed="{{ t.pressed }}" aria-label="{{ t.aria }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;background:{{ t.bg }};color:{{ t.fg }};border:1px solid {{ t.border }};cursor:{{ t.cursor }};text-align:left;opacity:1" style-hover="border-color:var(--color-text)">
+                  <span style="font-size:16px;font-weight:800;text-decoration:{{ t.deco }}">{{ t.time }}</span><span style="font-size:12px">{{ t.status }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </section>
+      </div>
+
+      <aside aria-label="Randevu özeti" style="flex:1 1 320px;max-width:100%;position:sticky;top:92px;background:var(--color-surface);padding:24px;display:flex;flex-direction:column;gap:16px">
+        <h6 style="margin:0;color:var(--color-neutral-700)">Randevu özeti</h6>
+        <div>
+          <div style="font-size:20px;font-weight:800">{{ salon.name }}</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-neutral-700);margin-top:4px">{{ ic.sm.pin }} {{ salon.address }}</div>
+        </div>
+        <dl style="margin:0;display:flex;flex-direction:column;border-top:2px solid var(--color-divider)">
+          <sc-for list="{{ summaryRows }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--color-divider);font-size:14px"><dt style="color:var(--color-neutral-700)">{{ r.k }}</dt><dd style="margin:0;font-weight:700;color:{{ r.color }};text-align:right">{{ r.v }}</dd></div>
+          </sc-for>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 0"><dt style="font-size:14px">Toplam</dt><dd style="margin:0;font-size:26px;font-weight:800">{{ summaryPrice }}</dd></div>
+        </dl>
+        <button onClick="{{ submitBooking }}" disabled="{{ submitDisabled }}" class="btn btn-primary" style="height:54px;font-size:16px;justify-content:space-between;padding:0 18px" aria-busy="{{ submitting }}">{{ submitLabel }} {{ submitIcon }}</button>
+        <div style="font-size:12px;color:var(--color-neutral-700);display:flex;flex-direction:column;gap:6px;line-height:1.5">
+          <span style="display:flex;gap:6px">{{ ic.sm.check }} Randevun anında oluşturulur, kuaföre bildirim gider.</span>
+          <span style="display:flex;gap:6px">{{ ic.sm.check }} Randevudan 24 saat öncesine kadar ücretsiz iptal.</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.success }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="05 Randevu başarılı" style="max-width:760px;margin:0 auto;padding:56px clamp(16px,4vw,40px) 0;display:flex;flex-direction:column;gap:20px" role="status">
+    <div style="width:72px;height:72px;background:var(--color-accent);color:var(--color-bg);display:grid;place-items:center">{{ ic.lg.check }}</div>
+    <h1 style="font-size:clamp(32px,4.4vw,52px);margin:0;letter-spacing:-0.025em">Randevunuz oluşturuldu.</h1>
+    <p style="margin:0;font-size:16px;color:var(--color-neutral-700);max-width:56ch">{{ last.salon }} kuaförüne bildirim gönderildi. Randevudan 24 saat önce hatırlatma alacaksın.</p>
+    <div style="background:var(--color-surface);padding:24px;display:flex;flex-direction:column;gap:4px;border-top:2px solid var(--color-text)">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><span style="font-size:12px;color:var(--color-neutral-700)">Randevu no: {{ last.ref }}</span><span class="tag tag-accent" style="gap:6px">{{ ic.sm.calCheck }} Randevu alındı</span></div>
+      <div style="font-size:24px;font-weight:800;margin-top:10px">{{ last.salon }}</div>
+      <div style="font-size:16px">{{ last.service }}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--color-divider)">
+        <div><div style="font-size:12px;color:var(--color-neutral-700)">Tarih</div><div style="font-weight:800;font-size:18px">{{ last.dateLabel }}</div></div>
+        <div><div style="font-size:12px;color:var(--color-neutral-700)">Saat</div><div style="font-weight:800;font-size:18px">{{ last.time }}</div></div>
+        <div><div style="font-size:12px;color:var(--color-neutral-700)">Süre</div><div style="font-weight:800;font-size:18px">{{ last.durLabel }}</div></div>
+        <div><div style="font-size:12px;color:var(--color-neutral-700)">Ücret</div><div style="font-weight:800;font-size:18px">{{ last.priceLabel }}</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onClick="{{ goAppts }}" class="btn btn-primary" style="height:50px;padding:0 18px;gap:12px">Randevularımı Gör {{ ic.ar }}</button>
+      <button onClick="{{ addToCal }}" class="btn btn-secondary" style="height:50px;padding:0 18px;gap:10px">{{ ic.calPlus }} Takvime Ekle</button>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.appts }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="06 Randevularım" style="max-width:1080px;margin:0 auto;padding:32px clamp(16px,4vw,40px) 0">
+    <h1 style="font-size:clamp(30px,3.6vw,44px);margin:0 0 20px">Randevularım</h1>
+    <div role="tablist" aria-label="Randevular" style="display:flex;gap:4px;border-bottom:2px solid var(--color-divider);margin-bottom:8px">
+      <sc-for list="{{ apptTabs }}" as="t" hint-placeholder-count="2">
+        <button role="tab" aria-selected="{{ t.selected }}" onClick="{{ t.onClick }}" style="padding:12px 14px;background:none;border:0;border-bottom:3px solid {{ t.border }};margin-bottom:-2px;font-size:15px;font-weight:700;color:{{ t.color }};cursor:pointer">{{ t.label }}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{ apptLoading }}" hint-placeholder-val="{{ false }}">
+      <div aria-busy="true"><sc-for list="{{ skeletonRows }}" as="k" hint-placeholder-count="3"><div style="display:flex;gap:20px;padding:20px 0;border-bottom:1px solid var(--color-divider)"><div style="width:72px;height:80px;background:var(--color-neutral-200)"></div><div style="flex:1;display:grid;gap:10px;align-content:center"><div style="height:18px;width:40%;background:var(--color-neutral-200)"></div><div style="height:12px;width:60%;background:var(--color-neutral-200)"></div></div></div></sc-for></div>
+    </sc-if>
+    <sc-if value="{{ apptError }}" hint-placeholder-val="{{ false }}">
+      <div role="alert" style="border:2px solid var(--color-divider);padding:40px 28px;margin-top:16px;display:flex;flex-direction:column;align-items:flex-start;gap:12px"><span style="color:var(--color-accent)">{{ ic.lg.alert }}</span><h3 style="margin:0">Bir şeyler ters gitti.</h3><p style="margin:0;color:var(--color-neutral-700)">Randevuların yüklenemedi.</p><button onClick="{{ retry }}" class="btn btn-primary" style="gap:10px">{{ ic.refresh }} Tekrar Dene</button></div>
+    </sc-if>
+    <sc-if value="{{ apptEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="border:2px solid var(--color-divider);padding:40px 28px;margin-top:16px;display:flex;flex-direction:column;align-items:flex-start;gap:12px"><span style="color:var(--color-neutral-600)">{{ ic.lg.cal }}</span><h3 style="margin:0">Henüz randevunuz yok.</h3><p style="margin:0;color:var(--color-neutral-700)">Yakınındaki kuaförleri keşfet ve ilk randevunu birkaç adımda oluştur.</p><button onClick="{{ goHome }}" class="btn btn-primary" style="gap:10px">Kuaför keşfet {{ ic.ar }}</button></div>
+    </sc-if>
+    <sc-if value="{{ apptReady }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ apptList }}" as="a" hint-placeholder-count="3">
+          <article style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;padding:20px 0;border-bottom:1px solid var(--color-divider);opacity:{{ a.dim }}">
+            <div style="width:72px;flex:none;border:2px solid var(--color-text);text-align:center;padding:8px 0;line-height:1.1">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.08em">{{ a.mon }}</div><div style="font-size:28px;font-weight:800">{{ a.d }}</div><div style="font-size:11px;color:var(--color-neutral-700)">{{ a.wdShort }}</div>
+            </div>
+            <div style="flex:1 1 240px;min-width:0;display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><strong style="font-size:18px">{{ a.service }}</strong><span class="{{ a.tagClass }}" style="gap:5px">{{ a.statusIcon }} {{ a.statusLabel }}</span></div>
+              <div style="font-size:14px">{{ a.salon }}</div>
+              <div style="display:flex;gap:14px;font-size:13px;color:var(--color-neutral-700);flex-wrap:wrap"><span style="display:flex;gap:5px;align-items:center">{{ ic.sm.clock }} {{ a.timeLine }}</span><span style="font-weight:700;color:var(--color-text)">{{ a.priceLabel }}</span></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onClick="{{ a.onDetail }}" class="btn btn-secondary">Detay</button>
+              <sc-if value="{{ a.isUp }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.onCancel }}" class="btn btn-ghost" style="color:var(--color-accent-700);padding:8px 12px">İptal Et</button></sc-if>
+              <sc-if value="{{ a.canReview }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.onReview }}" class="btn btn-primary" style="gap:8px">{{ ic.sm.star }} Değerlendir</button></sc-if>
+              <sc-if value="{{ a.reviewed }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-neutral-700);padding:8px 4px">{{ ic.sm.check }} Değerlendirildi</span></sc-if>
+              <sc-if value="{{ a.isInactive }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.onRebook }}" class="btn btn-ghost" style="padding:8px 12px">Tekrar randevu al</button></sc-if>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.apptDetail }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="07 Randevu detay" style="max-width:1080px;margin:0 auto;padding:24px clamp(16px,4vw,40px) 0">
+    <button onClick="{{ goAppts }}" class="btn btn-ghost" style="padding-left:0;color:var(--color-text);gap:8px">{{ ic.al }} Randevularım</button>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0 24px"><h1 style="font-size:clamp(30px,3.6vw,44px);margin:0">{{ dt.service }}</h1><span class="{{ dt.tagClass }}" style="gap:5px;font-size:12px">{{ dt.statusIcon }} {{ dt.statusLabel }}</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+      <div style="flex:1 1 520px;min-width:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));border-top:2px solid var(--color-text)">
+        <sc-for list="{{ dt.cells }}" as="c" hint-placeholder-count="8">
+          <div style="padding:16px 16px 16px 0;border-bottom:1px solid var(--color-divider)"><div style="font-size:12px;color:var(--color-neutral-700);margin-bottom:4px">{{ c.k }}</div><div style="font-size:17px;font-weight:700">{{ c.v }}</div></div>
+        </sc-for>
+      </div>
+      <aside style="flex:1 1 300px;background:var(--color-surface);padding:20px;display:flex;flex-direction:column;gap:8px">
+        <h6 style="margin:0 0 4px;color:var(--color-neutral-700)">İşlemler</h6>
+        <button onClick="{{ addToCal }}" class="btn btn-secondary" style="justify-content:flex-start;gap:10px;padding:12px">{{ ic.calPlus }} Takvime ekle</button>
+        <a href="tel:+902165550101" class="btn btn-secondary" style="justify-content:flex-start;gap:10px;padding:12px">{{ ic.phone }} Kuaförü ara</a>
+        <sc-if value="{{ dt.isUp }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ dt.onCancel }}" class="btn btn-secondary" style="justify-content:flex-start;gap:10px;padding:12px;color:var(--color-accent-700);border-color:var(--color-accent-700)">{{ ic.xC }} Randevuyu İptal Et</button>
+          <p style="font-size:12px;color:var(--color-neutral-700);margin:4px 0 0">Randevudan 24 saat öncesine kadar ücretsiz iptal edebilirsin.</p>
+        </sc-if>
+        <sc-if value="{{ dt.canReview }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ dt.onReview }}" class="btn btn-primary" style="justify-content:flex-start;gap:10px;padding:12px">{{ ic.sm.star }} Değerlendir</button>
+        </sc-if>
+        <sc-if value="{{ dt.isPast }}" hint-placeholder-val="{{ false }}">
+          <p style="font-size:12px;color:var(--color-neutral-700);margin:4px 0 0">Geçmiş randevular düzenlenemez veya iptal edilemez.</p>
+        </sc-if>
+      </aside>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.review }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="08 Değerlendirme" style="max-width:720px;margin:0 auto;padding:24px clamp(16px,4vw,40px) 0">
+    <button onClick="{{ goAppts }}" class="btn btn-ghost" style="padding-left:0;color:var(--color-text);gap:8px">{{ ic.al }} Randevularım</button>
+    <div style="display:flex;gap:16px;align-items:center;background:var(--color-surface);padding:16px;margin:16px 0 32px">
+      <div class="grayscale" style="width:56px;height:56px;flex:none;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 8px,var(--color-neutral-200) 8px 16px)"></div>
+      <div><div style="font-weight:800">{{ rv.salon }}</div><div style="font-size:13px;color:var(--color-neutral-700)">{{ rv.service }} · {{ rv.dateLabel }} · Tamamlandı</div></div>
+    </div>
+    <h1 style="font-size:clamp(30px,3.6vw,44px);margin:0 0 16px">Deneyimin nasıldı?</h1>
+    <div role="radiogroup" aria-label="Puan" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <sc-for list="{{ rStars }}" as="s" hint-placeholder-count="5">
+        <button role="radio" aria-checked="{{ s.checked }}" aria-label="{{ s.label }}" onClick="{{ s.onClick }}" style="width:52px;height:52px;display:grid;place-items:center;background:none;border:1px solid var(--color-divider);color:{{ s.color }};cursor:pointer" style-hover="border-color:var(--color-text)">{{ ic.starL }}</button>
+      </sc-for>
+      <span style="margin-left:10px;font-size:15px;font-weight:700">{{ ratingText }}</span>
+    </div>
+    <div class="field" style="margin-top:28px">
+      <label for="rcomment">Yorumun</label>
+      <textarea id="rcomment" class="input" value="{{ rComment }}" onChange="{{ onComment }}" maxLength="500" placeholder="Hizmet, iletişim, sonuç… Diğer müşterilere yardımcı olacak detayları paylaş." style="min-height:140px"></textarea>
+      <div style="font-size:12px;color:var(--color-neutral-700);margin-top:4px;text-align:right">{{ charCount }} / 500</div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:12px;color:var(--color-neutral-700);margin-bottom:6px">Fotoğraf ekle (isteğe bağlı, en fazla 4)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ rPhotoList }}" as="p" hint-placeholder-count="0">
+          <div style="position:relative;width:96px;height:96px"><div class="grayscale" style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--color-neutral-300) 0 8px,var(--color-neutral-200) 8px 16px)"></div><button onClick="{{ p.onRemove }}" aria-label="Fotoğrafı kaldır" style="position:absolute;top:0;right:0;width:24px;height:24px;border:0;background:var(--color-text);color:var(--color-bg);display:grid;place-items:center;cursor:pointer">{{ ic.sm.x }}</button></div>
+        </sc-for>
+        <sc-if value="{{ canAddPhoto }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ addPhoto }}" style="width:96px;height:96px;border:1px dashed var(--color-neutral-600);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:12px;color:var(--color-text)" style-hover="border-color:var(--color-accent);color:var(--color-accent)">{{ ic.camera }} Ekle</button>
+        </sc-if>
+      </div>
+    </div>
+    <div style="margin-top:28px;padding:20px 0;border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider);display:flex;gap:16px;align-items:flex-start">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px" id="share-q">Bu değerlendirmeyi kuaförün profilinde paylaşmak ister misiniz?</div>
+        <div style="font-size:13px;color:var(--color-neutral-700);margin-top:4px">Adınız ve fotoğrafınız kuaförün profilinde görüntülenebilir. İstediğin zaman profilinden kaldırabilirsin.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex:none">
+        <span style="font-size:13px">Profilde paylaş</span>
+        <button role="switch" aria-checked="{{ rShare }}" aria-labelledby="share-q" onClick="{{ toggleShare }}" style="width:44px;height:24px;flex:none;position:relative;border:0;padding:0;background:{{ shareTrack }};cursor:pointer"><span style="position:absolute;top:2px;left:{{ shareKnob }};width:20px;height:20px;background:var(--color-bg);transition:left .15s"></span></button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:24px;flex-wrap:wrap">
+      <button onClick="{{ submitReview }}" disabled="{{ reviewDisabled }}" class="btn btn-primary" style="height:50px;padding:0 18px;gap:12px">Değerlendirmeyi Gönder {{ ic.ar }}</button>
+      <button onClick="{{ goAppts }}" class="btn btn-secondary" style="height:50px;padding:0 18px">Vazgeç</button>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.profile }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="09 Profil" style="max-width:1080px;margin:0 auto;padding:32px clamp(16px,4vw,40px) 0">
+    <h1 style="font-size:clamp(30px,3.6vw,44px);margin:0 0 24px">Profil</h1>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+      <nav aria-label="Profil bölümleri" style="flex:1 1 220px;max-width:280px;display:flex;flex-direction:column;border-top:2px solid var(--color-text)">
+        <sc-for list="{{ pTabs }}" as="t" hint-placeholder-count="5">
+          <button onClick="{{ t.onClick }}" aria-current="{{ t.current }}" style="display:flex;align-items:center;gap:10px;padding:14px 12px;border:0;border-bottom:1px solid var(--color-divider);background:{{ t.bg }};color:{{ t.fg }};font-size:14px;font-weight:600;cursor:pointer;text-align:left" style-hover="background:var(--color-neutral-200)">{{ t.icon }}{{ t.label }}</button>
+        </sc-for>
+      </nav>
+      <div style="flex:3 1 480px;min-width:0">
+        <sc-if value="{{ pIs.account }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:20px;align-items:center;margin-bottom:28px;flex-wrap:wrap">
+            <div style="width:96px;height:96px;background:var(--color-text);color:var(--color-bg);display:grid;place-items:center;font-size:32px;font-weight:800">EK</div>
+            <div><div style="font-size:22px;font-weight:800">Elif Kaya</div><div style="font-size:13px;color:var(--color-neutral-700)">Üyelik: Mart 2025 · İstanbul, Kadıköy</div><button class="btn btn-ghost" style="margin-top:4px;padding-left:0">Fotoğrafı değiştir</button></div>
+          </div>
+          <h2 style="font-size:20px;margin:0 0 16px;padding-top:20px;border-top:2px solid var(--color-divider)">Hesap bilgilerim</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+            <div class="field"><label for="pf-n">Ad soyad</label><input id="pf-n" class="input" value="Elif Kaya" readOnly="{{ false }}"></div>
+            <div class="field"><label for="pf-e">E-posta</label><input id="pf-e" class="input" type="email" value="elif.kaya@posta.com"></div>
+            <div class="field"><label for="pf-p">Telefon</label><input id="pf-p" class="input" type="tel" value="0532 555 12 34"></div>
+            <div class="field"><label for="pf-l">Konum</label><button id="pf-l" onClick="{{ openLoc }}" class="input" style="display:flex;align-items:center;gap:8px;text-align:left;cursor:pointer">{{ ic.sm.pin }} {{ locLabel }}</button></div>
+          </div>
+          <button onClick="{{ saveProfile }}" class="btn btn-primary" style="margin-top:20px;padding:12px 18px">Kaydet</button>
+        </sc-if>
+        <sc-if value="{{ pIs.reviews }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-size:20px;margin:0 0 8px">Değerlendirmelerim</h2>
+          <sc-for list="{{ myReviews }}" as="r" hint-placeholder-count="2">
+            <article style="padding:18px 0;border-top:1px solid var(--color-divider);display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>{{ r.salon }} · {{ r.service }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">{{ r.date }}</span></div>
+              <div style="display:flex;gap:10px;align-items:center"><div style="display:flex;gap:1px"><sc-for list="{{ r.stars }}" as="st" hint-placeholder-count="5"><span style="color:{{ st.color }}">{{ ic.starF }}</span></sc-for></div><span class="{{ r.tagClass }}">{{ r.shareLabel }}</span></div>
+              <p style="margin:0;font-size:14px">{{ r.text }}</p>
+            </article>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ pIs.notifPrefs }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-size:20px;margin:0 0 8px">Bildirim tercihleri</h2>
+          <sc-for list="{{ prefList }}" as="t" hint-placeholder-count="4">
+            <div style="display:flex;gap:16px;align-items:center;padding:16px 0;border-top:1px solid var(--color-divider)">
+              <div style="flex:1"><div style="font-weight:700;font-size:15px" id="{{ t.id }}">{{ t.label }}</div><div style="font-size:13px;color:var(--color-neutral-700)">{{ t.desc }}</div></div>
+              <button role="switch" aria-checked="{{ t.on }}" aria-labelledby="{{ t.id }}" onClick="{{ t.onToggle }}" style="width:44px;height:24px;flex:none;position:relative;border:0;padding:0;background:{{ t.track }};cursor:pointer"><span style="position:absolute;top:2px;left:{{ t.knob }};width:20px;height:20px;background:var(--color-bg);transition:left .15s"></span></button>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ pIs.settings }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-size:20px;margin:0 0 16px">Ayarlar</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+            <div class="field"><label for="st-lang">Dil</label><select id="st-lang" class="input"><option>Türkçe</option><option>English</option></select></div>
+            <div class="field"><label for="st-pw">Şifre</label><button id="st-pw" class="btn btn-secondary" style="width:100%;justify-content:flex-start;min-height:36px">Şifreyi değiştir</button></div>
+          </div>
+          <div style="margin-top:32px;padding-top:20px;border-top:2px solid var(--color-divider)">
+            <div style="font-weight:700">Hesabı sil</div>
+            <p style="font-size:13px;color:var(--color-neutral-700);margin:4px 0 12px">Tüm randevu geçmişin ve değerlendirmelerin kalıcı olarak silinir.</p>
+            <button class="btn btn-secondary" style="color:var(--color-accent-700);border-color:var(--color-accent-700)">Hesabımı sil</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.notifs }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="10 Bildirimler" style="max-width:860px;margin:0 auto;padding:32px clamp(16px,4vw,40px) 0">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+      <h1 style="font-size:clamp(30px,3.6vw,44px);margin:0">Bildirimler</h1>
+      <button onClick="{{ markAllRead }}" disabled="{{ noUnread }}" class="btn btn-ghost">Tümünü okundu işaretle</button>
+    </div>
+    <ul style="list-style:none;margin:0;padding:0;border-top:2px solid var(--color-text)">
+      <sc-for list="{{ notifList }}" as="n" hint-placeholder-count="5">
+        <li>
+          <button onClick="{{ n.onClick }}" style="width:100%;display:flex;gap:16px;align-items:flex-start;padding:18px 16px;border:0;border-bottom:1px solid var(--color-divider);background:{{ n.bg }};cursor:pointer;text-align:left;color:var(--color-text)" style-hover="background:var(--color-neutral-200)">
+            <span style="width:40px;height:40px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);background:var(--color-bg)">{{ n.icon }}</span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:15px;font-weight:{{ n.weight }}">{{ n.title }}</span>
+              <span style="font-size:13px;color:var(--color-neutral-700)">{{ n.body }}</span>
+            </span>
+            <span style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none">
+              <span style="font-size:12px;color:var(--color-neutral-700)">{{ n.time }}</span>
+              <sc-if value="{{ n.unread }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:800;letter-spacing:0.08em;color:var(--color-accent-700);display:flex;gap:4px;align-items:center"><span style="width:8px;height:8px;background:var(--color-accent)"></span>YENİ</span></sc-if>
+            </span>
+          </button>
+        </li>
+      </sc-for>
+    </ul>
+  </div>
+</sc-if>
+
+</main>
+
+<footer style="border-top:2px solid var(--color-divider);margin-top:96px">
+  <div style="max-width:1280px;margin:0 auto;padding:40px clamp(16px,4vw,40px) 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:32px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;background:var(--color-accent)"></span><span style="font-weight:800;font-size:18px">SalonaBOX</span></div>
+      <p style="font-size:13px;color:var(--color-neutral-700);margin:0;max-width:30ch">Kuaförünü bul, boş saati seç, randevun anında oluşsun.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:14px"><h6 style="margin:0 0 4px;color:var(--color-neutral-700)">Keşfet</h6><a href="#" style="color:var(--color-text);text-decoration:none">Kuaförler</a><a href="#" style="color:var(--color-text);text-decoration:none">Hizmetler</a><a href="#" style="color:var(--color-text);text-decoration:none">Şehirler</a></div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:14px"><h6 style="margin:0 0 4px;color:var(--color-neutral-700)">Kuaförler için</h6><a href="Salon Panel.dc.html" style="color:var(--color-text);text-decoration:none">Kuaför paneli</a><a href="#" style="color:var(--color-text);text-decoration:none">Salonunu ekle</a></div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:14px"><h6 style="margin:0 0 4px;color:var(--color-neutral-700)">Destek</h6><a href="#" style="color:var(--color-text);text-decoration:none">Yardım merkezi</a><a href="#" style="color:var(--color-text);text-decoration:none">İptal politikası</a></div>
+  </div>
+  <div style="max-width:1280px;margin:0 auto;padding:16px clamp(16px,4vw,40px) 24px;border-top:1px solid var(--color-divider);font-size:12px;color:var(--color-neutral-700);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><span>© 2026 SalonaBOX</span><span>KVKK · Kullanım koşulları</span></div>
+  <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}"><div style="height:76px"></div></sc-if>
+</footer>
+
+<sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+  <nav aria-label="Mobil menü" style="position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--color-bg);border-top:2px solid var(--color-divider);display:grid;grid-template-columns:repeat(4,1fr)">
+    <sc-for list="{{ bottomNav }}" as="b" hint-placeholder-count="4">
+      <button onClick="{{ b.onClick }}" aria-current="{{ b.current }}" style="min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:0;border-top:3px solid {{ b.border }};margin-top:-2px;color:{{ b.color }};font-size:11px;font-weight:600;cursor:pointer">{{ b.icon }}{{ b.label }}</button>
+    </sc-for>
+  </nav>
+</sc-if>
+<sc-if value="{{ showMobileCta }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--color-bg);border-top:2px solid var(--color-divider);padding:10px 16px;display:flex;gap:12px;align-items:center">
+    <div style="flex:1;line-height:1.2"><div style="font-size:11px;color:var(--color-neutral-700)">{{ mobileCta.kicker }}</div><div style="font-weight:800;font-size:17px">{{ mobileCta.value }}</div></div>
+    <button onClick="{{ mobileCta.onClick }}" disabled="{{ mobileCta.disabled }}" class="btn btn-primary" style="height:48px;padding:0 18px;gap:10px">{{ mobileCta.label }} {{ ic.ar }}</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ locOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:80" onClick="{{ closeLoc }}">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="loc-t" onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:var(--color-bg);padding:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><div id="loc-t" class="dialog-title">Konum seç</div><button onClick="{{ closeLoc }}" aria-label="Kapat" class="btn btn-icon">{{ ic.x }}</button></div>
+      <button onClick="{{ useCurrent }}" disabled="{{ locLoading }}" class="btn btn-secondary" style="justify-content:flex-start;gap:10px;padding:12px;width:100%">{{ locBtnIcon }} {{ locBtnLabel }}</button>
+      <sc-if value="{{ locDenied }}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="display:flex;gap:10px;padding:12px;background:var(--color-accent-100);color:var(--color-accent-800);font-size:13px">{{ ic.alert }}<span>Konum izni reddedildi. İl ve ilçeyi aşağıdan manuel seçebilirsin; tarayıcı ayarlarından izni daha sonra açabilirsin.</span></div>
+      </sc-if>
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--color-divider);background:var(--color-surface);padding:0 10px"><span style="color:var(--color-neutral-600)">{{ ic.search }}</span><input value="{{ locQ }}" onChange="{{ onLocQ }}" placeholder="İlçe ara" aria-label="İlçe ara" style="flex:1;border:0;background:transparent;height:40px;font-size:14px;color:var(--color-text)"></div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);border-top:2px solid var(--color-divider)">
+        <div role="listbox" aria-label="Şehir" style="border-right:1px solid var(--color-divider);display:flex;flex-direction:column;max-height:300px;overflow:auto">
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-700);padding:10px 12px 6px">Şehir</div>
+          <sc-for list="{{ cityList }}" as="c" hint-placeholder-count="5">
+            <button role="option" aria-selected="{{ c.selected }}" onClick="{{ c.onClick }}" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:0;background:{{ c.bg }};color:{{ c.fg }};font-weight:{{ c.weight }};font-size:14px;cursor:pointer;text-align:left" style-hover="background:var(--color-neutral-200)">{{ c.label }}{{ ic.sm.cr }}</button>
+          </sc-for>
+        </div>
+        <div role="listbox" aria-label="İlçe" style="display:flex;flex-direction:column;max-height:300px;overflow:auto">
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-700);padding:10px 12px 6px">İlçe</div>
+          <sc-for list="{{ distList }}" as="c" hint-placeholder-count="5">
+            <button role="option" aria-selected="{{ c.selected }}" onClick="{{ c.onClick }}" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:0;background:{{ c.bg }};color:{{ c.fg }};font-weight:{{ c.weight }};font-size:14px;cursor:pointer;text-align:left" style-hover="background:var(--color-neutral-200)">{{ c.label }}<sc-if value="{{ c.selected }}" hint-placeholder-val="{{ false }}">{{ ic.sm.check }}</sc-if></button>
+          </sc-for>
+          <sc-if value="{{ distEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:12px;font-size:13px;color:var(--color-neutral-700)">Sonuç yok.</div></sc-if>
+        </div>
+      </div>
+      <div class="dialog-actions"><button onClick="{{ closeLoc }}" class="btn btn-secondary">Vazgeç</button><button onClick="{{ applyLoc }}" class="btn btn-primary">Konumu uygula</button></div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ cancelOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:80" onClick="{{ closeCancel }}">
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="cx-t" aria-describedby="cx-b" onClick="{{ stop }}" style="background:var(--color-bg);padding:24px">
+      <div style="width:44px;height:44px;background:var(--color-accent-100);color:var(--color-accent-700);display:grid;place-items:center">{{ ic.alert }}</div>
+      <div id="cx-t" class="dialog-title">Randevu iptal edilsin mi?</div>
+      <div id="cx-b" class="dialog-body"><strong>{{ cx.service }}</strong> · {{ cx.salon }}<br>{{ cx.dateLabel }}, {{ cx.time }}<br><br>Bu işlem geri alınamaz. Saat tekrar müsait olur ve kuaföre bildirim gönderilir.</div>
+      <div class="field"><label for="cx-r">İptal nedeni (isteğe bağlı)</label><select id="cx-r" class="input"><option>Seçiniz</option><option>Planlarım değişti</option><option>Başka bir saat istiyorum</option><option>Diğer</option></select></div>
+      <div class="dialog-actions"><button onClick="{{ closeCancel }}" class="btn btn-secondary">Vazgeç</button><button onClick="{{ confirmCancel }}" disabled="{{ cancelling }}" class="btn btn-primary">{{ cancelLabel }}</button></div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ conflictOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:80">
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="cf-t" style="background:var(--color-bg);padding:24px">
+      <div style="width:44px;height:44px;background:var(--color-accent);color:var(--color-bg);display:grid;place-items:center">{{ ic.clock }}</div>
+      <div id="cf-t" class="dialog-title">Bu saat az önce başka bir müşteri tarafından alındı.</div>
+      <div class="dialog-body">Hizmet ve tarih seçimin korunuyor. Aynı gün içinde başka bir boş saat seçebilirsin.</div>
+      <div class="dialog-actions" style="justify-content:flex-start"><button onClick="{{ pickAnother }}" class="btn btn-primary" style="gap:10px;padding:12px 16px">Başka Saat Seç {{ ic.ar }}</button></div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
+  <div role="dialog" aria-modal="true" aria-label="Portföy görüntüleyici" onTouchStart="{{ lbTouchStart }}" onTouchEnd="{{ lbTouchEnd }}" style="position:fixed;inset:0;z-index:90;background:color-mix(in srgb,var(--color-neutral-900) 96%,transparent);color:var(--color-bg);display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px">
+      <span style="font-size:13px;letter-spacing:0.06em">{{ lb.counter }}</span>
+      <button onClick="{{ lbClose }}" aria-label="Kapat (Esc)" style="width:44px;height:44px;display:grid;place-items:center;background:none;border:1px solid color-mix(in srgb,var(--color-bg) 40%,transparent);color:var(--color-bg);cursor:pointer">{{ ic.lg.x }}</button>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:16px;padding:0 16px;min-height:0">
+      <button onClick="{{ lbPrev }}" aria-label="Önceki fotoğraf" style="width:52px;height:52px;flex:none;display:grid;place-items:center;background:none;border:1px solid color-mix(in srgb,var(--color-bg) 40%,transparent);color:var(--color-bg);cursor:pointer">{{ ic.lg.cl }}</button>
+      <div style="position:relative;height:min(72vh,760px);aspect-ratio:4/5;max-width:calc(100vw - 168px)">
+        <div class="grayscale" style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,var(--color-neutral-500) 0 16px,var(--color-neutral-600) 16px 32px)"></div>
+        <span style="position:absolute;left:12px;bottom:10px;font-family:ui-monospace,monospace;font-size:11px;color:var(--color-neutral-200)">saç fotoğrafı · tam boyut</span>
+      </div>
+      <button onClick="{{ lbNext }}" aria-label="Sonraki fotoğraf" style="width:52px;height:52px;flex:none;display:grid;place-items:center;background:none;border:1px solid color-mix(in srgb,var(--color-bg) 40%,transparent);color:var(--color-bg);cursor:pointer">{{ ic.lg.cr }}</button>
+    </div>
+    <div style="padding:20px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end;border-top:1px solid color-mix(in srgb,var(--color-bg) 25%,transparent)">
+      <div><div style="font-size:20px;font-weight:800">{{ lb.name }}</div><div style="font-size:14px;opacity:0.8">{{ lb.service }}</div></div>
+      <div style="display:flex;gap:2px;align-items:center" aria-label="{{ lb.rating }} yıldız"><sc-for list="{{ lb.stars }}" as="st" hint-placeholder-count="5"><span style="color:{{ st.color }}">{{ ic.starM }}</span></sc-for></div>
+      <div style="font-size:12px;opacity:0.7">← → gezin · Esc kapat</div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" aria-live="polite" style="position:fixed;left:24px;bottom:{{ toastBottom }};z-index:95;background:var(--color-neutral-900);color:var(--color-bg);padding:14px 18px;display:flex;gap:10px;align-items:center;font-size:14px;box-shadow:var(--shadow-lg);max-width:calc(100vw - 48px)"><span style="color:var(--color-accent-400)">{{ ic.check }}</span>{{ toastMsg }}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Ana sayfa&quot;,&quot;Arama sonuçları&quot;,&quot;Salon detay&quot;,&quot;Randevu al&quot;,&quot;Randevu başarılı&quot;,&quot;Randevularım&quot;,&quot;Randevu detay&quot;,&quot;Değerlendirme&quot;,&quot;Profil&quot;,&quot;Bildirimler&quot;],&quot;default&quot;:&quot;Ana sayfa&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototip&quot;},&quot;demoState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Normal&quot;,&quot;Yükleniyor&quot;,&quot;Boş&quot;,&quot;Hata&quot;],&quot;default&quot;:&quot;Normal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Durumlar&quot;},&quot;simulateConflict&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Durumlar&quot;},&quot;locationPermission&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Reddedildi&quot;,&quot;İzin verildi&quot;],&quot;default&quot;:&quot;Reddedildi&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Durumlar&quot;}}">
+const ICONS={
+star:[{pg:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"}],
+pin:["M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z",{c:[12,10,3]}],
+search:[{c:[11,11,8]},"m21 21-4.3-4.3"],
+cal:[{r:[3,4,18,18,2]},"M16 2v4","M8 2v4","M3 10h18"],
+calPlus:[{r:[3,4,18,18,2]},"M16 2v4","M8 2v4","M3 10h18","M12 14v4","M10 16h4"],
+calCheck:[{r:[3,4,18,18,2]},"M16 2v4","M8 2v4","M3 10h18","m9 16 2 2 4-4"],
+clock:[{c:[12,12,10]},{pl:"12 6 12 12 16 14"}],
+bell:["M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9","M10.3 21a1.94 1.94 0 0 0 3.4 0"],
+user:["M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2",{c:[12,7,4]}],
+x:["M18 6 6 18","m6 6 12 12"],
+cl:["m15 18-6-6 6-6"],cr:["m9 18 6-6-6-6"],cd:["m6 9 6 6 6-6"],
+ar:["M5 12h14","m12 5 7 7-7 7"],al:["m12 19-7-7 7-7","M19 12H5"],
+sliders:["M4 21v-7","M4 10V3","M12 21v-9","M12 8V3","M20 21v-5","M20 12V3","M2 14h4","M10 8h4","M18 16h4"],
+phone:["M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"],
+mail:[{r:[2,4,20,16,2]},"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"],
+check:["M20 6 9 17l-5-5"],
+checkC:[{c:[12,12,10]},"m9 12 2 2 4-4"],
+alert:["m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3","M12 9v4","M12 17h.01"],
+scissors:[{c:[6,6,3]},{c:[6,18,3]},"M20 4 8.12 15.88","M14.47 14.48 20 20","M8.12 8.12 12 12"],
+nav:[{pg:"3 11 22 2 13 21 11 13 3 11"}],
+home:["m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",{pl:"9 22 9 12 15 12 15 22"}],
+xC:[{c:[12,12,10]},"m15 9-6 6","m9 9 6 6"],
+ban:[{c:[12,12,10]},"m4.9 4.9 14.2 14.2"],
+refresh:["M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8","M21 3v5h-5","M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16","M8 16H3v5"],
+loader:["M21 12a9 9 0 1 1-6.219-8.56"],
+camera:["M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",{c:[12,13,3]}],
+droplet:["M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"],
+sparkle:["M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"],
+contrast:[{c:[12,12,10]},"M12 18a6 6 0 0 0 0-12v12z"],
+waves:["M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1","M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1","M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"],
+wind:["M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2","M9.6 4.6A2 2 0 1 1 11 8H2","M12.6 19.4A2 2 0 1 0 14 16H2"],
+crown:["M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z","M5 21h14"],
+grid:[{r:[3,3,7,7]},{r:[14,3,7,7]},{r:[14,14,7,7]},{r:[3,14,7,7]}]
+};
+function mk(n,s,fill){const d=ICONS[n];return React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:fill?'currentColor':'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round','aria-hidden':'true',focusable:'false',style:{display:'block',flex:'none'}},d.map((e,i)=>typeof e==='string'?React.createElement('path',{key:i,d:e}):e.c?React.createElement('circle',{key:i,cx:e.c[0],cy:e.c[1],r:e.c[2]}):e.r?React.createElement('rect',{key:i,x:e.r[0],y:e.r[1],width:e.r[2],height:e.r[3],rx:e.r[4]||0}):e.pl?React.createElement('polyline',{key:i,points:e.pl}):React.createElement('polygon',{key:i,points:e.pg})));}
+const IC={};Object.keys(ICONS).forEach(n=>IC[n]=mk(n,18));
+IC.sm={pin:mk('pin',14),clock:mk('clock',14),cal:mk('cal',14),check:mk('check',14),x:mk('x',12),ban:mk('ban',12),calCheck:mk('calCheck',12),cr:mk('cr',14),star:mk('star',14,true),checkT:mk('check',12),xT:mk('x',12)};
+IC.starF=mk('star',14,true);IC.starM=mk('star',18,true);IC.starL=mk('star',28,true);
+IC.lg={check:mk('check',36),alert:mk('alert',28),search:mk('search',28),cal:mk('cal',28),x:mk('x',22),cl:mk('cl',26),cr:mk('cr',26)};
+const MONTHS=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+const MON_S=['OCA','ŞUB','MAR','NİS','MAY','HAZ','TEM','AĞU','EYL','EKİ','KAS','ARA'];
+const WD=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+const WD_S=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+const fmt=n=>n.toLocaleString('tr-TR')+' TL';
+const SERVICES=[{id:'balayage',name:'Balayage',dur:180,price:2500},{id:'kesim',name:'Saç Kesimi',dur:45,price:600},{id:'boya',name:'Boya',dur:120,price:1800},{id:'ombre',name:'Ombre',dur:150,price:2200},{id:'rofle',name:'Röfle',dur:120,price:1900},{id:'fon',name:'Fön',dur:30,price:350},{id:'gelin',name:'Gelin Saçı',dur:120,price:3500}];
+const SVC={};SERVICES.forEach(s=>SVC[s.id]=s);
+const SALONS=[
+{id:1,name:'Ayşe Yılmaz Studio',hood:'Moda',dist:1.2,rating:4.9,count:212,svc:['Balayage','Boya','Saç Kesimi'],from:350,pop:98},
+{id:2,name:'Atelier Nur',hood:'Caferağa',dist:0.8,rating:4.8,count:127,svc:['Gelin Saçı','Fön','Ombre'],from:400,pop:91},
+{id:3,name:'Kesik Hair Lab',hood:'Fenerbahçe',dist:2.4,rating:4.7,count:342,svc:['Saç Kesimi','Röfle'],from:300,pop:99},
+{id:4,name:'Form Kuaför',hood:'Göztepe',dist:3.1,rating:4.6,count:88,svc:['Boya','Röfle','Fön'],from:280,pop:70},
+{id:5,name:'Ton & Işık',hood:'Acıbadem',dist:2.9,rating:4.9,count:64,svc:['Balayage','Ombre'],from:450,pop:66},
+{id:6,name:'Mavi Makas',hood:'Bostancı',dist:4.6,rating:4.5,count:156,svc:['Saç Kesimi','Fön'],from:250,pop:80},
+{id:7,name:'Lina Hair Atelier',hood:'Suadiye',dist:4.2,rating:4.8,count:203,svc:['Gelin Saçı','Balayage'],from:500,pop:88},
+{id:8,name:'Kuzey Saç Evi',hood:'Koşuyolu',dist:1.9,rating:4.4,count:47,svc:['Boya','Saç Kesimi'],from:260,pop:52}];
+const SALON=id=>SALONS.find(s=>s.id===id)||SALONS[0];
+const CITIES={'İstanbul':['Kadıköy','Beşiktaş','Şişli','Üsküdar','Ataşehir','Bakırköy','Sarıyer'],'Ankara':['Çankaya','Keçiören','Yenimahalle','Etimesgut'],'İzmir':['Konak','Karşıyaka','Bornova','Çeşme'],'Bursa':['Nilüfer','Osmangazi'],'Antalya':['Muratpaşa','Konyaaltı']};
+const CATS=[['Saç Kesimi','scissors','Saç Kesimi'],['Boya','droplet','Boya'],['Balayage','sparkle','Balayage'],['Ombre','contrast','Ombre'],['Röfle','waves','Röfle'],['Fön','wind','Fön'],['Gelin Saçı','crown','Gelin Saçı'],['Diğer','grid',null]];
+const CAT_IC={};CATS.forEach(c=>CAT_IC[c[1]]=mk(c[1],26));
+const PORTFOLIO=[['Zeynep Baş','Balayage',5],['Elif Demir','Ombre',5],['Selin Aksoy','Saç Kesimi',4],['Deniz Kara','Röfle',5],['Ece Turan','Boya',5],['Melis Ak','Gelin Saçı',5],['Buse Öz','Balayage',4],['İpek Yıldız','Fön',5]];
+const REVIEWS=[
+{name:'Zeynep Baş',initials:'ZB',rating:5,date:'28 Eylül 2026',service:'Balayage',photo:true,text:'Ne istediğimi ilk dakikada anladı. Renk geçişleri çok doğal oldu, üç hafta sonra bile ilk günkü gibi duruyor.'},
+{name:'Selin Aksoy',initials:'SA',rating:4,date:'19 Eylül 2026',service:'Saç Kesimi',photo:false,text:'Kesim çok iyiydi; randevu saatinde başlandı. Salon cumartesi biraz kalabalıktı.'},
+{name:'Elif Demir',initials:'ED',rating:5,date:'3 Eylül 2026',service:'Ombre',photo:true,text:'Uygulama öncesi saç analizi yapıldı ve bakım önerileri verildi. Kesinlikle tekrar geleceğim.'},
+{name:'Mert Güneş',initials:'MG',rating:5,date:'27 Ağustos 2026',service:'Saç Kesimi',photo:false,text:'Online randevu ile bekleme olmadan girdim. Hızlı, temiz ve özenli.'}];
+const STATUS={BOOKED:{label:'Randevu alındı',cls:'tag tag-accent',icon:IC.sm.calCheck},COMPLETED:{label:'Tamamlandı',cls:'tag tag-neutral',icon:IC.sm.checkT},CANCELLED:{label:'İptal edildi',cls:'tag tag-outline',icon:IC.sm.xT},NO_SHOW:{label:'Gelinmedi',cls:'tag tag-neutral',icon:IC.sm.ban}};
+const INIT_APPTS=[
+{id:'a1',salonId:3,svc:'kesim',y:2026,m:9,d:9,time:'15:00',status:'BOOKED'},
+{id:'a2',salonId:2,svc:'fon',y:2026,m:9,d:20,time:'14:30',status:'BOOKED'},
+{id:'a3',salonId:3,svc:'kesim',y:2026,m:8,d:21,time:'11:00',status:'COMPLETED',reviewed:false},
+{id:'a4',salonId:5,svc:'ombre',y:2026,m:8,d:2,time:'13:00',status:'COMPLETED',reviewed:true},
+{id:'a5',salonId:4,svc:'boya',y:2026,m:7,d:14,time:'10:30',status:'CANCELLED'},
+{id:'a6',salonId:6,svc:'fon',y:2026,m:6,d:30,time:'17:00',status:'NO_SHOW'}];
+const INIT_NOTIFS=[
+{id:1,type:'booked',title:'Randevunuz oluşturuldu.',body:'Kesik Hair Lab · Saç Kesimi · 9 Ekim, 15:00',time:'2 saat önce',unread:true},
+{id:2,type:'updated',title:'Randevunuz güncellendi.',body:'Atelier Nur randevu saatinizi 14:30 olarak güncelledi.',time:'Dün',unread:true},
+{id:3,type:'review',title:'Değerlendirmeniz için hazır.',body:'Kesik Hair Lab ziyaretinizi değerlendirin.',time:'2 gün önce',unread:true,go:'a3'},
+{id:4,type:'completed',title:'Randevunuz tamamlandı.',body:'Ton & Işık · Ombre · 2 Eylül',time:'2 Eyl',unread:false},
+{id:5,type:'cancelled',title:'Randevunuz iptal edildi.',body:'Form Kuaför · Boya · 14 Ağustos',time:'14 Ağu',unread:false}];
+const N_IC={booked:IC.calCheck,updated:IC.refresh,review:IC.sm.star,completed:IC.checkC,cancelled:IC.xC};
+const pad=n=>String(n).padStart(2,'0');
+const TIMES=[];for(let h=9;h<19;h++){TIMES.push(pad(h)+':00');TIMES.push(pad(h)+':30');}
+function locSuffix(w){const v=(w.match(/[aeıioöuü]/gi)||['a']).pop().toLowerCase();const back='aıou'.includes(v);const hard='fstkçşhp'.includes(w.slice(-1).toLowerCase());return w+"'"+(hard?'t':'d')+(back?'a':'e');}
+const starsOf=(r,on,off)=>[1,2,3,4,5].map(i=>({color:i<=r?on:off}));
+
+class Component extends DCLogic {
+  state={w:typeof window!=='undefined'?window.innerWidth:1280,screen:'home',query:'',sort:'rating',cat:null,city:'İstanbul',district:'Kadıköy',
+    locOpen:false,locStatus:'idle',locCity:'İstanbul',locDist:'Kadıköy',locQ:'',
+    fDist:5,fSvc:[],fStyles:[],fMin:0,fAvail:'any',drawer:false,page:1,
+    salonId:1,lb:null,bSvc:null,bMonth:0,bDate:null,bTime:null,slotsLoading:false,submitting:false,conflictOpen:false,conflictUsed:false,taken:[],
+    last:null,apptTab:'up',apptId:null,cancelOpen:false,cancelling:false,
+    rId:'a3',rRating:0,rComment:'',rPhotos:0,rShare:true,pTab:'account',prefs:{email:true,sms:true,remind:true,promo:false},
+    appts:INIT_APPTS,notifs:INIT_NOTIFS,toast:null};
+  componentDidMount(){
+    this.onResize=()=>this.setState({w:window.innerWidth});window.addEventListener('resize',this.onResize);
+    this.onKey=e=>{const s=this.state;if(s.lb!==null){if(e.key==='ArrowRight')this.lbStep(1);else if(e.key==='ArrowLeft')this.lbStep(-1);else if(e.key==='Escape')this.setState({lb:null});}
+      else if(e.key==='Escape'){if(s.locOpen)this.setState({locOpen:false});else if(s.cancelOpen)this.setState({cancelOpen:false});else if(s.drawer)this.setState({drawer:false});}};
+    window.addEventListener('keydown',this.onKey);
+    if(this.props.startScreen)this.jump(this.props.startScreen);
+  }
+  componentDidUpdate(pp){if(pp.startScreen!==this.props.startScreen)this.jump(this.props.startScreen);}
+  componentWillUnmount(){window.removeEventListener('resize',this.onResize);window.removeEventListener('keydown',this.onKey);clearTimeout(this.tt);}
+  jump(k){const map={'Ana sayfa':'home','Arama sonuçları':'search','Salon detay':'salon','Randevu al':'booking','Randevu başarılı':'success','Randevularım':'appts','Randevu detay':'apptDetail','Değerlendirme':'review','Profil':'profile','Bildirimler':'notifs'};const s=map[k];if(!s)return;const x={};
+    if(s==='success'&&!this.state.last)x.last={id:'n0',salonId:1,svc:'balayage',y:2026,m:9,d:12,time:'10:00',ref:'SL-48213'};
+    if(s==='booking'&&!this.state.bSvc)x.bSvc='balayage';
+    if(s==='apptDetail')x.apptId='a1';if(s==='review')Object.assign(x,{rId:'a3',rRating:0,rComment:'',rPhotos:0,rShare:true});this.go(s,x);}
+  go(screen,x={}){this.setState({screen,drawer:false,...x});try{window.scrollTo(0,0)}catch(e){}}
+  toast(msg){clearTimeout(this.tt);this.setState({toast:msg});this.tt=setTimeout(()=>this.setState({toast:null}),3200);}
+  scrollToId(id){const el=document.getElementById(id);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-130,behavior:'smooth'});}
+  openSalon(id){this.go('salon',{salonId:id});}
+  startBooking(id,svc){this.go('booking',{salonId:id,bSvc:svc||this.state.bSvc,bTime:null});}
+  lbStep(d){const n=PORTFOLIO.length;this.setState(s=>({lb:(s.lb+d+n)%n}));}
+  isBooked(m,d,i){if(this.state.taken.includes(`${m}-${d}-${TIMES[i]}`))return true;if(m===9&&d===12)return [0,3,6,7,11,14,15].includes(i);return (d*3+i*5)%7===0||(d+i)%6===0;}
+  pickDate(m,d){clearTimeout(this.st);this.setState({bDate:{m,d},bTime:null,slotsLoading:true});this.st=setTimeout(()=>this.setState({slotsLoading:false}),450);}
+  submit(){const s=this.state;if(!s.bSvc||!s.bDate||!s.bTime||s.submitting)return;this.setState({submitting:true});
+    setTimeout(()=>{const s=this.state;
+      if((this.props.simulateConflict??false)&&!s.conflictUsed){this.setState({submitting:false,conflictOpen:true,conflictUsed:true,taken:[...s.taken,`${s.bDate.m}-${s.bDate.d}-${s.bTime}`]});return;}
+      const v=SVC[s.bSvc],sal=SALON(s.salonId);const a={id:'n'+Date.now(),salonId:s.salonId,svc:s.bSvc,y:2026,m:s.bDate.m,d:s.bDate.d,time:s.bTime,status:'BOOKED'};
+      this.setState({submitting:false,appts:[a,...s.appts],last:{...a,ref:'SL-'+(48213+s.appts.length)},taken:[...s.taken,`${a.m}-${a.d}-${a.time}`],
+        notifs:[{id:Date.now(),type:'booked',title:'Randevunuz oluşturuldu.',body:`${sal.name} · ${v.name} · ${a.d} ${MONTHS[a.m]}, ${a.time}`,time:'Şimdi',unread:true},...s.notifs]});
+      this.go('success');},900);}
+  view(a){const s=SALON(a.salonId),v=SVC[a.svc],dt=new Date(a.y,a.m,a.d),c=STATUS[a.status];const inactive=a.status==='CANCELLED'||a.status==='NO_SHOW';
+    return {...a,salon:s.name,address:`${s.hood}, Kadıköy · İstanbul`,service:v.name,durLabel:v.dur+' dakika',priceLabel:fmt(v.price),mon:MON_S[a.m],wdShort:WD_S[dt.getDay()],
+      dateLabel:`${a.d} ${MONTHS[a.m]} ${a.y}`,wd:WD[dt.getDay()],timeLine:`${a.time} · ${v.dur} dk`,statusLabel:c.label,tagClass:c.cls,statusIcon:c.icon,
+      isUp:a.status==='BOOKED',isPast:a.status!=='BOOKED',canReview:a.status==='COMPLETED'&&!a.reviewed,reviewed:a.status==='COMPLETED'&&!!a.reviewed,isInactive:inactive,dim:inactive?'0.72':'1',
+      onDetail:()=>this.go('apptDetail',{apptId:a.id}),onCancel:()=>this.setState({apptId:a.id,cancelOpen:true}),
+      onReview:()=>this.go('review',{rId:a.id,rRating:0,rComment:'',rPhotos:0,rShare:true}),onRebook:()=>this.startBooking(a.salonId,a.svc)};}
+  renderVals(){
+    const st=this.state,mob=st.w<768,demo=this.props.demoState??'Normal';
+    const sal=SALON(st.salonId);const is={};['home','search','salon','booking','success','appts','apptDetail','review','profile','notifs'].forEach(k=>is[k]=st.screen===k);
+    const A='var(--color-accent)',T='var(--color-text)',BG='var(--color-bg)';
+    const grp={home:['home'],search:['search','salon','booking','success'],appts:['appts','apptDetail','review'],profile:['profile'],notifs:['notifs']};
+    const onTab=k=>(grp[k]||[k]).includes(st.screen);
+    const navItems=[['Keşfet','home'],['Kuaförler','search'],['Randevularım','appts']].map(([label,k])=>({label,onClick:()=>this.go(k),current:onTab(k)?'page':undefined,color:onTab(k)?A:T,border:onTab(k)?A:'transparent'}));
+    const bottomNav=[['Keşfet','home','home'],['Ara','search','search'],['Randevular','appts','cal'],['Profil','profile','user']].map(([label,k,i])=>({label,icon:IC[i],onClick:()=>this.go(k),current:onTab(k)?'page':undefined,color:onTab(k)?A:T,border:onTab(k)?A:'transparent'}));
+    const unread=st.notifs.filter(n=>n.unread).length;const district=st.district;
+    const locLabel=`${st.city}, ${district}`;
+    const card=s=>({...s,place:district==='Kadıköy'?`${s.hood}, Kadıköy`:district,distLabel:s.dist.toLocaleString('tr-TR')+' km',fromLabel:fmt(s.from),svc:s.svc.slice(0,3),
+      onOpen:()=>this.openSalon(s.id),onKey:e=>{if(e.key==='Enter'&&e.target===e.currentTarget)this.openSalon(s.id)},onBook:e=>{e.stopPropagation();this.startBooking(s.id)}});
+    const sorter=st.sort==='rating'?(a,b)=>b.rating-a.rating:st.sort==='dist'?(a,b)=>a.dist-b.dist:(a,b)=>b.pop-a.pop;
+    const seg=(on)=>({bg:on?A:'transparent',fg:on?BG:T,pressed:on});
+    const sortOpts=[['En yüksek puan','rating'],['En yakın','dist'],['En popüler','pop']].map(([label,k])=>({label,...seg(st.sort===k),onClick:()=>this.setState({sort:k})}));
+    const categories=CATS.map(([label,icon,svc])=>{const on=st.cat===label;return {label,icon:CAT_IC[icon],pressed:on,bg:on?T:'var(--color-surface)',fg:on?BG:T,border:on?T:'transparent',iconColor:on?BG:A,
+      onClick:()=>{this.setState({cat:label,fSvc:svc?[svc]:[]});this.go('search');}};});
+    const popular=['Balayage','Kısa bob','Gelin saçı','Ombre'].map(label=>({label,onClick:()=>{const m=SERVICES.find(v=>label.toLowerCase().startsWith(v.name.toLowerCase().slice(0,5)));this.setState({fSvc:m?[m.name]:[],query:label});this.go('search');}}));
+    const filtered=SALONS.filter(s=>s.dist<=st.fDist&&(!st.fSvc.length||st.fSvc.some(v=>s.svc.includes(v)))&&s.rating>=st.fMin).sort(sorter);
+    const availL={any:'Herhangi bir zaman',today:'Bugün',tomorrow:'Yarın',week:'Bu hafta'};
+    const chips=[...st.fSvc.map(v=>({label:v,onRemove:()=>this.setState(s=>({fSvc:s.fSvc.filter(x=>x!==v),cat:null}))})),
+      ...st.fStyles.map(v=>({label:v,onRemove:()=>this.setState(s=>({fStyles:s.fStyles.filter(x=>x!==v)}))})),
+      ...(st.fMin?[{label:st.fMin.toLocaleString('tr-TR')+'+ puan',onRemove:()=>this.setState({fMin:0})}]:[]),
+      ...(st.fAvail!=='any'?[{label:availL[st.fAvail],onRemove:()=>this.setState({fAvail:'any'})}]:[]),
+      ...(st.fDist!==5?[{label:st.fDist+' km',onRemove:()=>this.setState({fDist:5})}]:[])];
+    const resultCount=chips.length?filtered.length:128;
+    const clearFilters=()=>this.setState({fSvc:[],fStyles:[],fMin:0,fAvail:'any',fDist:5,cat:null});
+    const filterStyle=mob?{display:st.drawer?'block':'none',position:'fixed',left:0,right:0,bottom:0,maxHeight:'86vh',overflowY:'auto',zIndex:60,background:'var(--color-bg)',padding:'16px 20px 20px',borderTop:'2px solid var(--color-text)'}
+      :{flex:'0 0 270px',width:270,position:'sticky',top:92,maxHeight:'calc(100vh - 110px)',overflowY:'auto',paddingRight:4};
+    const loading=demo==='Yükleniyor',err=demo==='Hata',empty=demo==='Boş';
+    // booking
+    const bm=9+st.bMonth,first=(new Date(2026,bm,1).getDay()+6)%7,dim=new Date(2026,bm+1,0).getDate();
+    const days=[];for(let i=0;i<first;i++)days.push({label:'',sub:'',vis:'hidden',disabled:true,bg:'transparent',fg:T,border:'0',cursor:'default',deco:'none',weight:400});
+    for(let d=1;d<=dim;d++){const dow=new Date(2026,bm,d).getDay();const past=bm===9&&d<7,closed=dow===0||(bm===9&&d===15),dis=past||closed;const sel=st.bDate&&st.bDate.m===bm&&st.bDate.d===d;const today=bm===9&&d===7;
+      days.push({label:d,sub:closed&&!past?'Kapalı':today?'Bugün':'',vis:'visible',disabled:dis,pressed:!!sel,aria:`${d} ${MONTHS[bm]}${closed?', kapalı':past?', geçmiş':''}`,
+        bg:sel?A:dis?'transparent':BG,fg:sel?BG:dis?'var(--color-neutral-500)':T,border:today&&!sel?'2px solid var(--color-text)':'1px solid transparent',cursor:dis?'not-allowed':'pointer',deco:dis?'line-through':'none',weight:sel||today?800:500,
+        onClick:()=>this.pickDate(bm,d)});}
+    let slots=[],free=0;
+    if(st.bDate){slots=TIMES.map((t,i)=>{const b=this.isBooked(st.bDate.m,st.bDate.d,i);const sel=st.bTime===t;if(!b)free++;
+      return {time:t,status:b?'Dolu':sel?'Seçildi':'Boş',disabled:b,pressed:sel,aria:`${t} ${b?'dolu':'boş'}`,bg:sel?A:b?'repeating-linear-gradient(135deg,var(--color-neutral-200) 0 6px,var(--color-bg) 6px 12px)':BG,
+        fg:sel?BG:b?'var(--color-neutral-600)':T,border:sel?A:b?'var(--color-neutral-300)':'var(--color-divider)',cursor:b?'not-allowed':'pointer',deco:b?'line-through':'none',onClick:()=>this.setState({bTime:t})};});}
+    const v=st.bSvc?SVC[st.bSvc]:null;const stepIdx=!v?0:!st.bDate?1:!st.bTime?2:3;
+    const steps=['Hizmet','Tarih','Saat','Özet'].map((label,i)=>{const done=i<stepIdx,act=i===stepIdx;return {label,current:act?'step':undefined,mark:done?IC.sm.checkT:i+1,bar:done||act?T:'transparent',weight:act?800:600,fg:done||act?T:'var(--color-neutral-600)',
+      boxBg:done?T:act?A:'transparent',boxFg:done||act?BG:'var(--color-neutral-700)',boxBorder:done?T:act?A:'var(--color-divider)'};});
+    const bSvcs=SERVICES.map(x=>{const on=st.bSvc===x.id;return {name:x.name,durLabel:x.dur+' dk',priceLabel:fmt(x.price),checked:on,bg:on?'var(--color-surface)':'transparent',border:on?'2px solid var(--color-text)':'1px solid var(--color-divider)',dotBorder:on?A:'var(--color-neutral-500)',dotFill:on?A:'transparent',onClick:()=>this.setState({bSvc:x.id})};});
+    const dash='—',muted='var(--color-neutral-600)';
+    const dLabel=st.bDate?`${st.bDate.d} ${MONTHS[st.bDate.m]} 2026, ${WD[new Date(2026,st.bDate.m,st.bDate.d).getDay()]}`:dash;
+    const summaryRows=[{k:'Hizmet',v:v?v.name:dash},{k:'Tarih',v:dLabel},{k:'Saat',v:st.bTime||dash},{k:'Süre',v:v?v.dur+' dakika':dash}].map(r=>({...r,color:r.v===dash?muted:T}));
+    const canSubmit=!!(v&&st.bDate&&st.bTime);
+    // appts
+    const views=st.appts.map(a=>this.view(a));const up=views.filter(a=>a.isUp).sort((a,b)=>(a.m*100+a.d)-(b.m*100+b.d));const past=views.filter(a=>!a.isUp).sort((a,b)=>(b.m*100+b.d)-(a.m*100+a.d));
+    const list=st.apptTab==='up'?up:past;
+    const apptTabs=[['Yaklaşan',`up`,up.length],['Geçmiş','past',past.length]].map(([l,k,n])=>({label:`${l} (${n})`,selected:st.apptTab===k,border:st.apptTab===k?A:'transparent',color:st.apptTab===k?T:'var(--color-neutral-700)',onClick:()=>this.setState({apptTab:k})}));
+    const cur=views.find(a=>a.id===st.apptId)||views[0];
+    const dt={...cur,cells:[{k:'Kuaför',v:cur.salon},{k:'Hizmet',v:cur.service},{k:'Tarih',v:`${cur.dateLabel}, ${cur.wd}`},{k:'Saat',v:cur.time},{k:'Süre',v:cur.durLabel},{k:'Fiyat',v:cur.priceLabel},{k:'Konum',v:cur.address},{k:'Durum',v:cur.statusLabel}]};
+    const rvA=views.find(a=>a.id===st.rId)||views.find(a=>a.id==='a3');
+    const last=st.last?this.view(st.last):null;
+    const lbItem=st.lb!==null?PORTFOLIO[st.lb]:null;
+    const tog=(on)=>({track:on?A:'var(--color-neutral-400)',knob:on?'22px':'2px'});
+    return {
+      ic:IC,isMobile:mob,notMobile:!mob,is,navItems,bottomNav,showBottomNav:mob&&!(is.salon||is.booking),
+      showMobileCta:mob&&(is.salon||is.booking),
+      mobileCta:is.booking?{kicker:v?`${v.name} · ${st.bTime||'saat seç'}`:'Hizmet seç',value:v?fmt(v.price):dash,label:'Oluştur',disabled:!canSubmit||st.submitting,onClick:()=>this.submit()}
+        :{kicker:'Başlangıç',value:fmt(sal.from),label:'Randevu Al',disabled:false,onClick:()=>this.startBooking(sal.id)},
+      goHome:()=>this.go('home'),goSearch:()=>this.go('search'),goAppts:()=>this.go('appts'),goNotifs:()=>this.go('notifs'),goProfile:()=>this.go('profile'),
+      unreadCount:unread,hasUnread:unread>0,noUnread:unread===0,bellLabel:`Bildirimler, ${unread} okunmamış`,locLabel,
+      query:st.query,onQuery:e=>this.setState({query:e.target.value}),onHeroSearch:e=>{e.preventDefault();this.go('search');},popular,
+      categories,sortOpts,homeSalons:[...SALONS].sort(sorter).map(card),
+      resultTitle:`${locSuffix(district)} ${resultCount} kuaför`,results:filtered.map(card),activeChips:chips,hasActiveChips:chips.length>0,clearFilters,
+      filterCountLabel:chips.length?`(${chips.length})`:'',showResultsLabel:`${resultCount} sonucu göster`,
+      filterStyle,drawerBackdrop:mob&&st.drawer,openDrawer:()=>this.setState({drawer:true}),closeDrawer:()=>this.setState({drawer:false}),
+      distOpts:[1,3,5,10].map(k=>({label:k+' km',...seg(st.fDist===k),onClick:()=>this.setState({fDist:k})})),
+      svcChecks:SERVICES.map(x=>({label:x.name,count:SALONS.filter(s=>s.svc.includes(x.name)).length*14,checked:st.fSvc.includes(x.name),onChange:()=>this.setState(s=>({fSvc:s.fSvc.includes(x.name)?s.fSvc.filter(y=>y!==x.name):[...s.fSvc,x.name]}))})),
+      styleChips:['Kısa','Orta boy','Uzun','Bob','Kıvırcık','Dalgalı'].map(l=>{const on=st.fStyles.includes(l);return {label:l,pressed:on,bg:on?T:'transparent',fg:on?BG:T,border:on?T:'var(--color-divider)',onClick:()=>this.setState(s=>({fStyles:on?s.fStyles.filter(x=>x!==l):[...s.fStyles,l]}))};}),
+      ratingOpts:[['Tümü',0],['4.0 ve üzeri',4],['4.5 ve üzeri',4.5],['4.8 ve üzeri',4.8]].map(([label,k])=>({label,checked:st.fMin===k,onChange:()=>this.setState({fMin:k})})),
+      availOpts:Object.keys(availL).map(k=>({label:availL[k],checked:st.fAvail===k,onChange:()=>this.setState({fAvail:k})})),
+      showLoading:loading,showError:err,showEmpty:!loading&&!err&&(empty||filtered.length===0),showResults:!loading&&!err&&!empty&&filtered.length>0,
+      retry:()=>this.toast('Yeniden deneniyor…'),skeletons:[1,2,3,4,5,6],
+      pages:[1,2,3,'…',11].map(p=>({label:p,current:p===1?'page':undefined,bg:p===1?T:'transparent',fg:p===1?BG:T,border:p===1?T:'var(--color-divider)',onClick:()=>{}})),
+      // location
+      locOpen:st.locOpen,openLoc:()=>this.setState({locOpen:true,locCity:st.city,locDist:st.district,locQ:'',locStatus:'idle',drawer:false}),closeLoc:()=>this.setState({locOpen:false}),stop:e=>e.stopPropagation(),
+      locLoading:st.locStatus==='loading',locDenied:st.locStatus==='denied',locBtnIcon:st.locStatus==='loading'?IC.loader:IC.nav,locBtnLabel:st.locStatus==='loading'?'Konum alınıyor…':'Mevcut konumumu kullan',
+      useCurrent:()=>{this.setState({locStatus:'loading'});setTimeout(()=>{if((this.props.locationPermission??'Reddedildi')==='İzin verildi'){this.setState({locStatus:'idle',locOpen:false,city:'İstanbul',district:'Kadıköy'});this.toast('Konum bulundu: İstanbul, Kadıköy');}else this.setState({locStatus:'denied'});},900);},
+      locQ:st.locQ,onLocQ:e=>this.setState({locQ:e.target.value}),
+      cityList:Object.keys(CITIES).map(c=>{const on=st.locCity===c;return {label:c,selected:on,bg:on?'var(--color-accent-100)':'transparent',fg:on?'var(--color-accent-800)':T,weight:on?700:400,onClick:()=>this.setState({locCity:c,locDist:CITIES[c][0]})};}),
+      distList:CITIES[st.locCity].filter(d=>!st.locQ||d.toLocaleLowerCase('tr').includes(st.locQ.toLocaleLowerCase('tr'))).map(d=>{const on=st.locDist===d;return {label:d,selected:on,bg:on?'var(--color-accent-100)':'transparent',fg:on?'var(--color-accent-800)':T,weight:on?700:400,onClick:()=>this.setState({locDist:d})};}),
+      distEmpty:!CITIES[st.locCity].some(d=>!st.locQ||d.toLocaleLowerCase('tr').includes(st.locQ.toLocaleLowerCase('tr'))),
+      applyLoc:()=>{this.setState({city:st.locCity,district:st.locDist,locOpen:false});this.toast(`Konum: ${st.locCity}, ${st.locDist}`);},
+      // salon
+      salon:{...sal,address:`${sal.hood} Mah. Bahariye Cad. No:24, Kadıköy / İstanbul`,email:'merhaba@'+sal.name.toLowerCase().replace(/[^a-z]/g,'')+'.com',desc:`${sal.name}, renk ve kesimde uzmanlaşmış ekibiyle doğal görünümlü sonuçlara odaklanır. Her uygulama öncesi kısa bir saç analizi yapılır.`},
+      thumbs:[1,2,3,4],five:[1,2,3,4,5],
+      salonTabs:[['Hizmetler','sec-svc'],['Portföy','sec-portfolio'],['Değerlendirmeler','sec-reviews'],['Çalışma saatleri','sec-hours']].map(([label,id])=>({label,onClick:()=>this.scrollToId(id)})),
+      toReviews:()=>this.scrollToId('sec-reviews'),toServices:()=>this.scrollToId('sec-svc'),bookFromSalon:()=>this.startBooking(sal.id),backToSalon:()=>this.go('salon'),
+      salonServices:SERVICES.map(x=>({name:x.name,durLabel:x.dur+' dakika',priceLabel:fmt(x.price),onBook:()=>this.startBooking(sal.id,x.id)})),
+      portfolio:PORTFOLIO.map(([name,service],i)=>({name,service,onOpen:()=>this.setState({lb:i})})),
+      ratingBars:[[5,'82%'],[4,'12%'],[3,'4%'],[2,'1%'],[1,'1%']].map(([n,pct])=>({n,pct})),
+      reviews:REVIEWS.map(r=>({...r,stars:starsOf(r.rating,A,'var(--color-neutral-300)')})),
+      hours:[['Pazartesi','09:00 – 19:00'],['Salı','09:00 – 19:00'],['Çarşamba','09:00 – 19:00'],['Perşembe','09:00 – 19:00'],['Cuma','09:00 – 20:00'],['Cumartesi','10:00 – 18:00'],['Pazar','Kapalı']].map(([day,time],i)=>({day,time,weight:i===2?800:400})),
+      // lightbox
+      lbOpen:st.lb!==null,lb:lbItem?{name:lbItem[0],service:lbItem[1],rating:lbItem[2],stars:starsOf(lbItem[2],'var(--color-accent-400)','var(--color-neutral-600)'),counter:`${st.lb+1} / ${PORTFOLIO.length}`}:{},
+      lbPrev:()=>this.lbStep(-1),lbNext:()=>this.lbStep(1),lbClose:()=>this.setState({lb:null}),
+      lbTouchStart:e=>{this.tx=e.touches[0].clientX},lbTouchEnd:e=>{const dx=e.changedTouches[0].clientX-(this.tx||0);if(Math.abs(dx)>40)this.lbStep(dx<0?1:-1);},
+      // booking
+      steps,bSvcs,weekdays:['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'],days,
+      cal:{title:`${MONTHS[bm]} 2026`,prevDisabled:st.bMonth===0,nextDisabled:st.bMonth===1,onPrev:()=>this.setState({bMonth:0}),onNext:()=>this.setState({bMonth:1})},
+      noDate:!st.bDate,slotsLoading:!!st.bDate&&st.slotsLoading,slotsReady:!!st.bDate&&!st.slotsLoading,slots,skeletonSlots:[1,2,3,4,5,6,7,8,9,10],
+      slotMeta:st.bDate&&!st.slotsLoading?`${dLabel} · ${free} boş saat`:'09:00 – 19:00 arası, 30 dk aralık',
+      summaryRows,summaryPrice:v?fmt(v.price):dash,submitDisabled:!canSubmit||st.submitting,submitting:st.submitting,
+      submitLabel:st.submitting?'Oluşturuluyor…':canSubmit?'Randevuyu Oluştur':'Hizmet, tarih ve saat seç',submitIcon:st.submitting?IC.loader:IC.ar,submitBooking:()=>this.submit(),
+      conflictOpen:st.conflictOpen,pickAnother:()=>{this.setState({conflictOpen:false,bTime:null});setTimeout(()=>this.scrollToId('slots'),50);},
+      last:last||{},addToCal:()=>this.toast('Takvim dosyası indirildi (.ics)'),
+      // appts
+      apptTabs,apptList:list,apptLoading:loading,apptError:err,apptEmpty:!loading&&!err&&(empty||list.length===0),apptReady:!loading&&!err&&!empty&&list.length>0,skeletonRows:[1,2,3],
+      dt,cancelOpen:st.cancelOpen,cx:cur,closeCancel:()=>this.setState({cancelOpen:false}),cancelling:st.cancelling,cancelLabel:st.cancelling?'İptal ediliyor…':'Randevuyu İptal Et',
+      confirmCancel:()=>{this.setState({cancelling:true});setTimeout(()=>{const s=this.state;const a=s.appts.find(x=>x.id===s.apptId);
+        this.setState({cancelling:false,cancelOpen:false,appts:s.appts.map(x=>x.id===s.apptId?{...x,status:'CANCELLED'}:x),
+          notifs:[{id:Date.now(),type:'cancelled',title:'Randevunuz iptal edildi.',body:`${SALON(a.salonId).name} · ${SVC[a.svc].name} · ${a.d} ${MONTHS[a.m]}`,time:'Şimdi',unread:true},...s.notifs]});
+        this.toast('Randevun iptal edildi. Kuaföre bildirim gönderildi.');},700);},
+      // review
+      rv:rvA,rStars:[1,2,3,4,5].map(i=>({label:`${i} yıldız`,checked:st.rRating===i,color:i<=st.rRating?A:'var(--color-neutral-400)',onClick:()=>this.setState({rRating:i})})),
+      ratingText:['Puan vermek için bir yıldız seç','Kötü','Orta','İyi','Çok iyi','Mükemmel'][st.rRating],
+      rComment:st.rComment,onComment:e=>this.setState({rComment:e.target.value}),charCount:st.rComment.length,
+      rPhotoList:Array.from({length:st.rPhotos},(_,i)=>({onRemove:()=>this.setState(s=>({rPhotos:s.rPhotos-1}))})),canAddPhoto:st.rPhotos<4,addPhoto:()=>this.setState(s=>({rPhotos:s.rPhotos+1})),
+      rShare:st.rShare,toggleShare:()=>this.setState(s=>({rShare:!s.rShare})),shareTrack:tog(st.rShare).track,shareKnob:tog(st.rShare).knob,reviewDisabled:st.rRating===0,
+      submitReview:()=>{this.setState(s=>({appts:s.appts.map(x=>x.id===s.rId?{...x,reviewed:true}:x),apptTab:'past'}));this.toast(st.rShare?'Değerlendirmen gönderildi ve profilde paylaşıldı.':'Değerlendirmen gönderildi.');this.go('appts');},
+      // profile
+      pTabs:[['Hesap bilgilerim','account','user'],['Randevularım','appts','cal'],['Değerlendirmelerim','reviews','star'],['Bildirimler','notifPrefs','bell'],['Ayarlar','settings','sliders']].map(([label,k,i])=>{const on=st.pTab===k;
+        return {label,icon:i==='star'?mk('star',18):IC[i],current:on?'page':undefined,bg:on?'var(--color-surface)':'transparent',fg:on?A:T,onClick:()=>k==='appts'?this.go('appts'):this.setState({pTab:k})};}),
+      pIs:{account:st.pTab==='account',reviews:st.pTab==='reviews',notifPrefs:st.pTab==='notifPrefs',settings:st.pTab==='settings'},
+      saveProfile:()=>this.toast('Hesap bilgilerin güncellendi.'),
+      myReviews:[{salon:'Ton & Işık',service:'Ombre',date:'4 Eylül 2026',rating:5,shared:true,text:'Renk geçişi tam istediğim gibi oldu, çok memnun kaldım.'},{salon:'Atelier Nur',service:'Fön',date:'12 Temmuz 2026',rating:4,shared:false,text:'Hızlı ve özenli; sadece biraz beklettiler.'}]
+        .map(r=>({...r,stars:starsOf(r.rating,A,'var(--color-neutral-300)'),shareLabel:r.shared?'Profilde paylaşıldı':'Yalnızca kuaför görür',tagClass:r.shared?'tag tag-accent':'tag tag-neutral'})),
+      prefList:[['email','E-posta bildirimleri','Randevu oluşturma, güncelleme ve iptaller'],['sms','SMS bildirimleri','Randevu bilgileri telefonuna gelsin'],['remind','Randevu hatırlatması','Randevudan 24 saat önce'],['promo','Kampanyalar','Takip ettiğin kuaförlerden fırsatlar']]
+        .map(([k,label,desc])=>({id:'pref-'+k,label,desc,on:st.prefs[k],...tog(st.prefs[k]),onToggle:()=>this.setState(s=>({prefs:{...s.prefs,[k]:!s.prefs[k]}}))})),
+      // notifs
+      notifList:st.notifs.map(n=>({...n,icon:N_IC[n.type],bg:n.unread?'var(--color-surface)':'transparent',weight:n.unread?800:500,
+        onClick:()=>{this.setState(s=>({notifs:s.notifs.map(x=>x.id===n.id?{...x,unread:false}:x)}));if(n.go)this.go('review',{rId:n.go,rRating:0,rComment:'',rPhotos:0,rShare:true});else if(n.type==='booked'||n.type==='updated')this.go('appts',{apptTab:'up'});}})),
+      markAllRead:()=>this.setState(s=>({notifs:s.notifs.map(x=>({...x,unread:false}))})),
+      hasToast:!!st.toast,toastMsg:st.toast,toastBottom:mob?'88px':'24px'
+    };
+  }
+}
+</script>
+</body>
+</html>
