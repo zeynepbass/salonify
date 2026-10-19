@@ -41,6 +41,7 @@ export default function LoginScreen() {
           <span className="text-[13px] text-neutral-700">Adminden email şifre talep et.</span>
         </form>
       </div>
+
       <div
   className="relative flex min-h-[320px] flex-[1_1_440px] flex-col justify-end bg-cover bg-center bg-no-repeat px-[clamp(24px,6vw,96px)] py-12 text-white"
   style={{
@@ -48,6 +49,8 @@ export default function LoginScreen() {
       "linear-gradient(to top, rgba(153, 27, 27, 0.85), rgba(239, 68, 68, 0.15)) url('/images/login-back.jpg')",
   }}
 >
+
+ 
         <p className="max-w-[12ch] text-[clamp(32px,4.4vw,60px)] leading-[1.02] font-extrabold tracking-[-0.03em]">
           Randevular onay beklemeden takvimine düşer.
         </p>
