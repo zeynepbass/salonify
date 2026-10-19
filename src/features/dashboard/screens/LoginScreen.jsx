@@ -41,7 +41,13 @@ export default function LoginScreen() {
           <span className="text-[13px] text-neutral-700">Bu bir tanıtım panelidir; şifre gerekmez.</span>
         </form>
       </div>
-      <div className="flex min-h-[320px] flex-[1_1_440px] flex-col justify-end bg-accent px-[clamp(24px,6vw,96px)] py-12 text-canvas">
+      <div
+  className="relative flex min-h-[320px] flex-[1_1_440px] flex-col justify-end bg-cover bg-center bg-no-repeat px-[clamp(24px,6vw,96px)] py-12 text-white"
+  style={{
+    backgroundImage:
+      "linear-gradient(to top, rgba(220, 38, 38, 0.65), rgba(220, 38, 38, 0.1)), url('/assets/images/login-background.jpg')",
+  }}
+>
         <p className="max-w-[12ch] text-[clamp(32px,4.4vw,60px)] leading-[1.02] font-extrabold tracking-[-0.03em]">
           Randevular onay beklemeden takvimine düşer.
         </p>
