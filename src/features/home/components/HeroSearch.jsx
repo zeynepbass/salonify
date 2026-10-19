@@ -36,7 +36,7 @@ export default function HeroSearch() {
         <p className="max-w-[52ch] text-[18px] text-pretty text-neutral-700">
           Puanları, portföyleri ve gerçek boş saatleri karşılaştır. Uygun saati seç, randevun anında oluşsun.
         </p>
-        <form role="search" onSubmit={handleSubmit} className="flex flex-wrap border-2 border-ink bg-surface">
+        <form role="search" onSubmit={handleSubmit} className="flex flex-wrap border-1 border-ink bg-surface">
           <label className="flex min-h-[60px] flex-[2_1_260px] items-center gap-2.5 border-line px-4 max-sm:border-b sm:border-r">
             <Icon name="search" className="text-neutral-600" />
             <input
