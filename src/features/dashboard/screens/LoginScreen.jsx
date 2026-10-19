@@ -38,7 +38,7 @@ export default function LoginScreen() {
             Giriş yap
             <Icon name="arrowRight" />
           </Button>
-          <span className="text-[13px] text-neutral-700">Bu bir tanıtım panelidir; şifre gerekmez.</span>
+          <span className="text-[13px] text-neutral-700">Adminden email şifre talep et.</span>
         </form>
       </div>
       <div

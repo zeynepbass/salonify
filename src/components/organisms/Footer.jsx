@@ -49,9 +49,9 @@ export default function Footer() {
         ))}
       </div>
       <div className="page-container">
-        <div className="flex flex-wrap justify-between gap-2 border-t border-line pt-4 pb-6 text-[12px] text-neutral-700">
+        <div className="flex flex-wrap justify-center gap-2 border-t border-line pt-4 pb-6 text-[12px] text-neutral-700">
           <span>© 2026 SalonaBOX</span>
-          <span>KVKK · Kullanım koşulları</span>
+ 
         </div>
       </div>
     </footer>
