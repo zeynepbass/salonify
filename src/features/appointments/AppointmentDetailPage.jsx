@@ -52,7 +52,7 @@ export default function AppointmentDetailPage({ appointmentId }) {
         </dl>
 
         <aside className="flex flex-[1_1_300px] flex-col gap-2 bg-surface p-5">
-          <h2 className="eyebrow mb-1 tracking-[0.08em] text-neutral-700">İşlemler</h2>
+          <h2 className="eyebrow mb-1 tracking-[0.08em] text-neutral-700 text-center">İşlemler</h2>
           <Button size="md" align="start" className="gap-2.5 px-3" onClick={() => addToCalendar(appointment)}>
             <Icon name="calendarPlus" />
             Takvime ekle
