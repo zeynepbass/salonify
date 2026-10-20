@@ -43,7 +43,7 @@ export default function LoginScreen() {
       </div>
 
       <div
-  className="relative flex min-h-[320px] flex-[1_1_440px] flex-col justify-end bg-cover bg-center bg-no-repeat px-[clamp(24px,6vw,96px)] py-12 text-white"
+  className="relative flex flex-[1_1_440px] flex-col justify-end bg-cover bg-center bg-no-repeat px-[clamp(24px,6vw,96px)] py-12 text-white"
   style={{
     backgroundImage:
       "linear-gradient(to top, rgba(153, 27, 27, 0.85), rgba(239, 68, 68, 0.15)), url('/assets/images/login-back.jpg')",
