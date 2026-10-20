@@ -24,7 +24,7 @@ export default function BookingSuccessPage({ appointmentId }) {
       <span className="grid size-[50px] place-items-center bg-accent text-canvas">
         <Icon name="check" size={30} />
       </span>
-      <h1 className="text-[clamp(32px,4.4vw,52px)] tracking-[-0.025em]">Randevunuz oluşturuldu.</h1>
+      <h1 className="text-[clamp(32px,4.4vw,52px)] ">Randevunuz oluşturuldu.</h1>
       <p className="max-w-[56ch] text-[16px] text-neutral-700">
         {salon.name} kuaförüne bildirim gönderildi. Randevudan 24 saat önce hatırlatma alacaksın.
       </p>
