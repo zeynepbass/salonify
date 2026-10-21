@@ -2,7 +2,7 @@
 
 import { useToast } from "@/components/organisms/ToastProvider";
 import { useNotifications } from "@/features/notifications/NotificationsProvider";
-import { usePanel } from "@/features/dashboard/PanelProvider";
+import { usePanel } from "@/features/customer/PanelProvider";
 import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 

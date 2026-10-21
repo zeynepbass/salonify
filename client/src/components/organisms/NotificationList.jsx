@@ -10,16 +10,16 @@ const TYPE_ICONS = {
   reminder: "clock",
 };
 
-export default function NotificationList({ notifications, onSelect }) {
+export default function NotificationList({ notifications, onSelect, onDelete }) {
   return (
     <ul className="border-t-2 border-ink">
       {notifications.map((notification) => (
-        <li key={notification.id}>
+        <li key={notification.id} className="flex items-stretch">
           <button
             type="button"
             onClick={() => onSelect(notification)}
             className={cn(
-              "flex w-full items-start gap-4 border-b border-line px-4 py-[18px] text-left transition-colors hover:bg-neutral-200",
+              "flex min-w-0 flex-1 items-start gap-4 border-b border-line px-4 py-[18px] text-left transition-colors hover:bg-neutral-200",
               notification.unread && "bg-surface",
             )}
           >
@@ -42,6 +42,20 @@ export default function NotificationList({ notifications, onSelect }) {
               )}
             </span>
           </button>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={() => onDelete(notification)}
+              aria-label={`Bildirimi sil: ${notification.title}`}
+              title="Sil"
+              className={cn(
+                "grid w-12 flex-none place-items-center border-b border-line text-neutral-700 transition-colors hover:bg-neutral-200 hover:text-accent-700",
+                notification.unread && "bg-surface",
+              )}
+            >
+              <Icon name="close" />
+            </button>
+          )}
         </li>
       ))}
     </ul>

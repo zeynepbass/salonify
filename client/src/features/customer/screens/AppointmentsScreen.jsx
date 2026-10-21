@@ -7,13 +7,13 @@ import SearchInput from "@/components/molecules/SearchInput";
 import StateMessage from "@/components/molecules/StateMessage";
 import StatusTag from "@/components/molecules/StatusTag";
 import Tabs from "@/components/molecules/Tabs";
-import { usePanel } from "@/features/dashboard/PanelProvider";
-import { useAppointmentActions } from "@/features/dashboard/useAppointmentActions";
-import { usePanelAppointments } from "@/features/dashboard/usePanelAppointments";
+import { usePanel } from "@/features/customer/PanelProvider";
+import { useAppointmentActions } from "@/features/customer/useAppointmentActions";
+import { usePanelAppointments } from "@/features/customer/usePanelAppointments";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { formatShortDate } from "@/lib/date";
-import { formatDuration, formatPrice, includesText } from "@/lib/format";
+import { formatDuration, formatPrice } from "@/lib/format";
 
 const chronological = (a, b) => a.date.localeCompare(b.date) || a.start - b.start;
 
@@ -138,10 +138,7 @@ export default function AppointmentsScreen({ initialTab = "today" }) {
   const [query, setQuery] = useState("");
 
   const activeTab = TABS.find((item) => item.value === tab);
-  const list = appointments
-    .filter(activeTab.filter)
-    .filter((item) => includesText(item.customer, query))
-    .sort(activeTab.sort);
+  const list = appointments.filter(activeTab.filter).sort(activeTab.sort);
 
   return (
     <div className="flex flex-col gap-4">

@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint ."
+    "start": "next start"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.5",
@@ -18,8 +17,6 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
-    "eslint": "^9.39.0",
-    "eslint-config-next": "^16.4.0",
     "tailwindcss": "^4.3.3"
   }
 }

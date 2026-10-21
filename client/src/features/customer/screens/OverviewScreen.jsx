@@ -8,10 +8,10 @@ import StateMessage from "@/components/molecules/StateMessage";
 import StatusTag from "@/components/molecules/StatusTag";
 import { getNotificationIcon } from "@/components/organisms/NotificationList";
 import Spinner from "@/components/atoms/Spinner";
-import { usePanel } from "@/features/dashboard/PanelProvider";
-import { getDayBounds } from "@/features/dashboard/scheduling";
-import { useAppointmentActions } from "@/features/dashboard/useAppointmentActions";
-import { usePanelAppointments } from "@/features/dashboard/usePanelAppointments";
+import { usePanel } from "@/features/customer/PanelProvider";
+import { getDayBounds } from "@/features/customer/scheduling";
+import { useAppointmentActions } from "@/features/customer/useAppointmentActions";
+import { usePanelAppointments } from "@/features/customer/usePanelAppointments";
 import { useNotifications } from "@/features/notifications/NotificationsProvider";
 import { api, getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
@@ -19,13 +19,20 @@ import { cn } from "@/lib/cn";
 import { formatDayMonth } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 
+const SLOT_MINUTES = 30;
+
+function describeFreeSlots(count) {
+  if (count === 0) return "Bugün yeni randevu alınabilecek boş saat kalmadı.";
+  return `Bugün yeni randevu alınabilecek ${count} boş zaman dilimi (${SLOT_MINUTES}'ar dakika) kaldı.`;
+}
+
 function StatCard({ stat }) {
   return (
     <Link
       href={stat.href}
-      className="flex flex-col items-start gap-1 border-b border-line py-5 pr-5 transition-colors hover:bg-surface"
+      className="flex flex-col items-center gap-1 border-b border-line px-3 py-5 text-center transition-colors hover:bg-surface"
     >
-      <span className="flex items-center gap-2 text-[13px] font-semibold">
+      <span className="flex items-center justify-center gap-2 text-[13px] font-semibold">
         <Icon name={stat.icon} />
         {stat.label}
       </span>
@@ -165,7 +172,7 @@ export default function OverviewScreen() {
               <div className="h-full bg-ink" style={{ width: `${occupancy}%` }} />
             </div>
             <div className="text-[12px] text-neutral-700">
-              {bounds.closed ? "Salon bugün kapalı" : `${freeSlotCount} boş slot kaldı`}
+              {bounds.closed ? "Salon bugün kapalı" : describeFreeSlots(freeSlotCount)}
             </div>
           </div>
           <div>

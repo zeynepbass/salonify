@@ -3,7 +3,7 @@
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import StatusTag from "@/components/molecules/StatusTag";
-import { useAppointmentActions } from "@/features/dashboard/useAppointmentActions";
+import { useAppointmentActions } from "@/features/customer/useAppointmentActions";
 import { formatDayWithWeekday } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { useBodyScrollLock, useEscapeKey } from "@/lib/hooks";

@@ -71,7 +71,7 @@ function listSlots({ date, duration, schedule, busy, now }) {
 export async function getAvailability({ salonId, serviceId, date, excludeAppointmentId }) {
   if (!(await Salon.exists({ _id: salonId }))) throw new ApiError(404, 'Salon bulunamadı.');
 
-  const service = await Service.findOne({ _id: serviceId, salon: salonId, isActive: true });
+  const service = await Service.findOne({ _id: serviceId, salon: salonId });
   if (!service) throw new ApiError(404, 'Hizmet bulunamadı.');
 
   const [schedule, busy] = await Promise.all([
@@ -119,7 +119,7 @@ export async function filterSalonsWithOpenSlot(salonIds, withinDays) {
     BlockedDate.find({ ...inSalons, date: { $in: dates } }).select('salon date'),
     Appointment.find({ ...inSalons, date: { $in: dates }, status: APPOINTMENT_STATUS.BOOKED }).select('salon date startTime endTime'),
     Service.aggregate([
-      { $match: { ...inSalons, isActive: true } },
+      { $match: inSalons },
       { $group: { _id: '$salon', duration: { $min: '$duration' } } },
     ]),
   ]);

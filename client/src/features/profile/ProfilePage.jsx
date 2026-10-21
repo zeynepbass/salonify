@@ -6,7 +6,6 @@ import Icon from "@/components/atoms/Icon";
 import { useAuth } from "@/features/auth/AuthProvider";
 import AccountSection from "@/features/profile/components/AccountSection";
 import MyReviewsSection from "@/features/profile/components/MyReviewsSection";
-import NotificationPreferences from "@/features/profile/components/NotificationPreferences";
 import SettingsSection from "@/features/profile/components/SettingsSection";
 import { cn } from "@/lib/cn";
 
@@ -14,7 +13,6 @@ const SECTIONS = [
   { key: "account", label: "Hesap bilgilerim", icon: "user" },
   { key: "appointments", label: "Randevularım", icon: "calendar", href: "/randevularim" },
   { key: "reviews", label: "Değerlendirmelerim", icon: "star" },
-  { key: "notifications", label: "Bildirimler", icon: "bell" },
   { key: "settings", label: "Ayarlar", icon: "sliders" },
 ];
 
@@ -55,7 +53,6 @@ export default function ProfilePage() {
         <div className="min-w-0 flex-[3_1_480px]">
           {active === "account" && <AccountSection user={user} />}
           {active === "reviews" && <MyReviewsSection />}
-          {active === "notifications" && <NotificationPreferences initialPreferences={user.notificationPreferences} />}
           {active === "settings" && <SettingsSection />}
         </div>
       </div>

@@ -59,6 +59,32 @@ export function NotificationsProvider({ audience = "customer", children }) {
     }
   }, [loadNotifications]);
 
+  const removeNotification = useCallback(
+    async (id) => {
+      const target = notifications.find((item) => item.id === id);
+      if (!target) return;
+
+      setNotifications((current) => current.filter((item) => item.id !== id));
+      if (target.unread) setUnreadCount((count) => Math.max(0, count - 1));
+      try {
+        await api.delete(`/notifications/${id}`);
+      } catch {
+        loadNotifications();
+      }
+    },
+    [notifications, loadNotifications],
+  );
+
+  const removeAll = useCallback(async () => {
+    setNotifications([]);
+    setUnreadCount(0);
+    try {
+      await api.delete("/notifications");
+    } catch {
+      loadNotifications();
+    }
+  }, [loadNotifications]);
+
   const value = useMemo(
     () => ({
       notifications: status === "authenticated" ? notifications : [],
@@ -67,8 +93,10 @@ export function NotificationsProvider({ audience = "customer", children }) {
       reloadNotifications: loadNotifications,
       markRead,
       markAllRead,
+      removeNotification,
+      removeAll,
     }),
-    [status, notifications, unreadCount, loading, loadNotifications, markRead, markAllRead],
+    [status, notifications, unreadCount, loading, loadNotifications, markRead, markAllRead, removeNotification, removeAll],
   );
 
   return <NotificationsContext.Provider value={value}>{children}</NotificationsContext.Provider>;

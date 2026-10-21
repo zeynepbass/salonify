@@ -1,4 +1,4 @@
-import SalonProfileScreen from "@/features/dashboard/screens/SalonProfileScreen";
+import SalonProfileScreen from "@/features/customer/screens/SalonProfileScreen";
 
 export const metadata = { title: "Salon profili" };
 

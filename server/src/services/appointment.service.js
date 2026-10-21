@@ -5,7 +5,7 @@ import { Salon } from '../models/Salon.js';
 import { Service } from '../models/Service.js';
 import { ApiError, isDuplicateKeyError } from '../utils/ApiError.js';
 import { buildPagination } from '../utils/response.js';
-import { escapeRegex, formatDayMonth, getSalonNow, hasStarted } from '../utils/time.js';
+import { formatDayMonth, getSalonNow, hasStarted } from '../utils/time.js';
 import { assertSlotAvailable, SLOT_TAKEN_MESSAGE } from './availability.service.js';
 import { notify } from './notification.service.js';
 import { assertSalonExists } from './salon.service.js';
@@ -65,7 +65,7 @@ function toSlotConflict(error) {
 }
 
 async function findBookableService(salonId, serviceId) {
-  const service = await Service.findOne({ _id: serviceId, salon: salonId, isActive: true });
+  const service = await Service.findOne({ _id: serviceId, salon: salonId });
   if (!service) throw new ApiError(404, 'Hizmet bulunamadı.');
   return service;
 }
@@ -240,7 +240,7 @@ function scopeFilters(today) {
   };
 }
 
-export async function listSalonAppointments({ salonId, scope, search, date, from, to, status, page, limit }) {
+export async function listSalonAppointments({ salonId, scope, date, from, to, status, page, limit }) {
   const scopes = scopeFilters(getSalonNow().date);
   const conditions = [{ salon: salonId }];
 
@@ -248,7 +248,6 @@ export async function listSalonAppointments({ salonId, scope, search, date, from
   if (status) conditions.push({ status });
   if (date) conditions.push({ date });
   else if (from || to) conditions.push({ date: { ...(from && { $gte: from }), ...(to && { $lte: to }) } });
-  if (search) conditions.push({ customerName: { $regex: escapeRegex(search), $options: 'i' } });
 
   const filter = { $and: conditions };
   const countScope = (name) => Appointment.countDocuments({ salon: salonId, ...scopes[name] });

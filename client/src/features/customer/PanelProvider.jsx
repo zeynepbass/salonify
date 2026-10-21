@@ -30,10 +30,6 @@ function toPanelAppointment(appointment) {
   };
 }
 
-function toPanelService(service) {
-  return { ...service, active: service.isActive };
-}
-
 function toPortfolioItem(item) {
   return {
     id: item.id,
@@ -88,7 +84,7 @@ export function PanelProvider({ children }) {
       ]);
 
       setSalon(mySalon);
-      setServices(myServices.map(toPanelService));
+      setServices(myServices);
       setHours(toWorkingHours(workingHours));
       setClosedDays(blockedDates);
       setPortfolio(myPortfolio.map(toPortfolioItem));
@@ -133,13 +129,7 @@ export function PanelProvider({ children }) {
     const saved = draft.id
       ? await api.patch(`/salon/me/services/${draft.id}`, payload)
       : await api.post("/salon/me/services", payload);
-    const view = toPanelService(saved);
-    setServices((current) => (draft.id ? replaceById(current, view) : [...current, view]));
-  }, []);
-
-  const toggleService = useCallback(async (service) => {
-    const saved = await api.patch(`/salon/me/services/${service.id}`, { isActive: !service.active });
-    setServices((current) => replaceById(current, toPanelService(saved)));
+    setServices((current) => (draft.id ? replaceById(current, saved) : [...current, saved]));
   }, []);
 
   const deleteService = useCallback(async (id) => {
@@ -205,7 +195,6 @@ export function PanelProvider({ children }) {
       setAppointmentStatus,
       saveAppointment,
       saveService,
-      toggleService,
       deleteService,
       updateHours,
       saveHours,
@@ -237,7 +226,6 @@ export function PanelProvider({ children }) {
       setAppointmentStatus,
       saveAppointment,
       saveService,
-      toggleService,
       deleteService,
       updateHours,
       saveHours,

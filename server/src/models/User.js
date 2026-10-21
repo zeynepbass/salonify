@@ -13,12 +13,6 @@ const userSchema = new mongoose.Schema(
       district: { type: String, trim: true, default: '' },
     },
     role: { type: String, enum: Object.values(ROLES), default: ROLES.CUSTOMER, immutable: true },
-    notificationPreferences: {
-      email: { type: Boolean, default: true },
-      sms: { type: Boolean, default: true },
-      reminder: { type: Boolean, default: true },
-      promo: { type: Boolean, default: false },
-    },
     refreshTokens: {
       type: [{ _id: false, tokenHash: { type: String, required: true }, expiresAt: { type: Date, required: true } }],
       default: [],

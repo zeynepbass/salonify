@@ -6,7 +6,7 @@ import { getSalonNow } from '../utils/time.js';
 import { syncSalonCatalog } from './salon.service.js';
 
 export function listActiveServices(salonId) {
-  return Service.find({ salon: salonId, isActive: true }).sort({ name: 1 });
+  return Service.find({ salon: salonId }).sort({ name: 1 });
 }
 
 export function listSalonServices(salonId) {
@@ -42,7 +42,7 @@ export async function deleteService(salonId, serviceId) {
     date: { $gte: getSalonNow().date },
   });
   if (hasUpcoming) {
-    throw new ApiError(409, 'Bu hizmete ait ileri tarihli randevular var. Hizmeti silmek yerine pasif hale getirebilirsiniz.');
+    throw new ApiError(409, 'Bu hizmete ait ileri tarihli randevular var. Önce bu randevuları iptal etmelisiniz.');
   }
 
   await service.deleteOne();

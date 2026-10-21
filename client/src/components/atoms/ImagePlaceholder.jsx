@@ -6,7 +6,6 @@ export default function ImagePlaceholder({ src, alt = "", label, stripe = 14, to
   if (src) {
     return (
       <div className={cn("relative overflow-hidden bg-neutral-200", className)}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt={alt} loading="lazy" className={cn("absolute inset-0 size-full object-cover grayscale", imageClassName)} />
       </div>
     );

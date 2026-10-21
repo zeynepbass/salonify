@@ -136,10 +136,9 @@ describe('salon listesi ve detayı', () => {
     salon = await registerSalon({ salon: { name: 'Işıltı Kuaför', city: 'İzmir', district: 'Konak' } });
     await createService(salon.token, { name: 'Balayage', category: 'balayage', duration: 180, price: 2500 });
     await createService(salon.token, { name: 'Fön', category: 'fon', duration: 30, price: 350 });
-    await createService(salon.token, { name: 'Gizli Hizmet', category: 'gelin', duration: 30, price: 100, isActive: false });
   });
 
-  it('şehir, kategori ve arama ile filtreler; pasif hizmetleri hesaba katmaz', async () => {
+  it('şehir, kategori ve arama ile filtreler', async () => {
     const byCity = await api().get('/api/salons').query({ city: 'İzmir' });
     assert.equal(byCity.body.data.items.length, 1);
     assert.equal(byCity.body.data.items[0].startingPrice, 350);
@@ -655,6 +654,21 @@ describe('bildirimler', () => {
     assert.equal((await api().get('/api/notifications').set(auth(customer.token))).body.data.unreadCount, 0);
     assert.equal((await api().get('/api/notifications').set(auth(salon.token))).body.data.unreadCount, 2);
   });
+
+  it('tek bildirimi ve tümünü siler; başkasının bildirimini silemez', async () => {
+    const { items } = (await api().get('/api/notifications').set(auth(salon.token))).body.data;
+
+    assert.equal((await api().delete(`/api/notifications/${items[0].id}`).set(auth(other.token))).status, 404);
+
+    const removed = await api().delete(`/api/notifications/${items[0].id}`).set(auth(salon.token));
+    assert.deepEqual(removed.body.data, { id: items[0].id });
+    assert.equal((await api().get('/api/notifications').set(auth(salon.token))).body.data.items.length, 1);
+
+    const all = await api().delete('/api/notifications').set(auth(salon.token));
+    assert.deepEqual(all.body.data, { deletedCount: 1 });
+    assert.equal((await api().get('/api/notifications').set(auth(salon.token))).body.data.items.length, 0);
+    assert.equal((await api().get('/api/notifications').set(auth(customer.token))).body.data.items.length, 3);
+  });
 });
 
 describe('profil: şifre değiştirme ve hesap silme', () => {
@@ -948,14 +962,6 @@ describe('panel: randevu sekmeleri ve günlük özet', () => {
     assert.deepEqual(await names({ scope: 'past' }), ['Elif Kaya', 'Elif Demir']);
     assert.equal((await names({ scope: 'all' })).length, 4);
     assert.deepEqual((await list({ scope: 'today' })).counts, { today: 1, upcoming: 2, past: 2, all: 4 });
-  });
-
-  it('müşteri adına göre arar; regex karakterlerini düz metin sayar', async () => {
-    assert.equal((await list({ search: 'elif' })).items.length, 2);
-    assert.equal((await list({ search: 'elif', scope: 'past' })).items.length, 2);
-    assert.equal((await list({ search: 'aksoy' })).items.length, 1);
-    assert.equal((await list({ search: '.*' })).items.length, 0);
-    assert.equal((await list({ search: 'aksoy' })).counts.all, 4);
   });
 
   it('dashboard doluluk ve boş saat bilgisini içerir', async () => {

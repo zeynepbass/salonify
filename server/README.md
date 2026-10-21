@@ -30,7 +30,6 @@ Proje kökünde (`salonify/.env`) bir `.env` dosyası oluşturulur. Arayüz de a
 | `npm start` | Sunucuyu başlatır |
 | `npm run seed` | Veritabanı boşsa örnek veriyi yazar, `npm run seed -- --reset` her şeyi silip baştan yazar |
 | `npm test` | Testleri geçici bir veritabanında çalıştırır |
-| `npm run lint` | Kod kontrolü |
 
 ## Örnek hesaplar
 
@@ -138,6 +137,8 @@ Dosya: `src/routes/notification.routes.js`
 | GET | `/notifications` | Bildirimler `/bildirimler`, `/panel/bildirimler`, Panel özeti | Bildirimleri listeler, okunmamış sayısını verir | Giriş yapmış |
 | PATCH | `/notifications/read-all` | Bildirimler | Hepsini okundu yapar | Giriş yapmış |
 | PATCH | `/notifications/:notificationId/read` | Bildirimler | Tek bildirimi okundu yapar | Giriş yapmış |
+| DELETE | `/notifications` | Panel bildirimleri | Kullanıcının tüm bildirimlerini siler | Giriş yapmış |
+| DELETE | `/notifications/:notificationId` | Panel bildirimleri | Tek bildirimi siler | Giriş yapmış |
 
 ### Görsel yükleme
 
@@ -163,7 +164,7 @@ Bu uçlar yalnızca salon sahibine açıktır ve her zaman giriş yapan kişinin
 | GET | `/salon/me/dashboard` | Özet `/panel` | Bugünkü, yaklaşan, tamamlanan ve iptal edilen randevu sayıları, doluluk oranı |
 | GET | `/salon/me/services` | Hizmetler `/panel/hizmetler`, Randevu formu | Pasifler dahil bütün hizmetleri listeler |
 | POST | `/salon/me/services` | Hizmetler | Yeni hizmet ekler |
-| PATCH | `/salon/me/services/:serviceId` | Hizmetler | Hizmetin adını, süresini, fiyatını değiştirir veya pasife alır |
+| PATCH | `/salon/me/services/:serviceId` | Hizmetler | Hizmetin adını, süresini ve fiyatını değiştirir |
 | DELETE | `/salon/me/services/:serviceId` | Hizmetler | Hizmeti siler |
 | PATCH | `/salon/me/working-hours` | Çalışma saatleri `/panel/calisma-saatleri` | Haftalık çalışma saatlerini kaydeder |
 | POST | `/salon/me/blocked-dates` | Çalışma saatleri | Kapalı gün ekler |
@@ -206,7 +207,7 @@ Bu uçlar yalnızca salon sahibine açıktır ve her zaman giriş yapan kişinin
 | Hizmetler `/panel/hizmetler` | `GET`, `POST`, `PATCH`, `DELETE /salon/me/services` |
 | Çalışma saatleri `/panel/calisma-saatleri` | `GET /salons/:salonId/working-hours`, `PATCH /salon/me/working-hours`, `GET /salons/:salonId/blocked-dates`, `POST`, `DELETE /salon/me/blocked-dates` |
 | Portföy `/panel/portfoy` | `GET`, `POST`, `PATCH`, `DELETE /salon/me/portfolio`, `POST /uploads` |
-| Bildirimler `/panel/bildirimler` | `GET /notifications`, `PATCH /notifications/:id/read`, `PATCH /notifications/read-all` |
+| Bildirimler `/panel/bildirimler` | `GET /notifications`, `PATCH /notifications/:id/read`, `DELETE /notifications/:id`, `DELETE /notifications` |
 | Profil `/panel/profil` | `GET`, `PATCH /salon/me`, `POST /uploads` |
 
 ## Genel kurallar

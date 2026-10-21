@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Button from "@/components/atoms/Button";
-import { Input, Select } from "@/components/atoms/Input";
+import { Input } from "@/components/atoms/Input";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { useAuth } from "@/features/auth/AuthProvider";
@@ -131,12 +131,6 @@ export default function SettingsSection() {
     <section>
       <h2 className="mb-4 text-[20px]">Ayarlar</h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-4">
-        <Field label="Dil" htmlFor="settings-language">
-          <Select id="settings-language" defaultValue="tr">
-            <option value="tr">Türkçe</option>
-            <option value="en">İngilizce</option>
-          </Select>
-        </Field>
         <Field label="Şifre">
           <Button align="start" className="min-h-10 w-full" onClick={() => setOpenForm("password")}>
             Şifreyi değiştir

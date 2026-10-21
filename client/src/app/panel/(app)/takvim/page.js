@@ -1,4 +1,4 @@
-import CalendarScreen from "@/features/dashboard/screens/CalendarScreen";
+import CalendarScreen from "@/features/customer/screens/CalendarScreen";
 
 export const metadata = { title: "Takvim" };
 

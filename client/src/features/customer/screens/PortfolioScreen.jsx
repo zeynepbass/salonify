@@ -8,7 +8,7 @@ import Tag from "@/components/atoms/Tag";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/dashboard/PanelProvider";
+import { usePanel } from "@/features/customer/PanelProvider";
 import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 

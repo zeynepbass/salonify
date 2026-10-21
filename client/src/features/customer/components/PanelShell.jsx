@@ -9,14 +9,14 @@ import ConfirmDialog from "@/components/molecules/ConfirmDialog";
 import StateMessage from "@/components/molecules/StateMessage";
 import { ToastProvider } from "@/components/organisms/ToastProvider";
 import AuthGuard from "@/features/auth/AuthGuard";
-import { PanelProvider, usePanel } from "@/features/dashboard/PanelProvider";
-import AppointmentDrawer from "@/features/dashboard/components/AppointmentDrawer";
-import AppointmentFormDialog from "@/features/dashboard/components/AppointmentFormDialog";
-import PanelHeader from "@/features/dashboard/components/PanelHeader";
-import PanelMenuSheet from "@/features/dashboard/components/PanelMenuSheet";
-import PanelSidebar from "@/features/dashboard/components/PanelSidebar";
-import { PANEL_MOBILE_NAV, PANEL_NAV, getActivePanelItem } from "@/features/dashboard/panelNav";
-import { toAppointmentView } from "@/features/dashboard/scheduling";
+import { PanelProvider, usePanel } from "@/features/customer/PanelProvider";
+import AppointmentDrawer from "@/features/customer/components/AppointmentDrawer";
+import AppointmentFormDialog from "@/features/customer/components/AppointmentFormDialog";
+import PanelHeader from "@/features/customer/components/PanelHeader";
+import PanelMenuSheet from "@/features/customer/components/PanelMenuSheet";
+import PanelSidebar from "@/features/customer/components/PanelSidebar";
+import { PANEL_MOBILE_NAV, PANEL_NAV, getActivePanelItem } from "@/features/customer/panelNav";
+import { toAppointmentView } from "@/features/customer/scheduling";
 import { NotificationsProvider, useNotifications } from "@/features/notifications/NotificationsProvider";
 import { TODAY } from "@/lib/clock";
 import { formatLongDate, getDateParts } from "@/lib/date";
@@ -26,7 +26,7 @@ function getSubtitle(href, { services, unreadCount }) {
     "/panel": `${getDateParts(TODAY).weekday}, ${formatLongDate(TODAY)}`,
     "/panel/takvim": "Randevular, boş ve bloklu saatler",
     "/panel/randevular": "Tüm randevular",
-    "/panel/hizmetler": `${services.filter((service) => service.active).length} aktif hizmet`,
+    "/panel/hizmetler": `${services.length} hizmet`,
     "/panel/portfoy": "Herkese açık profilde gösterilen işler",
     "/panel/bildirimler": `${unreadCount} okunmamış`,
     "/panel/profil": "Müşterilerin gördüğü bilgiler",

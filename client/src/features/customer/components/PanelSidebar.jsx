@@ -2,8 +2,8 @@ import Link from "next/link";
 import Icon from "@/components/atoms/Icon";
 import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import Logo from "@/components/atoms/Logo";
-import LogoutButton from "@/features/dashboard/components/LogoutButton";
-import { PANEL_NAV } from "@/features/dashboard/panelNav";
+import LogoutButton from "@/features/customer/components/LogoutButton";
+import { PANEL_NAV } from "@/features/customer/panelNav";
 import { cn } from "@/lib/cn";
 
 const FOOTER_LINK = "flex items-center gap-3 px-3 py-2.5 text-[13px] transition-colors hover:bg-neutral-200 max-rail:justify-center";

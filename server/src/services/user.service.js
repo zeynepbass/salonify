@@ -13,12 +13,9 @@ import { deleteUploadsOf } from './upload.service.js';
 
 const DELETED_CUSTOMER_NAME = 'Silinmiş kullanıcı';
 
-export async function updateProfile(user, { notificationPreferences, location, ...fields }) {
+export async function updateProfile(user, { location, ...fields }) {
   user.set(fields);
 
-  for (const [key, value] of Object.entries(notificationPreferences ?? {})) {
-    user.notificationPreferences[key] = value;
-  }
   for (const [key, value] of Object.entries(location ?? {})) {
     user.location[key] = value;
   }

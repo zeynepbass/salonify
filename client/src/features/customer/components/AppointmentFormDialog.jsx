@@ -7,8 +7,8 @@ import { Input, Select, Textarea } from "@/components/atoms/Input";
 import Dialog, { DialogActions, DialogTitle } from "@/components/molecules/Dialog";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/dashboard/PanelProvider";
-import { getOpenDates } from "@/features/dashboard/scheduling";
+import { usePanel } from "@/features/customer/PanelProvider";
+import { getOpenDates } from "@/features/customer/scheduling";
 import { useNotifications } from "@/features/notifications/NotificationsProvider";
 import { api, getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
@@ -23,13 +23,12 @@ export default function AppointmentFormDialog({ draft, onClose }) {
   const { salon, services, hours, closedDays, saveAppointment } = usePanel();
   const { reloadNotifications } = useNotifications();
   const { showToast } = useToast();
-  const activeServices = services.filter((service) => service.active);
   const dateOptions = getOpenDates(hours, closedDays, DATE_OPTION_COUNT);
 
   const [form, setForm] = useState({
     customer: draft.customer ?? "",
     phone: draft.phone ?? "",
-    serviceId: draft.serviceId ?? activeServices[0]?.id,
+    serviceId: draft.serviceId ?? services[0]?.id,
     date: draft.date && dateOptions.includes(draft.date) ? draft.date : dateOptions[0],
     time: draft.time ?? null,
     note: draft.note ?? "",
@@ -148,7 +147,7 @@ export default function AppointmentFormDialog({ draft, onClose }) {
             value={form.serviceId}
             onChange={(event) => update({ serviceId: event.target.value, time: null })}
           >
-            {activeServices.map((item) => (
+            {services.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name} · {formatDuration(item.duration)} · {formatPrice(item.price)}
               </option>
