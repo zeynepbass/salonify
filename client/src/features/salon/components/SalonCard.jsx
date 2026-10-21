@@ -7,17 +7,18 @@ import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import Skeleton from "@/components/atoms/Skeleton";
 import Tag from "@/components/atoms/Tag";
 import { useLocation } from "@/features/location/LocationProvider";
-import { getServiceName } from "@/lib/catalog";
+import { getCategoryLabel } from "@/lib/catalog";
 import { formatDistance, formatPrice, formatRating } from "@/lib/format";
 
 export default function SalonCard({ salon }) {
   const { location } = useLocation();
-  const place = location.district === salon.district ? `${salon.neighborhood}, ${salon.district}` : location.district;
+  const place = [salon.neighborhood, salon.district].filter(Boolean).join(", ") || location.district;
+  const hasDistance = typeof salon.distanceKm === "number";
 
   return (
     <article className="relative flex flex-col bg-surface transition-shadow duration-150 focus-within:shadow-md hover:shadow-md">
       <div className="relative">
-        <ImagePlaceholder label="salon fotoğrafı" className="aspect-[4/3]" />
+        <ImagePlaceholder src={salon.coverImage} alt={salon.name} label="salon fotoğrafı" className="aspect-[4/3]" />
         <div className="absolute top-0 left-0 flex items-center gap-1.5 bg-canvas px-2.5 py-1.5 text-[14px] font-extrabold">
           <Icon name="star" size={14} filled className="text-accent" />
           {formatRating(salon.rating)}
@@ -32,17 +33,20 @@ export default function SalonCard({ salon }) {
         </h3>
         <div className="flex items-center gap-1.5 text-[13px] text-neutral-700">
           <Icon name="pin" size={14} />
-          {place} · {formatDistance(salon.distanceKm)}
+          {place}
+          {hasDistance && ` · ${formatDistance(salon.distanceKm)}`}
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {salon.featuredServiceIds.map((serviceId) => (
-            <Tag key={serviceId}>{getServiceName(serviceId)}</Tag>
+          {salon.categories.map((category) => (
+            <Tag key={category}>{getCategoryLabel(category)}</Tag>
           ))}
         </div>
         <div className="mt-auto flex items-center justify-between gap-3 border-t border-line pt-3">
           <div className="flex flex-col leading-tight">
             <span className="text-[11px] text-neutral-700">Başlangıç</span>
-            <span className="text-[16px] font-extrabold">{formatPrice(salon.startingPrice)}</span>
+            <span className="text-[16px] font-extrabold">
+              {salon.startingPrice === null ? "—" : formatPrice(salon.startingPrice)}
+            </span>
           </div>
           <Button variant="primary" href={`/kuaforler/${salon.id}/randevu`} className="relative px-3.5 py-2.5">
             Randevu Al

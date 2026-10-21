@@ -1,27 +1,21 @@
-import { CURRENT_TIME, TODAY } from "@/data/mock/clock";
 import { isInactiveStatus } from "@/lib/appointmentStatus";
-import { getService } from "@/lib/catalog";
-import { addDays, minutesToTime, timeToMinutes } from "@/lib/date";
+import { CURRENT_TIME, TODAY } from "@/lib/clock";
+import { addDays, timeToMinutes } from "@/lib/date";
 import { getDaySchedule } from "@/lib/schedule";
 
 export const SLOT_INTERVAL = 30;
 export const NOW_MINUTES = timeToMinutes(CURRENT_TIME);
 
-const overlaps = (start, end, [rangeStart, rangeEnd]) => start < rangeEnd && end > rangeStart;
-
-export function toAppointmentView(appointment, services) {
-  const service = getService(appointment.serviceId, services);
+export function toAppointmentView(appointment) {
   const start = timeToMinutes(appointment.time);
-  const end = start + service.duration;
+  const end = timeToMinutes(appointment.endTime);
   const booked = appointment.status === "BOOKED";
   const started = appointment.date < TODAY || (appointment.date === TODAY && start <= NOW_MINUTES);
 
   return {
     ...appointment,
-    service,
     start,
     end,
-    endTime: minutesToTime(end),
     canComplete: booked && started,
     canEdit: booked && !started,
     locked: !booked,
@@ -31,6 +25,8 @@ export function toAppointmentView(appointment, services) {
 
 export function getGridRange(hours) {
   const openDays = hours.filter((day) => day.open);
+  if (openDays.length === 0) return { start: timeToMinutes("09:00"), end: timeToMinutes("19:00") };
+
   return {
     start: Math.min(...openDays.map((day) => timeToMinutes(day.start))),
     end: Math.max(...openDays.map((day) => timeToMinutes(day.end))),
@@ -39,38 +35,21 @@ export function getGridRange(hours) {
 
 export function getDayBounds(hours, closedDays, date) {
   const schedule = getDaySchedule(hours, closedDays, date);
+  if (schedule.closed) return { closed: true, start: 0, end: 0, breakRange: [0, 0] };
+
+  const hasBreak = Boolean(schedule.breakStart && schedule.breakEnd);
   return {
-    closed: schedule.closed,
+    closed: false,
     start: timeToMinutes(schedule.start),
     end: timeToMinutes(schedule.end),
-    breakRange: [timeToMinutes(schedule.breakStart), timeToMinutes(schedule.breakEnd)],
+    breakRange: hasBreak ? [timeToMinutes(schedule.breakStart), timeToMinutes(schedule.breakEnd)] : [0, 0],
   };
 }
 
-export function getBusyRanges(appointments, services, date, exceptId) {
+export function getBusyRanges(appointments, date, exceptId) {
   return appointments
-    .filter((item) => item.date === date && item.id !== exceptId && item.status !== "CANCELLED")
-    .map((item) => {
-      const start = timeToMinutes(item.time);
-      return [start, start + getService(item.serviceId, services).duration];
-    });
-}
-
-export function getFreeStarts({ date, duration, hours, closedDays, appointments, services, exceptId }) {
-  const bounds = getDayBounds(hours, closedDays, date);
-  if (bounds.closed || date < TODAY) return [];
-
-  const busy = getBusyRanges(appointments, services, date, exceptId);
-  const starts = [];
-
-  for (let start = bounds.start; start + duration <= bounds.end; start += SLOT_INTERVAL) {
-    const end = start + duration;
-    const past = date === TODAY && start <= NOW_MINUTES;
-    const blocked = overlaps(start, end, bounds.breakRange) || busy.some((range) => overlaps(start, end, range));
-    if (!past && !blocked) starts.push(minutesToTime(start));
-  }
-
-  return starts;
+    .filter((item) => item.date === date && item.id !== exceptId && item.status === "BOOKED")
+    .map((item) => [timeToMinutes(item.time), timeToMinutes(item.endTime)]);
 }
 
 export function getOpenDates(hours, closedDays, count) {

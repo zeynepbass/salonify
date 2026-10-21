@@ -1,39 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
 import StateMessage from "@/components/molecules/StateMessage";
-import { salons } from "@/data/mock/salons";
 import { useLocation } from "@/features/location/LocationProvider";
 import SalonGrid, { SalonGridSkeleton } from "@/features/salon/components/SalonGrid";
 import ActiveFilters from "@/features/search/components/ActiveFilters";
 import FilterPanel from "@/features/search/components/FilterPanel";
 import Pagination from "@/features/search/components/Pagination";
-import {
-  AVAILABILITY_OPTIONS,
-  DEFAULT_FILTERS,
-  SORT_OPTIONS,
-  filterSalons,
-  sortSalons,
-} from "@/features/search/salonQuery";
+import { AVAILABILITY_OPTIONS, DEFAULT_FILTERS, buildSalonParams, getSortOptions } from "@/features/search/salonQuery";
 import { useSalonFilters } from "@/features/search/useSalonFilters";
-import { getServiceName } from "@/lib/catalog";
+import { api, getErrorMessage } from "@/lib/api";
+import { getCategoryLabel } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 import { withLocativeSuffix } from "@/lib/format";
-import { useBodyScrollLock, useEscapeKey, useInitialLoading } from "@/lib/hooks";
+import { useBodyScrollLock, useEscapeKey } from "@/lib/hooks";
 
 const PAGE_SIZE = 6;
 
 const without = (list, item) => list.filter((value) => value !== item);
 
-function buildChips(filters, updateFilters) {
+function buildChips(filters, updateFilters, hasCoordinates) {
   const chips = [
     ...filters.serviceIds.map((id) => ({
       key: `service-${id}`,
-      label: getServiceName(id),
+      label: getCategoryLabel(id),
       onRemove: () => updateFilters({ serviceIds: without(filters.serviceIds, id) }),
     })),
     ...filters.hairStyles.map((style) => ({
@@ -60,7 +54,7 @@ function buildChips(filters, updateFilters) {
       onRemove: () => updateFilters({ availability: DEFAULT_FILTERS.availability }),
     });
   }
-  if (filters.distance !== DEFAULT_FILTERS.distance) {
+  if (hasCoordinates && filters.distance !== DEFAULT_FILTERS.distance) {
     chips.push({
       key: "distance",
       label: `${filters.distance} km`,
@@ -72,20 +66,45 @@ function buildChips(filters, updateFilters) {
 }
 
 export default function SearchPage() {
-  const { location, locationLabel, openLocationDialog } = useLocation();
+  const { location, locationLabel, hasCoordinates, openLocationDialog } = useLocation();
   const { filters, updateFilters, resetFilters } = useSalonFilters();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const loading = useInitialLoading();
+  const [result, setResult] = useState({ status: "loading", salons: [], total: 0, pageCount: 1, error: null });
 
   const closeDrawer = () => setDrawerOpen(false);
   useEscapeKey(closeDrawer, drawerOpen);
   useBodyScrollLock(drawerOpen);
 
-  const results = sortSalons(filterSalons(salons, filters), filters.sort);
-  const pageCount = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
-  const page = Math.min(filters.page, pageCount);
-  const visible = results.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const chips = buildChips(filters, updateFilters);
+  const params = buildSalonParams(filters, location, { limit: PAGE_SIZE });
+  const paramsKey = JSON.stringify(params);
+
+  useEffect(() => {
+    let ignore = false;
+    setResult((current) => ({ ...current, status: "loading", error: null }));
+
+    api
+      .get("/salons", { params: JSON.parse(paramsKey) })
+      .then((data) => {
+        if (ignore) return;
+        setResult({
+          status: "success",
+          salons: data.items,
+          total: data.pagination.total,
+          pageCount: data.pagination.totalPages,
+          error: null,
+        });
+      })
+      .catch((error) => {
+        if (!ignore) setResult({ status: "error", salons: [], total: 0, pageCount: 1, error: getErrorMessage(error) });
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [paramsKey]);
+
+  const page = Math.min(filters.page, result.pageCount);
+  const chips = buildChips(filters, updateFilters, hasCoordinates);
 
   return (
     <div className="page-container pt-7">
@@ -99,7 +118,7 @@ export default function SearchPage() {
             <span>Kuaförler</span>
           </nav>
           <h1 className="mt-1.5 text-[clamp(28px,3.4vw,40px)]">
-            {withLocativeSuffix(location.district)} {results.length} kuaför
+            {withLocativeSuffix(location.district)} {result.total} kuaför
           </h1>
         </div>
         <div className="flex max-w-full flex-wrap items-center gap-2">
@@ -109,7 +128,7 @@ export default function SearchPage() {
           </Button>
           <SegmentedControl
             label="Sıralama"
-            options={SORT_OPTIONS}
+            options={getSortOptions(hasCoordinates)}
             value={filters.sort}
             onChange={(sort) => updateFilters({ sort })}
             className="max-w-full overflow-x-auto"
@@ -132,7 +151,8 @@ export default function SearchPage() {
           <FilterPanel
             filters={filters}
             locationLabel={locationLabel}
-            resultCount={results.length}
+            resultCount={result.total}
+            showDistance={hasCoordinates}
             onChange={updateFilters}
             onReset={resetFilters}
             onChangeLocation={() => {
@@ -144,9 +164,11 @@ export default function SearchPage() {
         </aside>
 
         <div className="min-w-0 flex-1">
-          {loading ? (
+          {result.status === "loading" ? (
             <SalonGridSkeleton density="compact" />
-          ) : results.length === 0 ? (
+          ) : result.status === "error" ? (
+            <StateMessage role="alert" icon="alert" tone="accent" title="Kuaförler yüklenemedi." description={result.error} />
+          ) : result.salons.length === 0 ? (
             <StateMessage
               icon="search"
               title="Bu kriterlere uygun kuaför bulunamadı."
@@ -156,8 +178,8 @@ export default function SearchPage() {
             </StateMessage>
           ) : (
             <>
-              <SalonGrid salons={visible} density="compact" />
-              <Pagination page={page} pageCount={pageCount} onChange={(next) => updateFilters({ page: next })} />
+              <SalonGrid salons={result.salons} density="compact" />
+              <Pagination page={page} pageCount={result.pageCount} onChange={(next) => updateFilters({ page: next })} />
             </>
           )}
         </div>

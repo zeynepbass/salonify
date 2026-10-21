@@ -9,13 +9,13 @@ const ToastContext = createContext(null);
 const DURATION = 3200;
 
 export function ToastProvider({ className, children }) {
-  const [message, setMessage] = useState(null);
+  const [toast, setToast] = useState(null);
   const timerRef = useRef(null);
 
-  const showToast = useCallback((nextMessage) => {
+  const showToast = useCallback((message, { tone = "success" } = {}) => {
     clearTimeout(timerRef.current);
-    setMessage(nextMessage);
-    timerRef.current = setTimeout(() => setMessage(null), DURATION);
+    setToast({ message, tone });
+    timerRef.current = setTimeout(() => setToast(null), DURATION);
   }, []);
 
   useEffect(() => () => clearTimeout(timerRef.current), []);
@@ -26,10 +26,10 @@ export function ToastProvider({ className, children }) {
     <ToastContext.Provider value={value}>
       {children}
       <div role="status" aria-live="polite" className={cn("pointer-events-none fixed z-95 max-w-[calc(100vw-32px)]", className)}>
-        {message && (
+        {toast && (
           <div className="flex animate-rise items-center gap-2.5 bg-neutral-900 px-[18px] py-3.5 text-[14px] text-canvas shadow-lg">
-            <Icon name="check" className="text-accent-400" />
-            {message}
+            <Icon name={toast.tone === "error" ? "alert" : "check"} className="text-accent-400" />
+            {toast.message}
           </div>
         )}
       </div>

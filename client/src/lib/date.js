@@ -91,3 +91,22 @@ export function getMonthGrid(year, monthIndex) {
   const days = Array.from({ length: dayCount }, (_, index) => toISODate(new Date(year, monthIndex, index + 1)));
   return { leading, days };
 }
+
+export function formatRelativeTime(isoDateTime, now = new Date()) {
+  const date = new Date(isoDateTime);
+  const minutes = Math.floor((now - date) / 60000);
+
+  if (minutes < 1) return "Şimdi";
+  if (minutes < 60) return `${minutes} dk önce`;
+  if (minutes < 24 * 60) return `${Math.floor(minutes / 60)} saat önce`;
+
+  const days = Math.floor(minutes / (24 * 60));
+  if (days === 1) return "Dün";
+  if (days < 7) return `${days} gün önce`;
+  return `${date.getDate()} ${MONTHS_SHORT[date.getMonth()]}`;
+}
+
+export function formatMonthYear(isoDateTime) {
+  const date = new Date(isoDateTime);
+  return `${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+}

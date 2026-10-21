@@ -9,6 +9,7 @@ import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/dashboard/PanelProvider";
 import { getOpenDates } from "@/features/dashboard/scheduling";
+import { getErrorMessage } from "@/lib/api";
 import { WEEKDAYS, formatDayWithWeekday } from "@/lib/date";
 
 const HEAD_CELL = "eyebrow border-b-2 border-ink px-3 py-2.5 text-left text-neutral-700";
@@ -70,24 +71,52 @@ function WeeklySchedule({ hours, onChange }) {
 }
 
 export default function WorkingHoursScreen() {
-  const { hours, closedDays, appointments, updateHours, addClosedDay, removeClosedDay } = usePanel();
+  const { hours, closedDays, updateHours, saveHours, addClosedDay, removeClosedDay } = usePanel();
   const { showToast } = useToast();
   const dateOptions = getOpenDates(hours, closedDays, DATE_OPTION_COUNT);
   const [date, setDate] = useState(null);
   const [note, setNote] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const selectedDate = dateOptions.includes(date) ? date : dateOptions[0];
+  const showError = (error) => showToast(getErrorMessage(error), { tone: "error" });
 
-  const handleAddClosedDay = (event) => {
+  const handleSaveHours = async () => {
+    setSaving(true);
+    try {
+      await saveHours();
+      showToast("Çalışma saatleri kaydedildi.");
+    } catch (error) {
+      showError(error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddClosedDay = async (event) => {
     event.preventDefault();
-    const bookedCount = appointments.filter((item) => item.date === selectedDate && item.status === "BOOKED").length;
-    addClosedDay({ date: selectedDate, note: note.trim() || "Kapalı" });
-    setNote("");
-    showToast(
-      bookedCount
-        ? `Kapalı gün eklendi. O gün ${bookedCount} randevu var — iptal edilmesi gerekiyor.`
-        : "Kapalı gün eklendi.",
-    );
+    if (!selectedDate) return;
+
+    try {
+      const saved = await addClosedDay({ date: selectedDate, note: note.trim() || "Kapalı" });
+      setNote("");
+      showToast(
+        saved.bookedAppointmentCount
+          ? `Kapalı gün eklendi. O gün ${saved.bookedAppointmentCount} randevu var — iptal edilmesi gerekiyor.`
+          : "Kapalı gün eklendi.",
+      );
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const handleRemoveClosedDay = async (day) => {
+    try {
+      await removeClosedDay(day.id);
+      showToast("Kapalı gün kaldırıldı.");
+    } catch (error) {
+      showError(error);
+    }
   };
 
   return (
@@ -95,8 +124,8 @@ export default function WorkingHoursScreen() {
       <section className="min-w-0 flex-[2_1_620px]">
         <h2 className="mb-3 text-[20px]">Haftalık program</h2>
         <WeeklySchedule hours={hours} onChange={updateHours} />
-        <Button variant="primary" size="md" className="mt-4 px-[18px]" onClick={() => showToast("Çalışma saatleri kaydedildi.")}>
-          Değişiklikleri kaydet
+        <Button variant="primary" size="md" className="mt-4 px-[18px]" disabled={saving} onClick={handleSaveHours}>
+          {saving ? "Kaydediliyor…" : "Değişiklikleri kaydet"}
         </Button>
         <p className="mt-2 text-[12px] text-neutral-700">
           Mevcut randevular etkilenmez; yeni saatler müşteri tarafındaki boş slotlara anında yansır.
@@ -108,16 +137,16 @@ export default function WorkingHoursScreen() {
         <div className="border-t-2 border-ink">
           {closedDays.length === 0 && <p className="border-b border-line py-3 text-[13px] text-neutral-700">Tanımlı kapalı gün yok.</p>}
           {closedDays.map((day) => (
-            <div key={day.date} className="flex items-center gap-3 border-b border-line py-3">
+            <div key={day.id} className="flex items-center gap-3 border-b border-line py-3">
               <div className="flex-1">
                 <div className="font-extrabold">{formatDayWithWeekday(day.date)}</div>
-                <div className="text-[13px] text-neutral-700">Kapalı · {day.note}</div>
+                <div className="text-[13px] text-neutral-700">Kapalı{day.note && ` · ${day.note}`}</div>
               </div>
               <Button
                 variant="plain"
                 size="icon"
                 aria-label={`${formatDayWithWeekday(day.date)} kapalı gününü kaldır`}
-                onClick={() => removeClosedDay(day.date)}
+                onClick={() => handleRemoveClosedDay(day)}
               >
                 <Icon name="trash" />
               </Button>

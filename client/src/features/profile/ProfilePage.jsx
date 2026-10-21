@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import Icon from "@/components/atoms/Icon";
-import { myReviews } from "@/data/mock/reviews";
-import { currentUser } from "@/data/mock/users";
+import { useAuth } from "@/features/auth/AuthProvider";
 import AccountSection from "@/features/profile/components/AccountSection";
 import MyReviewsSection from "@/features/profile/components/MyReviewsSection";
 import NotificationPreferences from "@/features/profile/components/NotificationPreferences";
@@ -22,6 +21,7 @@ const SECTIONS = [
 const ITEM = "flex items-center gap-2.5 border-b border-line px-3 py-3.5 text-left text-[14px] font-semibold whitespace-nowrap transition-colors hover:bg-neutral-200";
 
 export default function ProfilePage() {
+  const { user } = useAuth();
   const [active, setActive] = useState("account");
 
   return (
@@ -53,11 +53,9 @@ export default function ProfilePage() {
           )}
         </nav>
         <div className="min-w-0 flex-[3_1_480px]">
-          {active === "account" && <AccountSection user={currentUser} />}
-          {active === "reviews" && <MyReviewsSection reviews={myReviews} />}
-          {active === "notifications" && (
-            <NotificationPreferences initialPreferences={currentUser.notificationPreferences} />
-          )}
+          {active === "account" && <AccountSection user={user} />}
+          {active === "reviews" && <MyReviewsSection />}
+          {active === "notifications" && <NotificationPreferences initialPreferences={user.notificationPreferences} />}
           {active === "settings" && <SettingsSection />}
         </div>
       </div>

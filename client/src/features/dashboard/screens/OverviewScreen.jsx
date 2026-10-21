@@ -1,18 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import StateMessage from "@/components/molecules/StateMessage";
 import StatusTag from "@/components/molecules/StatusTag";
 import { getNotificationIcon } from "@/components/organisms/NotificationList";
-import { TODAY } from "@/data/mock/clock";
+import Spinner from "@/components/atoms/Spinner";
 import { usePanel } from "@/features/dashboard/PanelProvider";
-import { NOW_MINUTES, SLOT_INTERVAL, getDayBounds, getFreeStarts } from "@/features/dashboard/scheduling";
+import { getDayBounds } from "@/features/dashboard/scheduling";
 import { useAppointmentActions } from "@/features/dashboard/useAppointmentActions";
 import { usePanelAppointments } from "@/features/dashboard/usePanelAppointments";
+import { useNotifications } from "@/features/notifications/NotificationsProvider";
+import { api, getErrorMessage } from "@/lib/api";
+import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
-import { addDays, formatDayMonth, startOfWeek } from "@/lib/date";
+import { formatDayMonth } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 
 function StatCard({ stat }) {
@@ -68,36 +72,58 @@ export default function OverviewScreen() {
   const panel = usePanel();
   const actions = useAppointmentActions();
   const appointments = usePanelAppointments();
+  const { notifications } = useNotifications();
+  const [dashboard, setDashboard] = useState({ status: "loading", data: null, error: null });
 
-  const weekStart = startOfWeek(TODAY);
-  const weekEnd = addDays(weekStart, 6);
-  const todayList = appointments
-    .filter((item) => item.date === TODAY && item.status !== "CANCELLED")
-    .sort((a, b) => a.start - b.start);
-  const upcoming = appointments.filter(
-    (item) => item.status === "BOOKED" && (item.date > TODAY || (item.date === TODAY && item.start > NOW_MINUTES)),
-  );
-  const thisWeek = appointments.filter((item) => item.date >= weekStart && item.date <= weekEnd);
-  const cancelledCount = thisWeek.filter((item) => item.status === "CANCELLED").length;
+  useEffect(() => {
+    let ignore = false;
+    api
+      .get("/salon/me/dashboard")
+      .then((data) => !ignore && setDashboard({ status: "success", data, error: null }))
+      .catch((error) => !ignore && setDashboard({ status: "error", data: null, error: getErrorMessage(error) }));
+    return () => {
+      ignore = true;
+    };
+  }, [panel.appointments]);
+
+  if (dashboard.status === "loading") {
+    return (
+      <div aria-busy="true" className="grid min-h-[40vh] place-items-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (dashboard.status === "error") {
+    return <StateMessage role="alert" icon="alert" tone="accent" title="Özet yüklenemedi." description={dashboard.error} />;
+  }
+
+  const summary = dashboard.data;
+  const todayIds = new Set(summary.todayAppointments.map((item) => item.id));
+  const todayList = appointments.filter((item) => todayIds.has(item.id)).sort((a, b) => a.start - b.start);
 
   const stats = [
-    { label: "Bugünkü Randevular", value: todayList.length, caption: formatDayMonth(TODAY), icon: "calendarCheck", href: "/panel/randevular?sekme=bugun" },
-    { label: "Yaklaşan", value: upcoming.length, caption: "Bugün ve sonrası", icon: "clock", href: "/panel/randevular?sekme=yaklasan" },
+    { label: "Bugünkü Randevular", value: summary.todayAppointments.length, caption: formatDayMonth(summary.date), icon: "calendarCheck", href: "/panel/randevular?sekme=bugun" },
+    { label: "Yaklaşan", value: summary.upcomingCount, caption: "Bugün ve sonrası", icon: "clock", href: "/panel/randevular?sekme=yaklasan" },
     {
       label: "Tamamlanan",
-      value: thisWeek.filter((item) => item.status === "COMPLETED").length,
+      value: summary.completedAppointments,
       caption: "Bu hafta",
       icon: "checkCircle",
       href: "/panel/randevular?sekme=gecmis",
     },
-    { label: "İptal", value: cancelledCount, caption: "Bu hafta", icon: "closeCircle", href: "/panel/randevular?sekme=gecmis", alert: cancelledCount > 0 },
+    {
+      label: "İptal",
+      value: summary.cancelledAppointments,
+      caption: "Bu hafta",
+      icon: "closeCircle",
+      href: "/panel/randevular?sekme=gecmis",
+      alert: summary.cancelledAppointments > 0,
+    },
   ];
 
   const bounds = getDayBounds(panel.hours, panel.closedDays, TODAY);
-  const openMinutes = bounds.closed ? 0 : bounds.end - bounds.start - (bounds.breakRange[1] - bounds.breakRange[0]);
-  const bookedMinutes = todayList.reduce((total, item) => total + item.service.duration, 0);
-  const occupancy = openMinutes ? Math.min(100, Math.round((bookedMinutes / openMinutes) * 100)) : 0;
-  const freeSlots = getFreeStarts({ ...panel, date: TODAY, duration: SLOT_INTERVAL }).length;
+  const { occupancy, freeSlotCount } = summary.today;
 
   return (
     <div className="flex flex-col gap-8">
@@ -139,7 +165,7 @@ export default function OverviewScreen() {
               <div className="h-full bg-ink" style={{ width: `${occupancy}%` }} />
             </div>
             <div className="text-[12px] text-neutral-700">
-              {bounds.closed ? "Salon bugün kapalı" : `${freeSlots} boş slot kaldı`}
+              {bounds.closed ? "Salon bugün kapalı" : `${freeSlotCount} boş slot kaldı`}
             </div>
           </div>
           <div>
@@ -149,7 +175,8 @@ export default function OverviewScreen() {
                 Tümü
               </Button>
             </div>
-            {panel.notifications.slice(0, 3).map((notification) => (
+            {notifications.length === 0 && <p className="border-t border-line py-3 text-[13px] text-neutral-700">Henüz bildirim yok.</p>}
+            {notifications.slice(0, 3).map((notification) => (
               <div key={notification.id} className="flex gap-3 border-t border-line py-3">
                 <Icon name={getNotificationIcon(notification.type)} className="text-neutral-700" />
                 <div className="min-w-0 flex-1">

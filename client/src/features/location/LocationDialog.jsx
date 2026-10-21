@@ -7,7 +7,7 @@ import Spinner from "@/components/atoms/Spinner";
 import Dialog, { DialogActions, DialogTitle } from "@/components/molecules/Dialog";
 import SearchInput from "@/components/molecules/SearchInput";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { cities, defaultLocation } from "@/data/mock/locations";
+import { cities } from "@/data/catalog";
 import { cn } from "@/lib/cn";
 import { includesText } from "@/lib/format";
 
@@ -60,7 +60,11 @@ export default function LocationDialog({ current, onApply, onClose }) {
 
     setStatus("locating");
     navigator.geolocation.getCurrentPosition(
-      () => apply(defaultLocation, `Konum bulundu: ${defaultLocation.city}, ${defaultLocation.district}`),
+      ({ coords }) =>
+        apply(
+          { city, district, lat: coords.latitude, lng: coords.longitude },
+          `Konum bulundu. Sonuçlar ${city}, ${district} için yakınlığa göre listelenir.`,
+        ),
       () => setStatus("denied"),
       { timeout: 8000 },
     );

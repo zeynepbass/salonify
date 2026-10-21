@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export function useEscapeKey(onEscape, active = true) {
   useEffect(() => {
@@ -25,15 +25,4 @@ export function useBodyScrollLock(active = true) {
       document.body.style.overflow = previous;
     };
   }, [active]);
-}
-
-export function useInitialLoading(duration = 450) {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), duration);
-    return () => clearTimeout(timer);
-  }, [duration]);
-
-  return loading;
 }

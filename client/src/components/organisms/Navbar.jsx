@@ -34,23 +34,31 @@ export default function Navbar({ items, unreadCount, userName }) {
           >
             Kuaför Paneli
           </Link>
-          <Button
-            variant="plain"
-            size="icon"
-            href="/bildirimler"
-            aria-label={`Bildirimler, ${unreadCount} okunmamış`}
-            className="relative"
-          >
-            <Icon name="bell" />
-            {unreadCount > 0 && (
-              <span className="absolute top-0.5 right-0.5 grid h-4 min-w-4 place-items-center bg-accent px-1 text-[10px] font-extrabold text-canvas">
-                {unreadCount}
-              </span>
-            )}
-          </Button>
-          <Link href="/profil" aria-label={`Profil: ${userName}`}>
-            <Avatar name={userName} size="sm" tone="dark" />
-          </Link>
+          {userName ? (
+            <>
+              <Button
+                variant="plain"
+                size="icon"
+                href="/bildirimler"
+                aria-label={`Bildirimler, ${unreadCount} okunmamış`}
+                className="relative"
+              >
+                <Icon name="bell" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 grid h-4 min-w-4 place-items-center bg-accent px-1 text-[10px] font-extrabold text-canvas">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+              <Link href="/profil" aria-label={`Profil: ${userName}`}>
+                <Avatar name={userName} size="sm" tone="dark" />
+              </Link>
+            </>
+          ) : (
+            <Button variant="primary" href="/giris">
+              Giriş yap
+            </Button>
+          )}
         </div>
       </div>
     </header>

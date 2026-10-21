@@ -20,10 +20,12 @@ export default function PortfolioGallery({ items }) {
               key={item.id}
               type="button"
               onClick={() => setActiveIndex(index)}
-              aria-label={`${item.title}, ${item.subtitle} fotoğrafını büyüt`}
+              aria-label={`${[item.title, item.subtitle].filter(Boolean).join(", ")} fotoğrafını büyüt`}
               className="group flex flex-col gap-2 text-left"
             >
               <ImagePlaceholder
+                src={item.image}
+                alt={item.title}
                 label="saç fotoğrafı"
                 stripe={12}
                 className="aspect-[4/5] w-full"

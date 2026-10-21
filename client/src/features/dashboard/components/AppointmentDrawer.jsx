@@ -48,13 +48,15 @@ export default function AppointmentDrawer({ appointment, onClose }) {
             <h2 id="appointment-drawer-title" className="mt-2.5 mb-0.5 text-[28px]">
               {appointment.customer}
             </h2>
-            <a
-              href={`tel:${appointment.phone.replace(/\s/g, "")}`}
-              className="inline-flex items-center gap-1.5 text-[14px] hover:text-accent"
-            >
-              <Icon name="phone" size={14} />
-              {appointment.phone}
-            </a>
+            {appointment.phone && (
+              <a
+                href={`tel:${appointment.phone.replace(/\s/g, "")}`}
+                className="inline-flex items-center gap-1.5 text-[14px] hover:text-accent"
+              >
+                <Icon name="phone" size={14} />
+                {appointment.phone}
+              </a>
+            )}
           </div>
           <dl className="grid grid-cols-2 border-t-2 border-ink">
             {details.map((item) => (

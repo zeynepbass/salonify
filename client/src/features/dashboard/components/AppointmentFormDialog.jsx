@@ -1,30 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import { Input, Select, Textarea } from "@/components/atoms/Input";
 import Dialog, { DialogActions, DialogTitle } from "@/components/molecules/Dialog";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { TODAY } from "@/data/mock/clock";
 import { usePanel } from "@/features/dashboard/PanelProvider";
-import { getFreeStarts, getOpenDates } from "@/features/dashboard/scheduling";
-import { getService } from "@/lib/catalog";
+import { getOpenDates } from "@/features/dashboard/scheduling";
+import { useNotifications } from "@/features/notifications/NotificationsProvider";
+import { api, getErrorMessage } from "@/lib/api";
+import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { formatDayWithWeekday } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 
-const SAVE_MS = 600;
 const DATE_OPTION_COUNT = 24;
 const TITLE_ID = "appointment-form-title";
 
 export default function AppointmentFormDialog({ draft, onClose }) {
-  const { appointments, services, hours, closedDays, saveAppointment } = usePanel();
+  const { salon, services, hours, closedDays, saveAppointment } = usePanel();
+  const { reloadNotifications } = useNotifications();
   const { showToast } = useToast();
   const activeServices = services.filter((service) => service.active);
   const dateOptions = getOpenDates(hours, closedDays, DATE_OPTION_COUNT);
-  const timer = useRef(null);
 
   const [form, setForm] = useState({
     customer: draft.customer ?? "",
@@ -34,49 +34,83 @@ export default function AppointmentFormDialog({ draft, onClose }) {
     time: draft.time ?? null,
     note: draft.note ?? "",
   });
+  const [slots, setSlots] = useState([]);
+  const [slotsLoading, setSlotsLoading] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => () => clearTimeout(timer.current), []);
+  const [error, setError] = useState(null);
 
   const editing = Boolean(draft.id);
-  const service = getService(form.serviceId, services);
-  const slots = getFreeStarts({
-    date: form.date,
-    duration: service.duration,
-    hours,
-    closedDays,
-    appointments,
-    services,
-    exceptId: draft.id,
-  });
+  const onlineBooking = editing && draft.source === "online";
+  const service = services.find((item) => item.id === form.serviceId);
+
+  useEffect(() => {
+    if (!form.serviceId || !form.date) return undefined;
+
+    let ignore = false;
+    setSlotsLoading(true);
+    api
+      .get(`/salons/${salon.id}/availability`, {
+        params: { serviceId: form.serviceId, date: form.date, ...(draft.id && { excludeAppointmentId: draft.id }) },
+      })
+      .then((data) => !ignore && setSlots(data.slots.filter((slot) => slot.available).map((slot) => slot.time)))
+      .catch(() => !ignore && setSlots([]))
+      .finally(() => !ignore && setSlotsLoading(false));
+
+    return () => {
+      ignore = true;
+    };
+  }, [salon.id, form.serviceId, form.date, draft.id]);
 
   const selectedTime = slots.includes(form.time) ? form.time : null;
 
   const errors = {
     customer: submitted && !form.customer.trim(),
-    phone: submitted && !form.phone.trim(),
+    phone: submitted && !onlineBooking && !form.phone.trim(),
     time: submitted && !selectedTime,
   };
 
   const update = (changes) => setForm((current) => ({ ...current, ...changes }));
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitted(true);
-    if (!form.customer.trim() || !form.phone.trim() || !selectedTime) return;
+    if (!form.customer.trim() || (!onlineBooking && !form.phone.trim()) || !selectedTime || saving) return;
 
     setSaving(true);
-    timer.current = setTimeout(() => {
-      saveAppointment({ ...form, id: draft.id, time: selectedTime, customer: form.customer.trim(), phone: form.phone.trim() });
-      showToast(
-        editing
-          ? "Randevu güncellendi. Müşteriye bildirim gönderildi."
-          : "Randevu oluşturuldu. Müşteriye SMS gönderildi.",
-      );
+    setError(null);
+    try {
+      await saveAppointment({
+        ...form,
+        id: draft.id,
+        time: selectedTime,
+        customer: form.customer.trim(),
+        phone: form.phone.trim(),
+        note: form.note.trim(),
+      });
+      showToast(editing ? "Randevu güncellendi. Müşteriye bildirim gönderildi." : "Randevu oluşturuldu.");
+      reloadNotifications();
       onClose();
-    }, SAVE_MS);
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+      setSaving(false);
+    }
   };
+
+  if (!service) {
+    return (
+      <Dialog size="md" titleId={TITLE_ID} onClose={onClose}>
+        <DialogTitle id={TITLE_ID}>Yeni randevu</DialogTitle>
+        <p className="text-[14px] text-neutral-700">Randevu oluşturmak için önce en az bir aktif hizmet ekle.</p>
+        <DialogActions>
+          <Button onClick={onClose}>Kapat</Button>
+          <Button variant="primary" href="/panel/hizmetler" onClick={onClose}>
+            Hizmetlere git
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog as="form" size="md" titleId={TITLE_ID} onClose={onClose} onSubmit={handleSubmit} noValidate>
@@ -94,6 +128,7 @@ export default function AppointmentFormDialog({ draft, onClose }) {
             value={form.customer}
             onChange={(event) => update({ customer: event.target.value })}
             aria-invalid={errors.customer}
+            disabled={onlineBooking}
           />
         </Field>
         <Field label="Telefon *" htmlFor="appointment-phone" error={errors.phone && "Telefon gerekli."}>
@@ -104,6 +139,7 @@ export default function AppointmentFormDialog({ draft, onClose }) {
             onChange={(event) => update({ phone: event.target.value })}
             placeholder="05xx xxx xx xx"
             aria-invalid={errors.phone}
+            disabled={onlineBooking}
           />
         </Field>
         <Field label="Hizmet" htmlFor="appointment-service">
@@ -133,10 +169,12 @@ export default function AppointmentFormDialog({ draft, onClose }) {
 
       <Field
         label="Saat"
-        hint={`${formatDuration(service.duration)} · ${slots.length} uygun başlangıç`}
+        hint={slotsLoading ? formatDuration(service.duration) : `${formatDuration(service.duration)} · ${slots.length} uygun başlangıç`}
         error={errors.time && slots.length > 0 && "Bir saat seç."}
       >
-        {slots.length === 0 ? (
+        {slotsLoading ? (
+          <div className="border border-dashed border-line p-3.5 text-[13px] text-neutral-700">Uygun saatler yükleniyor…</div>
+        ) : slots.length === 0 ? (
           <div className="border border-dashed border-line p-3.5 text-[13px] text-neutral-700">
             Bu tarihte seçili hizmet için uygun saat yok. Başka bir tarih seç.
           </div>
@@ -170,9 +208,17 @@ export default function AppointmentFormDialog({ draft, onClose }) {
         />
       </Field>
 
+      {error && (
+        <p role="alert" className="text-[13px] text-accent-700">
+          {error}
+        </p>
+      )}
+
       <p className="flex gap-2 text-[12px] text-neutral-700">
         <Icon name="info" size={14} className="mt-0.5" />
-        Randevu doğrudan oluşturulur ve müşteriye SMS ile bilgi gider.
+        {onlineBooking
+          ? "Online alınan randevularda müşteri bilgileri değiştirilemez; müşteriye bildirim gider."
+          : "Randevu doğrudan oluşturulur."}
       </p>
 
       <DialogActions>

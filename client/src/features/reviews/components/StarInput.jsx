@@ -1,5 +1,5 @@
 import Icon from "@/components/atoms/Icon";
-import { ratingLabels } from "@/data/mock/reviews";
+import { ratingLabels } from "@/data/catalog";
 import { cn } from "@/lib/cn";
 
 export default function StarInput({ value, onChange }) {

@@ -1,4 +1,5 @@
 import { Inter } from "next/font/google";
+import { AuthProvider } from "@/features/auth/AuthProvider";
 import "@/styles/globals.css";
 
 const inter = Inter({
@@ -23,7 +24,9 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="tr" className={inter.variable}>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

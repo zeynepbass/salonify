@@ -8,13 +8,14 @@ import StarRating from "@/components/atoms/StarRating";
 import Tag from "@/components/atoms/Tag";
 import StateMessage from "@/components/molecules/StateMessage";
 import SalonSection from "@/features/salon/components/SalonSection";
-import { getServiceName } from "@/lib/catalog";
 import { formatLongDate } from "@/lib/date";
 import { formatRating } from "@/lib/format";
 
 const PREVIEW_COUNT = 3;
 
-function RatingSummary({ rating, reviewCount, distribution }) {
+function RatingSummary({ summary }) {
+  const { averageRating: rating, reviewCount, distribution } = summary;
+
   return (
     <div className="min-w-[240px] flex-[0_1_300px] border-t-2 border-ink pt-5">
       <div className="text-[64px] leading-none font-extrabold">{formatRating(rating)}</div>
@@ -38,31 +39,37 @@ function RatingSummary({ rating, reviewCount, distribution }) {
 function ReviewItem({ review }) {
   return (
     <article className="flex gap-4 border-t border-line py-5">
-      <Avatar name={review.author} />
+      <Avatar name={review.authorName} />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex flex-wrap justify-between gap-2">
-          <strong className="text-[15px]">{review.author}</strong>
-          <span className="text-[12px] text-neutral-700">{formatLongDate(review.date)}</span>
+          <strong className="text-[15px]">{review.authorName}</strong>
+          <span className="text-[12px] text-neutral-700">{formatLongDate(review.createdAt.slice(0, 10))}</span>
         </div>
         <div className="flex items-center gap-2.5">
           <StarRating value={review.rating} />
-          <Tag>{getServiceName(review.serviceId)}</Tag>
+          <Tag>{review.serviceName}</Tag>
         </div>
-        <p className="max-w-[68ch] text-[14px] leading-[1.6]">{review.text}</p>
-        {review.hasPhoto && <ImagePlaceholder stripe={8} className="mt-1 h-[120px] w-24" />}
+        {review.comment && <p className="max-w-[68ch] text-[14px] leading-[1.6]">{review.comment}</p>}
+        {review.hairPhotos.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-2">
+            {review.hairPhotos.map((photo) => (
+              <ImagePlaceholder key={photo} src={photo} alt="Müşteri saç fotoğrafı" stripe={8} className="h-[120px] w-24" />
+            ))}
+          </div>
+        )}
       </div>
     </article>
   );
 }
 
-export default function ReviewsSection({ rating, reviewCount, reviews, distribution }) {
+export default function ReviewsSection({ summary, reviews }) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? reviews : reviews.slice(0, PREVIEW_COUNT);
 
   return (
     <SalonSection id="degerlendirmeler" title="Değerlendirmeler">
       <div className="flex flex-wrap items-start gap-10">
-        <RatingSummary rating={rating} reviewCount={reviewCount} distribution={distribution} />
+        <RatingSummary summary={summary} />
         <div className="flex min-w-0 flex-[1_1_480px] flex-col">
           {reviews.length === 0 ? (
             <StateMessage icon="star" title="Henüz değerlendirme yok." description="İlk değerlendirmeyi sen yapabilirsin." />

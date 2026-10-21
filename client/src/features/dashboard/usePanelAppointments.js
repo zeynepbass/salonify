@@ -5,7 +5,7 @@ import { usePanel } from "@/features/dashboard/PanelProvider";
 import { toAppointmentView } from "@/features/dashboard/scheduling";
 
 export function usePanelAppointments() {
-  const { appointments, services } = usePanel();
+  const { appointments } = usePanel();
 
-  return useMemo(() => appointments.map((item) => toAppointmentView(item, services)), [appointments, services]);
+  return useMemo(() => appointments.map(toAppointmentView), [appointments]);
 }

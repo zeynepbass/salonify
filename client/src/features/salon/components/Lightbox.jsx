@@ -68,6 +68,8 @@ export default function Lightbox({ items, index, onChange, onClose }) {
         </button>
         <ImagePlaceholder
           key={item.id}
+          src={item.image}
+          alt={item.title}
           label="saç fotoğrafı · tam boyut"
           tone="dark"
           stripe={16}
@@ -83,7 +85,7 @@ export default function Lightbox({ items, index, onChange, onClose }) {
           <div className="text-[20px] font-extrabold">{item.title}</div>
           <div className="text-[14px] opacity-80">{item.subtitle}</div>
         </div>
-        <StarRating value={item.rating} size={18} tone="dark" />
+        {item.rating && <StarRating value={item.rating} size={18} tone="dark" />}
         <div className="text-[12px] opacity-70 max-sm:hidden">← → gezin · Esc kapat</div>
         <div className="flex gap-2 sm:hidden">
           <button type="button" onClick={() => step(-1)} aria-label="Önceki fotoğraf" className={`${CONTROL} size-11`}>

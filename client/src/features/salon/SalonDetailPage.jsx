@@ -1,47 +1,85 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
+import Spinner from "@/components/atoms/Spinner";
 import BackLink from "@/components/molecules/BackLink";
 import MobileActionBar from "@/components/molecules/MobileActionBar";
-import { TODAY } from "@/data/mock/clock";
-import { portfolioItems } from "@/data/mock/portfolio";
-import { ratingDistribution, salonReviews } from "@/data/mock/reviews";
-import { services } from "@/data/mock/services";
-import { workingHours } from "@/data/mock/workingHours";
 import HoursSection from "@/features/salon/components/HoursSection";
 import PortfolioGallery from "@/features/salon/components/PortfolioGallery";
 import ReviewsSection from "@/features/salon/components/ReviewsSection";
 import SalonProfileHeader from "@/features/salon/components/SalonProfileHeader";
 import SalonSectionNav from "@/features/salon/components/SalonSectionNav";
 import ServicesSection from "@/features/salon/components/ServicesSection";
-import { getServiceName } from "@/lib/catalog";
+import SalonNotFound from "@/features/salon/SalonNotFound";
+import { api, getErrorMessage, isNotFound } from "@/lib/api";
+import { TODAY } from "@/lib/clock";
 import { getDateParts } from "@/lib/date";
 import { formatPrice } from "@/lib/format";
+import { toWorkingHours } from "@/lib/schedule";
 
-const galleryItems = portfolioItems
-  .filter((item) => item.published)
-  .map((item) => ({ id: item.id, title: item.customer, subtitle: getServiceName(item.serviceId), rating: item.rating }));
+const REVIEW_LIMIT = 20;
 
-const activeServices = services.filter((service) => service.active);
+export default function SalonDetailPage({ salonId }) {
+  const [state, setState] = useState({ status: "loading", salon: null, reviews: null, error: null });
 
-export default function SalonDetailPage({ salon }) {
+  useEffect(() => {
+    let ignore = false;
+
+    Promise.all([
+      api.get(`/salons/${salonId}`),
+      api.get(`/salons/${salonId}/reviews`, { params: { limit: REVIEW_LIMIT } }),
+    ])
+      .then(([salon, reviews]) => {
+        if (!ignore) setState({ status: "success", salon, reviews, error: null });
+      })
+      .catch((error) => {
+        if (ignore) return;
+        setState({ status: isNotFound(error) ? "not-found" : "error", salon: null, reviews: null, error: getErrorMessage(error) });
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [salonId]);
+
+  if (state.status === "loading") {
+    return (
+      <div aria-busy="true" className="grid min-h-[50vh] place-items-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (state.status === "not-found") return <SalonNotFound />;
+  if (state.status === "error") return <SalonNotFound description={state.error} />;
+
+  const { salon, reviews } = state;
+  const hours = toWorkingHours(salon.workingHours);
   const bookingHref = `/kuaforler/${salon.id}/randevu`;
+  const galleryItems = salon.portfolio.map((item) => ({
+    id: item.id,
+    image: item.image,
+    title: item.customerName || item.title || salon.name,
+    subtitle: item.customerName ? item.title : item.description,
+    rating: item.rating,
+  }));
 
   return (
     <div className="page-container pt-6">
       <BackLink href="/kuaforler">Kuaförler</BackLink>
-      <SalonProfileHeader salon={salon} />
+      <SalonProfileHeader salon={salon} hours={hours} closedDays={salon.blockedDates} />
       <SalonSectionNav />
-      <ServicesSection salonId={salon.id} services={activeServices} />
+      <ServicesSection salonId={salon.id} services={salon.services} />
       <PortfolioGallery items={galleryItems} />
-      <ReviewsSection
-        rating={salon.rating}
-        reviewCount={salon.reviewCount}
-        reviews={salonReviews}
-        distribution={ratingDistribution}
-      />
-      <HoursSection hours={workingHours} todayWeekday={getDateParts(TODAY).weekdayIndex} />
+      <ReviewsSection summary={reviews.summary} reviews={reviews.items} />
+      <HoursSection hours={hours} todayWeekday={getDateParts(TODAY).weekdayIndex} />
 
-      <MobileActionBar kicker="Başlangıç" value={formatPrice(salon.startingPrice)}>
+      <MobileActionBar
+        kicker="Başlangıç"
+        value={salon.startingPrice === null ? "—" : formatPrice(salon.startingPrice)}
+      >
         <Button variant="primary" href={bookingHref} className="h-12 gap-2.5 px-[18px]">
           Randevu Al
           <Icon name="arrowRight" />

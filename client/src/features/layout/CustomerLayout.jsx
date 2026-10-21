@@ -5,8 +5,7 @@ import BottomNav from "@/components/molecules/BottomNav";
 import Footer from "@/components/organisms/Footer";
 import Navbar from "@/components/organisms/Navbar";
 import { ToastProvider } from "@/components/organisms/ToastProvider";
-import { currentUser } from "@/data/mock/users";
-import { AppointmentsProvider } from "@/features/appointments/AppointmentsProvider";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { LocationProvider } from "@/features/location/LocationProvider";
 import { NotificationsProvider, useNotifications } from "@/features/notifications/NotificationsProvider";
 
@@ -29,6 +28,7 @@ const ACTION_BAR_ROUTE = /^\/kuaforler\/[^/]+(\/randevu)?$/;
 function Chrome({ children }) {
   const pathname = usePathname();
   const { unreadCount } = useNotifications();
+  const { status, user } = useAuth();
 
   const navItems = NAV_ITEMS.map((item) => ({ ...item, active: item.match(pathname) }));
   const bottomItems = [...NAV_ITEMS, PROFILE_ITEM].map((item) => ({
@@ -40,7 +40,7 @@ function Chrome({ children }) {
 
   return (
     <div className="flex min-h-screen flex-col pb-[76px] md:pb-0">
-      <Navbar items={navItems} unreadCount={unreadCount} userName={currentUser.name} />
+      <Navbar items={navItems} unreadCount={unreadCount} userName={status === "authenticated" ? user.name : null} />
       <main className="flex-1">{children}</main>
       <Footer />
       {!ACTION_BAR_ROUTE.test(pathname) && <BottomNav label="Mobil menü" items={bottomItems} className="md:hidden" />}
@@ -52,11 +52,9 @@ export default function CustomerLayout({ children }) {
   return (
     <ToastProvider className="bottom-[88px] left-4 md:bottom-6 md:left-6">
       <NotificationsProvider>
-        <AppointmentsProvider>
-          <LocationProvider>
-            <Chrome>{children}</Chrome>
-          </LocationProvider>
-        </AppointmentsProvider>
+        <LocationProvider>
+          <Chrome>{children}</Chrome>
+        </LocationProvider>
       </NotificationsProvider>
     </ToastProvider>
   );
