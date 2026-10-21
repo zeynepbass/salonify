@@ -43,3 +43,14 @@ export async function markAllAsRead(userId) {
   const result = await Notification.updateMany({ recipient: userId, isRead: false }, { isRead: true });
   return { updatedCount: result.modifiedCount };
 }
+
+export async function deleteNotification({ userId, notificationId }) {
+  const notification = await Notification.findOneAndDelete({ _id: notificationId, recipient: userId });
+  if (!notification) throw new ApiError(404, 'Bildirim bulunamadı.');
+  return { id: notification.id };
+}
+
+export async function deleteAllNotifications(userId) {
+  const result = await Notification.deleteMany({ recipient: userId });
+  return { deletedCount: result.deletedCount };
+}

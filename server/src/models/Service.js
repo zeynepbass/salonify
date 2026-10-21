@@ -10,7 +10,6 @@ const serviceSchema = new mongoose.Schema(
     category: { type: String, enum: SERVICE_CATEGORIES, default: 'diger' },
     duration: { type: Number, required: true, min: 5, max: 600 },
     price: { type: Number, required: true, min: 0 },
-    isActive: { type: Boolean, default: true },
   },
   schemaOptions(),
 );

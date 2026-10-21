@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import LoginScreen from "@/features/dashboard/screens/LoginScreen";
+import LoginScreen from "@/features/customer/screens/LoginScreen";
 
 export const metadata = { title: "Panele giriş" };
 

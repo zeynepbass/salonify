@@ -1,4 +1,4 @@
-import OverviewScreen from "@/features/dashboard/screens/OverviewScreen";
+import OverviewScreen from "@/features/customer/screens/OverviewScreen";
 
 export const metadata = { title: "Dashboard" };
 

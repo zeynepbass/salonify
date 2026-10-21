@@ -7,8 +7,8 @@ import { Input, Select } from "@/components/atoms/Input";
 import Switch from "@/components/atoms/Switch";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/dashboard/PanelProvider";
-import { getOpenDates } from "@/features/dashboard/scheduling";
+import { usePanel } from "@/features/customer/PanelProvider";
+import { getOpenDates } from "@/features/customer/scheduling";
 import { getErrorMessage } from "@/lib/api";
 import { WEEKDAYS, formatDayWithWeekday } from "@/lib/date";
 

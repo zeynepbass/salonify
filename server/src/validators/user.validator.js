@@ -8,14 +8,6 @@ export const updateProfileSchema = {
       name: requiredText('Ad soyad', 80).optional(),
       email: email.optional(),
       phone: phone.optional(),
-      notificationPreferences: z
-        .object({
-          email: z.boolean().optional(),
-          sms: z.boolean().optional(),
-          reminder: z.boolean().optional(),
-          promo: z.boolean().optional(),
-        })
-        .optional(),
       location: z.object({ city: text('Şehir', 60).optional(), district: text('İlçe', 60).optional() }).optional(),
     })
     .refine(...atLeastOneField),

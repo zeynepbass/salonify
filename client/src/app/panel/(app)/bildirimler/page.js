@@ -1,4 +1,4 @@
-import NotificationsScreen from "@/features/dashboard/screens/NotificationsScreen";
+import NotificationsScreen from "@/features/customer/screens/NotificationsScreen";
 
 export const metadata = { title: "Bildirimler" };
 

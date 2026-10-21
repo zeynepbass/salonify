@@ -7,7 +7,7 @@ import Dialog, { DialogActions, DialogTitle } from "@/components/molecules/Dialo
 import Field from "@/components/molecules/Field";
 
 const TITLE_ID = "service-form-title";
-const NEW_SERVICE = { name: "", duration: 60, price: 500, active: true };
+const NEW_SERVICE = { name: "", duration: 60, price: 500 };
 
 export default function ServiceFormDialog({ service, onSave, onClose }) {
   const [form, setForm] = useState(service ?? NEW_SERVICE);

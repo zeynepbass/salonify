@@ -4,11 +4,11 @@ import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
-import { usePanel } from "@/features/dashboard/PanelProvider";
-import CalendarDayView from "@/features/dashboard/components/CalendarDayView";
-import CalendarWeekView from "@/features/dashboard/components/CalendarWeekView";
-import { getBusyRanges, getDayBounds, getGridRange } from "@/features/dashboard/scheduling";
-import { usePanelAppointments } from "@/features/dashboard/usePanelAppointments";
+import { usePanel } from "@/features/customer/PanelProvider";
+import CalendarDayView from "@/features/customer/components/CalendarDayView";
+import CalendarWeekView from "@/features/customer/components/CalendarWeekView";
+import { getBusyRanges, getDayBounds, getGridRange } from "@/features/customer/scheduling";
+import { usePanelAppointments } from "@/features/customer/usePanelAppointments";
 import { TODAY } from "@/lib/clock";
 import { addDays, formatDayMonth, formatDayWithWeekday, getDateParts, startOfWeek } from "@/lib/date";
 

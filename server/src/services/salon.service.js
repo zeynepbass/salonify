@@ -108,7 +108,7 @@ export async function getSalonDetail(salonId) {
   const salon = await assertSalonExists(salonId);
 
   const [services, portfolio, workingHours, blockedDates] = await Promise.all([
-    Service.find({ salon: salon._id, isActive: true }).sort({ name: 1 }),
+    Service.find({ salon: salon._id }).sort({ name: 1 }),
     listPublicPortfolio(salon._id),
     WorkingHours.find({ salon: salon._id }),
     BlockedDate.find({ salon: salon._id, date: { $gte: getSalonNow().date } }).sort({ date: 1 }),
@@ -138,7 +138,7 @@ export async function updateSalonProfile(salon, { coordinates, ...changes }) {
 export async function syncSalonCatalog(salonId) {
   const [salon, services] = await Promise.all([
     Salon.findById(salonId),
-    Service.find({ salon: salonId, isActive: true }).select('name category price'),
+    Service.find({ salon: salonId }).select('name category price'),
   ]);
   if (!salon) return;
 

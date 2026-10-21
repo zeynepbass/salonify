@@ -8,7 +8,7 @@ import { Input, Textarea } from "@/components/atoms/Input";
 import Tag from "@/components/atoms/Tag";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/dashboard/PanelProvider";
+import { usePanel } from "@/features/customer/PanelProvider";
 import { getErrorMessage, uploadImage } from "@/lib/api";
 import { WEEKDAYS } from "@/lib/date";
 
@@ -125,11 +125,9 @@ export default function SalonProfileScreen() {
       <aside className="flex min-w-0 flex-[1_1_300px] flex-col gap-6">
         <SummaryCard title="Hizmetler" actionLabel="Yönet" href="/panel/hizmetler">
           <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {services
-              .filter((service) => service.active)
-              .map((service) => (
-                <Tag key={service.id}>{service.name}</Tag>
-              ))}
+            {services.map((service) => (
+              <Tag key={service.id}>{service.name}</Tag>
+            ))}
           </div>
         </SummaryCard>
         <SummaryCard title="Çalışma saatleri" actionLabel="Düzenle" href="/panel/calisma-saatleri">

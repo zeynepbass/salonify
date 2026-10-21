@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
-import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import { popularSearches } from "@/data/catalog";
 import { useLocation } from "@/features/location/LocationProvider";
 import { buildSearchHref } from "@/features/search/useSalonFilters";
@@ -76,10 +75,13 @@ export default function HeroSearch() {
           ))}
         </div>
       </div>
-      <ImagePlaceholder
-        label="hero görseli · salon iç mekân, siyah-beyaz"
-        className="min-h-[240px] min-w-0 flex-[1_1_360px] md:min-h-[360px]"
-      />
+      <div
+        aria-hidden="true"
+        className="relative min-h-[240px] min-w-0 flex-[1_1_360px] bg-ink bg-cover bg-center bg-no-repeat md:min-h-[360px]"
+        style={{ backgroundImage: "url('/assets/images/login-back.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-accent-400/40" />
+      </div>
     </section>
   );
 }

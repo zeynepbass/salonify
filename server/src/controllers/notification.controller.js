@@ -15,3 +15,14 @@ export async function markRead(req, res) {
 export async function markAllRead(req, res) {
   sendSuccess(res, await notificationService.markAllAsRead(req.user._id));
 }
+
+export async function remove(req, res) {
+  sendSuccess(
+    res,
+    await notificationService.deleteNotification({ userId: req.user._id, notificationId: req.params.notificationId }),
+  );
+}
+
+export async function removeAll(req, res) {
+  sendSuccess(res, await notificationService.deleteAllNotifications(req.user._id));
+}

@@ -65,7 +65,6 @@ export const cancelAppointmentSchema = {
 export const listSalonAppointmentsSchema = {
   query: z.object({
     scope: z.enum(['today', 'upcoming', 'past', 'all'], 'scope today, upcoming, past veya all olmalı.').optional(),
-    search: text('Arama metni', 80).optional(),
     date: dateString.optional(),
     from: dateString.optional(),
     to: dateString.optional(),

@@ -12,7 +12,6 @@ const fields = {
     .min(5, 'Süre en az 5 dakika olmalı.')
     .max(600, 'Süre en fazla 600 dakika olabilir.'),
   price: z.number('Fiyat bir sayı olmalı.').min(0, 'Fiyat negatif olamaz.').max(1_000_000, 'Fiyat çok yüksek.'),
-  isActive: z.boolean('isActive true veya false olmalı.'),
 };
 
 export const serviceIdParams = z.object({ serviceId: objectId('Hizmet kimliği') });
@@ -24,7 +23,6 @@ export const createServiceSchema = {
     price: fields.price,
     description: fields.description.optional(),
     category: fields.category.optional(),
-    isActive: fields.isActive.optional(),
   }),
 };
 

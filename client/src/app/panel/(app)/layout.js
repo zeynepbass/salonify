@@ -1,4 +1,4 @@
-import PanelShell from "@/features/dashboard/components/PanelShell";
+import PanelShell from "@/features/customer/components/PanelShell";
 
 export const metadata = {
   title: {
