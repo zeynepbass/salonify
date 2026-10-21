@@ -78,7 +78,9 @@ salonify/
 │   └── src/
 │       ├── app/            sayfalar (rotalar)
 │       ├── components/     ortak bileşenler (atoms, molecules, organisms)
-│       ├── features/       sayfa bazlı modüller
+│       ├── features/
+│       │   ├── customer/   müşteri sayfalarının modülleri
+│       │   └── panel/      kuaför paneli modülleri
 │       ├── data/           sabit listeler (kategoriler, şehirler)
 │       ├── lib/            yardımcı fonksiyonlar, API istemcisi (axios)
 │       └── styles/         genel stiller ve renk paleti

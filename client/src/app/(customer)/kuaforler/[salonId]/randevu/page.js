@@ -1,4 +1,4 @@
-import BookingPage from "@/features/booking/BookingPage";
+import BookingPage from "@/features/customer/booking/BookingPage";
 
 export const metadata = { title: "Randevu al" };
 

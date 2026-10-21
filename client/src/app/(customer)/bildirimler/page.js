@@ -1,4 +1,4 @@
-import NotificationsPage from "@/features/notifications/NotificationsPage";
+import NotificationsPage from "@/features/customer/notifications/NotificationsPage";
 
 export const metadata = { title: "Bildirimler" };
 

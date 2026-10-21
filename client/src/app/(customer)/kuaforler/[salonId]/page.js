@@ -1,4 +1,4 @@
-import SalonDetailPage from "@/features/salon/SalonDetailPage";
+import SalonDetailPage from "@/features/customer/salon/SalonDetailPage";
 
 export const metadata = { title: "Kuaför" };
 

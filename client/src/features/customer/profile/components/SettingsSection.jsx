@@ -1,0 +1,161 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Button from "@/components/atoms/Button";
+import { Input } from "@/components/atoms/Input";
+import Field from "@/components/molecules/Field";
+import { useToast } from "@/components/organisms/ToastProvider";
+import { useAuth } from "@/features/customer/auth/AuthProvider";
+import { api, getErrorMessage, setAccessToken } from "@/lib/api";
+
+function PasswordForm({ onDone }) {
+  const { applySession } = useAuth();
+  const { showToast } = useToast();
+  const [form, setForm] = useState({ currentPassword: "", newPassword: "" });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      applySession(await api.patch("/users/me/password", form));
+      showToast("Şifren değiştirildi.");
+      onDone();
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+      setSaving(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3 bg-surface p-4">
+      <Field label="Mevcut şifre" htmlFor="settings-current-password">
+        <Input
+          id="settings-current-password"
+          type="password"
+          autoComplete="current-password"
+          value={form.currentPassword}
+          onChange={(event) => setForm({ ...form, currentPassword: event.target.value })}
+          required
+        />
+      </Field>
+      <Field label="Yeni şifre" hint="en az 8 karakter" htmlFor="settings-new-password">
+        <Input
+          id="settings-new-password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          value={form.newPassword}
+          onChange={(event) => setForm({ ...form, newPassword: event.target.value })}
+          required
+        />
+      </Field>
+      {error && (
+        <p role="alert" className="text-[13px] text-accent-700">
+          {error}
+        </p>
+      )}
+      <div className="flex gap-2">
+        <Button onClick={onDone}>Vazgeç</Button>
+        <Button type="submit" variant="primary" disabled={saving}>
+          {saving ? "Kaydediliyor…" : "Şifreyi kaydet"}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function DeleteAccountForm({ onDone }) {
+  const router = useRouter();
+  const { updateSession } = useAuth();
+  const [password, setPassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setDeleting(true);
+    setError(null);
+    try {
+      await api.delete("/users/me", { data: { password } });
+      setAccessToken(null);
+      updateSession({ status: "guest", user: null, salon: null });
+      router.replace("/");
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-3 bg-accent-100 p-4">
+      <Field label="Onaylamak için şifreni gir" htmlFor="settings-delete-password">
+        <Input
+          id="settings-delete-password"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+        />
+      </Field>
+      {error && (
+        <p role="alert" className="text-[13px] text-accent-700">
+          {error}
+        </p>
+      )}
+      <div className="flex gap-2">
+        <Button onClick={onDone}>Vazgeç</Button>
+        <Button type="submit" variant="danger" disabled={deleting}>
+          {deleting ? "Siliniyor…" : "Hesabımı kalıcı olarak sil"}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+export default function SettingsSection() {
+  const router = useRouter();
+  const { logout } = useAuth();
+  const [openForm, setOpenForm] = useState(null);
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/");
+  };
+
+  return (
+    <section>
+      <h2 className="mb-4 text-[20px]">Ayarlar</h2>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-4">
+        <Field label="Şifre">
+          <Button align="start" className="min-h-10 w-full" onClick={() => setOpenForm("password")}>
+            Şifreyi değiştir
+          </Button>
+        </Field>
+      </div>
+      {openForm === "password" && <PasswordForm onDone={() => setOpenForm(null)} />}
+
+      <div className="mt-8 border-t-2 border-line pt-5">
+        <Button onClick={handleLogout}>Çıkış yap</Button>
+      </div>
+
+      <div className="mt-8 border-t-2 border-line pt-5">
+        <div className="font-bold">Hesabı sil</div>
+        <p className="mt-1 mb-3 text-[13px] text-neutral-700">
+          Tüm randevu geçmişin ve değerlendirmelerin kalıcı olarak silinir.
+        </p>
+        {openForm === "delete" ? (
+          <DeleteAccountForm onDone={() => setOpenForm(null)} />
+        ) : (
+          <Button variant="danger" onClick={() => setOpenForm("delete")}>
+            Hesabımı sil
+          </Button>
+        )}
+      </div>
+    </section>
+  );
+}

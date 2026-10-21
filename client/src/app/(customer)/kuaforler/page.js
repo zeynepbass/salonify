@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { SalonGridSkeleton } from "@/features/salon/components/SalonGrid";
-import SearchPage from "@/features/search/SearchPage";
+import { SalonGridSkeleton } from "@/features/customer/salon/components/SalonGrid";
+import SearchPage from "@/features/customer/search/SearchPage";
 
 export const metadata = { title: "Kuaförler" };
 

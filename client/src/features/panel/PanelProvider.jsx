@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/features/auth/AuthProvider";
+import { useAuth } from "@/features/customer/auth/AuthProvider";
 import { api, getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
 import { addDays } from "@/lib/date";

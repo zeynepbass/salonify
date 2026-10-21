@@ -7,7 +7,7 @@ import SearchInput from "@/components/molecules/SearchInput";
 import StateMessage from "@/components/molecules/StateMessage";
 import NotificationList from "@/components/organisms/NotificationList";
 import { usePanel } from "@/features/panel/PanelProvider";
-import { useNotifications } from "@/features/notifications/NotificationsProvider";
+import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
 
 export default function NotificationsScreen() {
   const router = useRouter();

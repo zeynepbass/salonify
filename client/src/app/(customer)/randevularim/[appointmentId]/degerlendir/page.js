@@ -1,4 +1,4 @@
-import ReviewFormPage from "@/features/reviews/ReviewFormPage";
+import ReviewFormPage from "@/features/customer/reviews/ReviewFormPage";
 
 export const metadata = { title: "Değerlendirme" };
 

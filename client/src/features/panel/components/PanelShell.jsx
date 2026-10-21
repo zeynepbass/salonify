@@ -8,7 +8,7 @@ import BottomNav from "@/components/molecules/BottomNav";
 import ConfirmDialog from "@/components/molecules/ConfirmDialog";
 import StateMessage from "@/components/molecules/StateMessage";
 import { ToastProvider } from "@/components/organisms/ToastProvider";
-import AuthGuard from "@/features/auth/AuthGuard";
+import AuthGuard from "@/features/customer/auth/AuthGuard";
 import { PanelProvider, usePanel } from "@/features/panel/PanelProvider";
 import AppointmentDrawer from "@/features/panel/components/AppointmentDrawer";
 import AppointmentFormDialog from "@/features/panel/components/AppointmentFormDialog";
@@ -17,7 +17,7 @@ import PanelMenuSheet from "@/features/panel/components/PanelMenuSheet";
 import PanelSidebar from "@/features/panel/components/PanelSidebar";
 import { PANEL_MOBILE_NAV, PANEL_NAV, getActivePanelItem } from "@/features/panel/panelNav";
 import { toAppointmentView } from "@/features/panel/scheduling";
-import { NotificationsProvider, useNotifications } from "@/features/notifications/NotificationsProvider";
+import { NotificationsProvider, useNotifications } from "@/features/customer/notifications/NotificationsProvider";
 import { TODAY } from "@/lib/clock";
 import { formatLongDate, getDateParts } from "@/lib/date";
 
