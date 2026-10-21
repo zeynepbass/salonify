@@ -51,9 +51,13 @@ Kuaför ve güzellik salonu randevu platformu. Müşteri salonları puan, portf�
 | --- | --- |
 | ![Panel girişi](docs/screenshots/panel-giris.png) | ![Panel özeti](docs/screenshots/panel.png) |
 
-| Panel takvimi | Mobil görünüm |
+| Panel takvimi | Panel bildirimleri |
 | --- | --- |
-| ![Panel takvimi](docs/screenshots/panel-takvim.png) | <img src="docs/screenshots/mobil.png" alt="Mobil görünüm" width="320"> |
+| ![Panel takvimi](docs/screenshots/panel-takvim.png) | ![Panel bildirimleri](docs/screenshots/panel-bildirimler.png) |
+
+| Mobil görünüm |
+| --- |
+| <img src="docs/screenshots/mobil.png" alt="Mobil görünüm" width="320"> |
 
 ## Kullanılan teknolojiler
 
@@ -61,7 +65,7 @@ Projede kullanılan bütün paketler açık kaynak ve ücretsizdir; ücretli bir
 
 | Katman | Teknoloji |
 | --- | --- |
-| Arayüz | Next.js 16 (App Router), React 19, Tailwind CSS 4 |
+| Arayüz | Next.js 16 (App Router), React 19, Tailwind CSS 4, Axios, TanStack Query |
 | Sunucu | Node.js 20+, Express 5 |
 | Veritabanı | MongoDB, Mongoose |
 | Kimlik doğrulama | JWT (access + refresh token), bcrypt |
@@ -128,6 +132,16 @@ npm run dev        # http://localhost:5000/api
 ```
 
 Gerekli ortam değişkenleri ve bütün uçların açıklaması için: [server/README.md](server/README.md)
+
+### Örnek hesaplar
+
+Ekran görüntülerindeki veriler bu hesaplarla uygulama üzerinden oluşturuldu. Hepsinin şifresi `Salonabox123`.
+
+| Hesap | E-posta | Giriş |
+| --- | --- | --- |
+| Kuaför: Ayşe Yılmaz Studio | `ayse@ayseyilmazstudio.com` | `/panel/giris` |
+| Müşteri: Elif Kaya | `elif.kaya@posta.com` | `/giris` |
+| Müşteri: Selin Aksoy | `selin.aksoy@posta.com` | `/giris` |
 
 ## Sayfalar
 
