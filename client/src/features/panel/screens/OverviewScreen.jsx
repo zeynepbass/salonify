@@ -12,7 +12,7 @@ import { usePanel } from "@/features/panel/PanelProvider";
 import { getDayBounds } from "@/features/panel/scheduling";
 import { useAppointmentActions } from "@/features/panel/useAppointmentActions";
 import { usePanelAppointments } from "@/features/panel/usePanelAppointments";
-import { useNotifications } from "@/features/notifications/NotificationsProvider";
+import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
 import { api, getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";

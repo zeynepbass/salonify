@@ -1,4 +1,4 @@
-import ProfilePage from "@/features/profile/ProfilePage";
+import ProfilePage from "@/features/customer/profile/ProfilePage";
 
 export const metadata = { title: "Profil" };
 

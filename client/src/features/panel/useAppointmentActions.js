@@ -1,7 +1,7 @@
 "use client";
 
 import { useToast } from "@/components/organisms/ToastProvider";
-import { useNotifications } from "@/features/notifications/NotificationsProvider";
+import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
 import { usePanel } from "@/features/panel/PanelProvider";
 import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";

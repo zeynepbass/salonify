@@ -1,4 +1,4 @@
-import BookingSuccessPage from "@/features/booking/BookingSuccessPage";
+import BookingSuccessPage from "@/features/customer/booking/BookingSuccessPage";
 
 export const metadata = { title: "Randevunuz oluşturuldu" };
 

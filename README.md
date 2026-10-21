@@ -2,7 +2,7 @@
 
 Kuaför ve güzellik salonu randevu platformu. Müşteri salonları puan, portföy ve gerçek boş saatlere göre karşılaştırır, uygun saati seçer ve randevusu onay beklemeden oluşur. Salon sahibi ise randevularını, takvimini, hizmetlerini ve portföyünü tek bir panelden yönetir.
 
-![Ana sayfa](docs/ekran-goruntuleri/anasayfa.png)
+![Ana sayfa](docs/screenshots/anasayfa.png)
 
 ## İçindekiler
 
@@ -41,19 +41,23 @@ Kuaför ve güzellik salonu randevu platformu. Müşteri salonları puan, portf�
 
 | Kuaför arama | Salon detayı |
 | --- | --- |
-| ![Kuaför arama](docs/ekran-goruntuleri/kuaforler.png) | ![Salon detayı](docs/ekran-goruntuleri/salon-detay.png) |
+| ![Kuaför arama](docs/screenshots/kuaforler.png) | ![Salon detayı](docs/screenshots/salon-detay.png) |
 
 | Randevu alma | Randevularım |
 | --- | --- |
-| ![Randevu alma](docs/ekran-goruntuleri/randevu.png) | ![Randevularım](docs/ekran-goruntuleri/randevularim.png) |
+| ![Randevu alma](docs/screenshots/randevu.png) | ![Randevularım](docs/screenshots/randevularim.png) |
 
 | Panel girişi | Panel özeti |
 | --- | --- |
-| ![Panel girişi](docs/ekran-goruntuleri/panel-giris.png) | ![Panel özeti](docs/ekran-goruntuleri/panel.png) |
+| ![Panel girişi](docs/screenshots/panel-giris.png) | ![Panel özeti](docs/screenshots/panel.png) |
 
-| Panel takvimi | Mobil görünüm |
+| Panel takvimi | Panel bildirimleri |
 | --- | --- |
-| ![Panel takvimi](docs/ekran-goruntuleri/panel-takvim.png) | <img src="docs/ekran-goruntuleri/mobil.png" alt="Mobil görünüm" width="320"> |
+| ![Panel takvimi](docs/screenshots/panel-takvim.png) | ![Panel bildirimleri](docs/screenshots/panel-bildirimler.png) |
+
+| Mobil görünüm |
+| --- |
+| <img src="docs/screenshots/mobil.png" alt="Mobil görünüm" width="320"> |
 
 ## Kullanılan teknolojiler
 
@@ -61,7 +65,7 @@ Projede kullanılan bütün paketler açık kaynak ve ücretsizdir; ücretli bir
 
 | Katman | Teknoloji |
 | --- | --- |
-| Arayüz | Next.js 16 (App Router), React 19, Tailwind CSS 4 |
+| Arayüz | Next.js 16 (App Router), React 19, Tailwind CSS 4, Axios, TanStack Query |
 | Sunucu | Node.js 20+, Express 5 |
 | Veritabanı | MongoDB, Mongoose |
 | Kimlik doğrulama | JWT (access + refresh token), bcrypt |
@@ -78,7 +82,9 @@ salonify/
 │   └── src/
 │       ├── app/            sayfalar (rotalar)
 │       ├── components/     ortak bileşenler (atoms, molecules, organisms)
-│       ├── features/       sayfa bazlı modüller
+│       ├── features/
+│       │   ├── customer/   müşteri sayfalarının modülleri
+│       │   └── panel/      kuaför paneli modülleri
 │       ├── data/           sabit listeler (kategoriler, şehirler)
 │       ├── lib/            yardımcı fonksiyonlar, API istemcisi (axios)
 │       └── styles/         genel stiller ve renk paleti
@@ -86,7 +92,7 @@ salonify/
 │   ├── src/                routes, controllers, services, models, validators
 │   ├── scripts/            örnek veri script'i
 │   └── tests/              API testleri
-└── docs/ekran-goruntuleri/ README görselleri
+└── docs/screenshots/ README görselleri
 ```
 
 ## Kurulum
@@ -126,6 +132,16 @@ npm run dev        # http://localhost:5000/api
 ```
 
 Gerekli ortam değişkenleri ve bütün uçların açıklaması için: [server/README.md](server/README.md)
+
+### Örnek hesaplar
+
+Ekran görüntülerindeki veriler bu hesaplarla uygulama üzerinden oluşturuldu. Hepsinin şifresi `Salonabox123`.
+
+| Hesap | E-posta | Giriş |
+| --- | --- | --- |
+| Kuaför: Ayşe Yılmaz Studio | `ayse@ayseyilmazstudio.com` | `/panel/giris` |
+| Müşteri: Elif Kaya | `elif.kaya@posta.com` | `/giris` |
+| Müşteri: Selin Aksoy | `selin.aksoy@posta.com` | `/giris` |
 
 ## Sayfalar
 

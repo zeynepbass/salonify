@@ -9,7 +9,7 @@ import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/panel/PanelProvider";
 import { getOpenDates } from "@/features/panel/scheduling";
-import { useNotifications } from "@/features/notifications/NotificationsProvider";
+import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
 import { api, getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";

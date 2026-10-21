@@ -1,4 +1,4 @@
-import AppointmentsPage from "@/features/appointments/AppointmentsPage";
+import AppointmentsPage from "@/features/customer/appointments/AppointmentsPage";
 
 export const metadata = { title: "Randevularım" };
 

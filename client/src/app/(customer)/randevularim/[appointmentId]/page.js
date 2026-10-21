@@ -1,4 +1,4 @@
-import AppointmentDetailPage from "@/features/appointments/AppointmentDetailPage";
+import AppointmentDetailPage from "@/features/customer/appointments/AppointmentDetailPage";
 
 export const metadata = { title: "Randevu detayı" };
 

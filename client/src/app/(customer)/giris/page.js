@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import CustomerLoginPage from "@/features/auth/CustomerLoginPage";
+import CustomerLoginPage from "@/features/customer/auth/CustomerLoginPage";
 
 export const metadata = { title: "Giriş yap" };
 

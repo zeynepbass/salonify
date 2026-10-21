@@ -10,7 +10,7 @@ import Logo from "@/components/atoms/Logo";
 import Spinner from "@/components/atoms/Spinner";
 import Field from "@/components/molecules/Field";
 import { demoAccounts } from "@/data/catalog";
-import { useAuth } from "@/features/auth/AuthProvider";
+import { useAuth } from "@/features/customer/auth/AuthProvider";
 import { getErrorMessage } from "@/lib/api";
 
 function getSafeNext(value) {
