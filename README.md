@@ -39,6 +39,10 @@ Kuaför ve güzellik salonu randevu platformu. Müşteri salonları puan, portf�
 
 ## Ekran görüntüleri
 
+| Yüksek puanlı salonlar |
+| --- |
+| ![Yüksek puanlı salonlar](docs/screenshots/yuksek-puanli.png) |
+
 | Kuaför arama | Salon detayı |
 | --- | --- |
 | ![Kuaför arama](docs/screenshots/kuaforler.png) | ![Salon detayı](docs/screenshots/salon-detay.png) |
@@ -140,6 +144,7 @@ Ekran görüntülerindeki veriler bu hesaplarla uygulama üzerinden oluşturuldu
 | Hesap | E-posta | Giriş |
 | --- | --- | --- |
 | Kuaför: Ayşe Yılmaz Studio | `ayse@ayseyilmazstudio.com` | `/panel/giris` |
+| Kuaför: Nehir Kuaför Atelier | `deniz@nehirkuafor.com` | `/panel/giris` |
 | Müşteri: Elif Kaya | `elif.kaya@posta.com` | `/giris` |
 | Müşteri: Selin Aksoy | `selin.aksoy@posta.com` | `/giris` |
 
