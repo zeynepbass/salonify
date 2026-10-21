@@ -1,9 +1,6 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import request from 'supertest';
 
-// Testler gerçek Atlas veritabanına dokunmaz; her çalıştırmada bellekte
-// geçici bir MongoDB ayağa kalkar. Environment değerleri, uygulama modülleri
-// yüklenmeden önce ayarlanmalıdır; bu yüzden app dinamik import edilir.
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-access-secret';
 process.env.JWT_REFRESH_SECRET = 'test-refresh-secret';

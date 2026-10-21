@@ -3,14 +3,6 @@ import { sendSuccess } from './response.js';
 
 export const REFRESH_COOKIE = 'refreshToken';
 
-// Refresh token tarayıcıya httpOnly cookie olarak verilir.
-// - httpOnly: JavaScript cookie'yi okuyamaz; XSS ile token çalınamaz.
-// - secure: production'da yalnızca HTTPS üzerinden gönderilir.
-// - sameSite: frontend ve API farklı domain'lerdeyse cookie'nin
-//   gönderilebilmesi için production'da "none" gerekir (secure ile birlikte).
-// - path: cookie yalnızca /api/auth isteklerine eklenir, diğer isteklerde taşınmaz.
-// Access token ise kısa ömürlüdür ve cevap gövdesinde döner; frontend onu
-// bellekte tutup Authorization header'ında gönderir.
 const cookieOptions = {
   httpOnly: true,
   secure: env.isProduction,

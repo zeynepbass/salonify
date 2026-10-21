@@ -2,10 +2,6 @@ import dotenv from 'dotenv';
 
 dotenv.config({ quiet: true });
 
-// Secret değerler (MongoDB URI, JWT anahtarları) koda yazılmaz; yalnızca
-// environment üzerinden gelir. Eksik bir değerle uygulamayı ayağa kaldırıp
-// ilk istekte anlaşılmaz bir hatayla karşılaşmak yerine, açılışta net bir
-// mesajla duruyoruz ("fail fast").
 const REQUIRED = ['MONGODB_URI', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
 
 const missing = REQUIRED.filter((key) => !process.env[key]?.trim());
@@ -15,16 +11,10 @@ if (missing.length > 0) {
   );
 }
 
-// Atlas'ın verdiği şablondaki <db_password> gibi alanlar doldurulmadan
-// bırakılırsa bağlantı "authentication failed" hatasıyla düşer. Sebebi
-// daha anlaşılır kılmak için bunu bağlanmadan önce yakalıyoruz.
 if (/<[^>]+>/.test(process.env.MONGODB_URI)) {
   throw new Error('MONGODB_URI içinde doldurulmamış bir alan var (ör. <db_password>). Gerçek değeri .env dosyasına yazın.');
 }
 
-// Access ve refresh token'lar aynı anahtarla imzalanırsa, ele geçirilen bir
-// refresh token access token gibi kullanılabilir. Bu yüzden iki anahtarın
-// farklı olmasını zorunlu tutuyoruz.
 if (process.env.JWT_SECRET === process.env.JWT_REFRESH_SECRET) {
   throw new Error('JWT_SECRET ve JWT_REFRESH_SECRET farklı değerler olmalı.');
 }

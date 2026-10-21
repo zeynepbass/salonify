@@ -16,17 +16,6 @@ import { WorkingHours } from '../src/models/WorkingHours.js';
 import { createSalonForOwner, refreshSalonRating, syncSalonCatalog, toPoint } from '../src/services/salon.service.js';
 import { addDays, formatDayMonth, getDayOfWeek, getSalonNow, minutesToTime, timeToMinutes } from '../src/utils/time.js';
 
-// ÖRNEK VERİ
-// Frontend'deki mock verilerle (src/data/mock) aynı salonları ve kişileri
-// veritabanına yazar; böylece ekranlar API'ye bağlandığında tanıdık verilerle
-// karşılaşılır. Tarihler sabit değildir, script'in çalıştığı güne göre
-// hesaplanır: "yaklaşan" randevular her zaman ileride, "geçmiş" randevular
-// her zaman geçmişte kalır.
-//
-// Kullanım:
-//   npm run seed              -> yalnızca veritabanı boşsa yazar
-//   npm run seed -- --reset   -> uygulamanın bütün verisini silip baştan yazar
-
 export const SEED_PASSWORD = process.env.SEED_PASSWORD || 'Salonabox123';
 
 const image = (seed, size = '800/1000') => `https://picsum.photos/seed/salonabox-${seed}/${size}`;
@@ -167,8 +156,6 @@ const CUSTOMERS = [
 ];
 
 async function assertSafeToSeed(reset) {
-  // Örnek hesapların şifresi herkesçe bilinir; canlı ortamda çalıştırmak
-  // hem gerçek veriyi siler hem de bilinen şifreli hesaplar açar.
   if (env.isProduction) throw new Error('Örnek veri production ortamında yazılamaz.');
 
   if (reset) {
@@ -184,7 +171,6 @@ export async function seedDatabase({ reset = false } = {}) {
   await assertSafeToSeed(reset);
 
   const today = getSalonNow().date;
-  // Pazar günleri salonlar kapalı olduğundan randevular açık günlere kaydırılır.
   const openDay = (offset) => {
     let date = addDays(today, offset);
     while (getDayOfWeek(date) === 0) date = addDays(date, offset < 0 ? -1 : 1);
@@ -192,7 +178,6 @@ export async function seedDatabase({ reset = false } = {}) {
   };
   const at = (date, time = '12:00') => new Date(`${date}T${time}:00+03:00`);
 
-  // --- Kullanıcılar ve salonlar -------------------------------------------
   const passwordHash = await bcrypt.hash(SEED_PASSWORD, 10);
 
   const customers = {};
@@ -224,15 +209,12 @@ export async function seedDatabase({ reset = false } = {}) {
     }
   }
 
-  // Pasif hizmet örneği: müşteriye görünmez, panelde listelenir.
   await Service.create({ salon: salons.ayse._id, name: 'Keratin Bakımı', category: 'diger', duration: 90, price: 1500, isActive: false });
 
-  // Ayşe Yılmaz Studio: Cuma geç kapanış, Cumartesi kısa gün.
   await WorkingHours.updateOne({ salon: salons.ayse._id, dayOfWeek: 5 }, { closeTime: '20:00' });
   await WorkingHours.updateOne({ salon: salons.ayse._id, dayOfWeek: 6 }, { openTime: '10:00', closeTime: '18:00' });
   await BlockedDate.create({ salon: salons.ayse._id, date: openDay(8), note: 'Personel eğitimi' });
 
-  // --- Randevular ----------------------------------------------------------
   let sequence = 48207;
   const appointments = {};
 
@@ -258,7 +240,6 @@ export async function seedDatabase({ reset = false } = {}) {
     return appointments[key];
   }
 
-  // Ayşe Yılmaz Studio paneli: bugün, yaklaşan ve geçmiş randevular.
   if (getDayOfWeek(today) !== 0) {
     await addAppointment('ayseToday1', { salon: 'ayse', category: 'kesim', customer: 'selin', date: today, startTime: '09:00' });
     await addAppointment('ayseToday2', { salon: 'ayse', category: 'boya', guest: { name: 'Deniz Kara', phone: '0535 405 15 35' }, date: today, startTime: '13:00', notes: 'Telefonla arayıp randevu aldı' });
@@ -275,7 +256,6 @@ export async function seedDatabase({ reset = false } = {}) {
   await addAppointment('ayseNoShow', { salon: 'ayse', category: 'boya', customer: 'asli', date: openDay(-3), startTime: '16:00', status: 'NO_SHOW' });
   await addAppointment('ayseCancelled', { salon: 'ayse', category: 'fon', customer: 'mert', date: openDay(-1), startTime: '13:00', status: 'CANCELLED', cancellationReason: 'Planlarım değişti' });
 
-  // Elif Kaya'nın müşteri ekranları: her durumdan bir randevu.
   await addAppointment('elifUpcoming1', { salon: 'kesik', category: 'kesim', customer: 'elif', date: openDay(2), startTime: '15:00' });
   await addAppointment('elifUpcoming2', { salon: 'nur', category: 'fon', customer: 'elif', date: openDay(12), startTime: '14:30' });
   await addAppointment('elifToReview', { salon: 'kesik', category: 'kesim', customer: 'elif', date: openDay(-16), startTime: '11:00', status: 'COMPLETED' });
@@ -284,7 +264,6 @@ export async function seedDatabase({ reset = false } = {}) {
   await addAppointment('elifCancelled', { salon: 'form', category: 'boya', customer: 'elif', date: openDay(-54), startTime: '10:30', status: 'CANCELLED', cancellationReason: 'Başka bir saat istiyorum' });
   await addAppointment('elifNoShow', { salon: 'mavi', category: 'fon', customer: 'elif', date: openDay(-69), startTime: '17:00', status: 'NO_SHOW' });
 
-  // Diğer salonların da puanı olsun diye birer tamamlanmış randevu.
   const others = [
     ['nur', 'ombre', 'zeynep', 5, 'Prova randevusunda her detayı konuştuk, sonuç tam hayal ettiğim gibi.'],
     ['kesik', 'kesim', 'mert', 5, 'Online randevu ile bekleme olmadan girdim. Hızlı, temiz ve özenli.'],
@@ -298,7 +277,6 @@ export async function seedDatabase({ reset = false } = {}) {
     await addAppointment(`other${index}`, { salon, category, customer, date: openDay(-20 - index * 3), startTime: '10:00', status: 'COMPLETED' });
   }
 
-  // --- Değerlendirmeler ----------------------------------------------------
   const reviews = {};
   async function addReview(key, { rating, comment, photos = [], isPublic }) {
     const appointment = appointments[key];
@@ -321,7 +299,6 @@ export async function seedDatabase({ reset = false } = {}) {
   await addReview('ayseDone2', { rating: 4, isPublic: true, comment: 'Kesim çok iyiydi; randevu saatinde başlandı. Salon cumartesi biraz kalabalıktı.' });
   await addReview('ayseDone3', { rating: 5, isPublic: true, comment: 'Uygulama öncesi saç analizi yapıldı ve bakım önerileri verildi. Kesinlikle tekrar geleceğim.' });
   await addReview('ayseDone4', { rating: 5, isPublic: true, photos: [image('gizem-balayage-1'), image('gizem-balayage-2')], comment: 'Tam istediğim ton oldu, teşekkürler!' });
-  // Paylaşım izni verilmemiş değerlendirme: yalnızca salon ve müşterinin kendisi görür.
   await addReview('ayseDone5', { rating: 4, isPublic: false, photos: [image('asli-boya')], comment: 'Renk güzel oldu ama biraz beklemek zorunda kaldım.' });
   await addReview('elifReviewed1', { rating: 5, isPublic: true, comment: 'Renk geçişi tam istediğim gibi oldu, çok memnun kaldım.' });
   await addReview('elifReviewed2', { rating: 4, isPublic: false, comment: 'Hızlı ve özenli; sadece biraz beklettiler.' });
@@ -329,7 +306,6 @@ export async function seedDatabase({ reset = false } = {}) {
     await addReview(`other${index}`, { rating, comment, isPublic: true });
   }
 
-  // --- Portföy -------------------------------------------------------------
   const salonItem = (salon, seed, title, description = '') => ({
     salon: salons[salon]._id,
     source: PORTFOLIO_SOURCE.SALON,
@@ -355,11 +331,8 @@ export async function seedDatabase({ reset = false } = {}) {
     salonItem('ayse', 'ayse-1', 'Bal köpüğü balayage', 'Koyu kumral üzerine sıcak tonlar.'),
     salonItem('ayse', 'ayse-2', 'Küt bob kesim'),
     salonItem('ayse', 'ayse-3', 'Gelin topuzu', 'Düğün günü hazırlığı.'),
-    // Müşteri izin verdi, salon yayınladı -> herkese açık.
     ...reviewItems('ayseDone1', true),
-    // Müşteri izin verdi, salon henüz yayınlamadı -> yalnızca panelde.
     ...reviewItems('ayseDone4', false),
-    // Müşteri izin vermedi -> salon yayınlayamaz.
     ...reviewItems('ayseDone5', false),
     ...SALONS.filter((salon) => salon.key !== 'ayse').flatMap((salon) => [
       salonItem(salon.key, `${salon.key}-1`, SERVICE_CATALOG[salon.services[0]].name),
@@ -367,29 +340,23 @@ export async function seedDatabase({ reset = false } = {}) {
     ]),
   ]);
 
-  // --- Bildirimler ---------------------------------------------------------
   const describe = (appointment, who) =>
     `${who} · ${appointment.serviceName} · ${formatDayMonth(appointment.date)}, ${appointment.startTime}`;
   const hoursAgo = (hours) => new Date(Date.now() - hours * 60 * 60 * 1000);
   const T = NOTIFICATION_TYPES;
 
   await Notification.insertMany([
-    // Müşteri (Elif Kaya)
     { recipient: customers.elif._id, type: T.APPOINTMENT_CREATED, title: 'Randevunuz oluşturuldu.', body: describe(appointments.elifUpcoming1, 'Kesik Hair Lab'), appointment: appointments.elifUpcoming1._id, createdAt: hoursAgo(2) },
     { recipient: customers.elif._id, type: T.APPOINTMENT_UPDATED, title: 'Randevunuz güncellendi.', body: describe(appointments.elifUpcoming2, 'Atelier Nur'), appointment: appointments.elifUpcoming2._id, createdAt: hoursAgo(26) },
     { recipient: customers.elif._id, type: T.REVIEW_REQUESTED, title: 'Değerlendirmeniz için hazır.', body: 'Kesik Hair Lab ziyaretinizi değerlendirin.', appointment: appointments.elifToReview._id, createdAt: hoursAgo(50) },
     { recipient: customers.elif._id, type: T.APPOINTMENT_COMPLETED, title: 'Randevunuz tamamlandı.', body: describe(appointments.elifReviewed1, 'Ton & Işık'), appointment: appointments.elifReviewed1._id, isRead: true, createdAt: at(appointments.elifReviewed1.date, '15:30') },
     { recipient: customers.elif._id, type: T.APPOINTMENT_CANCELLED, title: 'Randevunuz iptal edildi.', body: describe(appointments.elifCancelled, 'Form Kuaför'), appointment: appointments.elifCancelled._id, isRead: true, createdAt: at(addDays(appointments.elifCancelled.date, -1)) },
-    // Salon (Ayşe Yılmaz)
     { recipient: owners.ayse._id, type: T.APPOINTMENT_CREATED, title: 'Yeni randevu', body: describe(appointments.ayseNext1, 'Zeynep Baş'), appointment: appointments.ayseNext1._id, createdAt: hoursAgo(1) },
     { recipient: owners.ayse._id, type: T.APPOINTMENT_CANCELLED, title: 'Randevu iptal edildi', body: describe(appointments.ayseCancelled, 'Mert Güneş'), appointment: appointments.ayseCancelled._id, createdAt: hoursAgo(30) },
     { recipient: owners.ayse._id, type: T.REVIEW_PUBLISHED, title: 'Yeni değerlendirme · 5 yıldız', body: 'Gizem Tan değerlendirmesinin profilde paylaşılmasına izin verdi.', appointment: appointments.ayseDone4._id, isRead: true, createdAt: hoursAgo(32) },
     { recipient: owners.ayse._id, type: T.APPOINTMENT_CREATED, title: 'Yeni randevu', body: describe(appointments.ayseNext3, 'Gizem Tan'), appointment: appointments.ayseNext3._id, isRead: true, createdAt: hoursAgo(52) },
   ]);
 
-  // --- Türetilen alanlar ---------------------------------------------------
-  // Puan, yorum sayısı, kategoriler ve başlangıç fiyatı salon kaydında
-  // tutulduğu için veriler yazıldıktan sonra yeniden hesaplanır.
   for (const salon of Object.values(salons)) {
     await syncSalonCatalog(salon._id);
     await refreshSalonRating(salon._id);
@@ -416,20 +383,11 @@ export async function seedDatabase({ reset = false } = {}) {
   };
 }
 
-// Dosya doğrudan çalıştırıldığında (npm run seed) veritabanına bağlanıp yazar.
-// Testler aynı fonksiyonu import ederek kullanır.
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     await connectDatabase();
-    const { accounts, ...counts } = await seedDatabase({ reset: process.argv.includes('--reset') });
-
-    console.info('\nÖrnek veri yazıldı:');
-    for (const [name, count] of Object.entries(counts)) console.info(`  ${name.padEnd(14)} ${count}`);
-    console.info(`Bütün örnek hesapların şifresi: ${SEED_PASSWORD}`);
-    console.info(`  Müşteri : ${accounts.customer}`);
-    console.info(`  Salon   : ${accounts.salon}`);
-  } catch (error) {
-    console.error(`Örnek veri yazılamadı: ${error.message}`);
+    await seedDatabase({ reset: process.argv.includes('--reset') });
+  } catch {
     process.exitCode = 1;
   } finally {
     await disconnectDatabase();

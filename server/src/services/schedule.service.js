@@ -11,9 +11,6 @@ export async function getWorkingHours(salonId) {
 }
 
 export async function updateWorkingHours(salonId, days) {
-  // Her gün (salon, dayOfWeek) çiftiyle güncellenir; kayıt yoksa oluşturulur.
-  // Filtrede her zaman kendi salonumuz olduğu için başka salonun saatlerine
-  // dokunmak mümkün değildir.
   await WorkingHours.bulkWrite(
     days.map(({ dayOfWeek, ...fields }) => ({
       updateOne: {
@@ -39,9 +36,6 @@ export async function addBlockedDate(salonId, { date, note }) {
     throw error;
   }
 
-  // Günü kapatmak mevcut randevuları iptal etmez; bu salonun bilinçli
-  // vereceği bir karardır. Panelin uyarı gösterebilmesi için o güne ait aktif
-  // randevu sayısını da dönüyoruz.
   const bookedAppointmentCount = await Appointment.countDocuments({
     salon: salonId,
     date,

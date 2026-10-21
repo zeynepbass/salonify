@@ -29,14 +29,14 @@ export default function HeroSearch() {
   return (
     <section className="page-container flex flex-wrap gap-12 pt-[clamp(32px,6vw,72px)] pb-14">
       <div className="flex min-w-0 flex-[1_1_560px] flex-col justify-center gap-6">
-        <p className="eyebrow tracking-[0.1em] text-accent-700">Kuaför randevusu · Onay beklemeden</p>
-        <h1 className="max-w-[15ch] text-[clamp(38px,5.2vw,68px)] leading-[1.02] tracking-[-0.03em] text-balance">
+        <p className="eyebrow text-accent-700">Kuaför randevusu · Onay beklemeden</p>
+        <h1 className="max-w-[15ch] text-[clamp(38px,5.2vw,68px)] leading-[1.02] text-balance">
           Hayalindeki saç stiline en yakın kuaförü keşfet.
         </h1>
         <p className="max-w-[52ch] text-[18px] text-pretty text-neutral-700">
           Puanları, portföyleri ve gerçek boş saatleri karşılaştır. Uygun saati seç, randevun anında oluşsun.
         </p>
-        <form role="search" onSubmit={handleSubmit} className="flex flex-wrap border-1 border-ink bg-surface">
+        <form role="search" onSubmit={handleSubmit} className="flex flex-wrap border border-ink bg-surface">
           <label className="flex min-h-[60px] flex-[2_1_260px] items-center gap-2.5 border-line px-4 max-sm:border-b sm:border-r">
             <Icon name="search" className="text-neutral-600" />
             <input

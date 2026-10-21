@@ -5,8 +5,6 @@ import * as salonService from '../services/salon.service.js';
 import * as scheduleService from '../services/schedule.service.js';
 import { sendSuccess } from '../utils/response.js';
 
-// Herkese açık (giriş gerektirmeyen) salon uçları.
-
 export async function listSalons(req, res) {
   sendSuccess(res, await salonService.listSalons(req.query));
 }

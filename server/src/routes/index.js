@@ -13,8 +13,6 @@ router.get('/health', (_req, res) => res.json({ success: true, data: { status: '
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
-// /salons   -> herkese açık salon keşfi
-// /salon/me -> giriş yapan salon sahibinin kendi paneli
 router.use('/salons', salonRoutes);
 router.use('/salon/me', salonPanelRoutes);
 router.use('/appointments', appointmentRoutes);

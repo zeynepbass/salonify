@@ -17,7 +17,7 @@ const PREVIEW_COUNT = 3;
 function RatingSummary({ rating, reviewCount, distribution }) {
   return (
     <div className="min-w-[240px] flex-[0_1_300px] border-t-2 border-ink pt-5">
-      <div className="text-[64px] leading-none font-extrabold tracking-[-0.03em]">{formatRating(rating)}</div>
+      <div className="text-[64px] leading-none font-extrabold">{formatRating(rating)}</div>
       <StarRating value={rating} size={18} className="mt-2.5 mb-1.5 gap-0.5" />
       <div className="text-[14px] text-neutral-700">{reviewCount} değerlendirme</div>
       <div className="mt-5 flex flex-col gap-1.5">

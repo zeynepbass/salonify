@@ -15,10 +15,6 @@ const SALON_SUMMARY = 'name address neighborhood district city phone coverImage'
 
 const generateReference = () => `SL-${String(randomInt(0, 100_000_000)).padStart(8, '0')}`;
 
-// ---------------------------------------------------------------------------
-// Bildirimler
-// ---------------------------------------------------------------------------
-
 const TITLES = {
   [NOTIFICATION_TYPES.APPOINTMENT_CREATED]: { customer: 'Randevunuz oluşturuldu.', salon: 'Yeni randevu' },
   [NOTIFICATION_TYPES.APPOINTMENT_UPDATED]: { customer: 'Randevunuz güncellendi.', salon: 'Randevu güncellendi' },
@@ -26,8 +22,6 @@ const TITLES = {
   [NOTIFICATION_TYPES.APPOINTMENT_COMPLETED]: { customer: 'Randevunuz tamamlandı.' },
 };
 
-// Randevu olaylarını ilgili taraflara bildirir. Hesabı olmayan (salonun elle
-// girdiği) müşteriler için customer boş olduğundan bildirim oluşmaz.
 async function notifyAppointmentEvent(type, appointment, { toCustomer = false, toSalon = false }) {
   const salon = await Salon.findById(appointment.salon).select('name owner');
   if (!salon) return;
@@ -53,7 +47,6 @@ async function notifyAppointmentEvent(type, appointment, { toCustomer = false, t
       appointment: appointment._id,
     });
   }
-  // Randevu tamamlandığında müşteriden değerlendirme istenir.
   if (type === NOTIFICATION_TYPES.APPOINTMENT_COMPLETED && appointment.customer) {
     entries.push({
       recipient: appointment.customer,
@@ -67,21 +60,11 @@ async function notifyAppointmentEvent(type, appointment, { toCustomer = false, t
   await notify(entries);
 }
 
-// ---------------------------------------------------------------------------
-// Ortak yardımcılar
-// ---------------------------------------------------------------------------
-
-// Müsaitlik kontrolünden geçen iki istek aynı anda kayda ulaşırsa, unique
-// index ikincisini E11000 hatasıyla reddeder. Bu hatayı 409 Conflict'e
-// çeviriyoruz. Yani asıl garanti veritabanındadır; üstteki kontrol yalnızca
-// anlaşılır hata mesajları üretmek içindir.
 function toSlotConflict(error) {
   return isDuplicateKeyError(error, 'slots') ? new ApiError(409, SLOT_TAKEN_MESSAGE) : error;
 }
 
 async function findBookableService(salonId, serviceId) {
-  // Hizmet seçilen salona ait ve aktif olmalı. Yalnızca serviceId ile
-  // aransaydı, A salonuna B salonunun hizmetiyle randevu yazılabilirdi.
   const service = await Service.findOne({ _id: serviceId, salon: salonId, isActive: true });
   if (!service) throw new ApiError(404, 'Hizmet bulunamadı.');
   return service;
@@ -105,11 +88,9 @@ async function createAppointment({ salonId, serviceId, date, startTime, notes, c
     endTime,
     notes,
     source,
-    // Onay adımı yok: randevu oluştuğu anda kesinleşmiştir.
     status: BOOKED,
   };
 
-  // Referans kodu rastgele üretilir; çok düşük ihtimalle çakışırsa yeniden denenir.
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       return await Appointment.create({ ...payload, reference: generateReference() });
@@ -122,16 +103,11 @@ async function createAppointment({ salonId, serviceId, date, startTime, notes, c
 }
 
 function assertBooked(appointment) {
-  // BOOKED dışındaki durumlar (iptal, tamamlandı, gelmedi) son durumlardır;
-  // bu randevular artık değiştirilemez.
   if (appointment.status !== BOOKED) {
     throw new ApiError(409, 'Yalnızca aktif (BOOKED) randevular üzerinde işlem yapılabilir.');
   }
 }
 
-// Randevunun hizmetini, tarihini veya saatini değiştirir. Yeni zaman için
-// müsaitlik kuralları baştan uygulanır; randevunun kendi mevcut saati
-// "dolu" sayılmaz.
 async function reschedule(appointment, { serviceId, date, startTime }) {
   let { duration } = appointment;
 
@@ -157,9 +133,6 @@ async function reschedule(appointment, { serviceId, date, startTime }) {
 async function applyEdit(appointment, { serviceId, date, startTime, ...fields }) {
   assertBooked(appointment);
 
-  // Form çoğu zaman değişmeyen alanları da gönderir. Müsaitlik kurallarını
-  // yalnızca hizmet, tarih veya saat gerçekten değiştiyse yeniden uyguluyoruz;
-  // aksi halde yalnızca notu düzeltmek isteyen salon gereksiz yere engellenirdi.
   const scheduleChanged =
     (serviceId !== undefined && String(serviceId) !== String(appointment.service)) ||
     (date !== undefined && date !== appointment.date) ||
@@ -177,20 +150,10 @@ async function applyEdit(appointment, { serviceId, date, startTime, ...fields })
 
 async function cancel(appointment, reason = '') {
   assertBooked(appointment);
-  // Durum CANCELLED olduğunda randevu unique index'in kapsamından çıkar;
-  // saat başka bir müşteri için kendiliğinden müsait hale gelir.
   appointment.set({ status: CANCELLED, cancellationReason: reason });
   await appointment.save();
 }
 
-// ---------------------------------------------------------------------------
-// Müşteri işlemleri
-// ---------------------------------------------------------------------------
-
-// Frontend'den gelen appointmentId tek başına yetki anlamına gelmez.
-// Randevuyu her zaman (id + giriş yapan müşteri) çiftiyle arıyoruz. Randevu
-// başkasına aitse "bulunamadı" döner; böylece hem erişim engellenir hem de
-// o kimlikte bir randevunun var olduğu bilgisi sızdırılmaz.
 async function findCustomerAppointment(customerId, appointmentId) {
   const appointment = await Appointment.findOne({ _id: appointmentId, customer: customerId });
   if (!appointment) throw new ApiError(404, 'Randevu bulunamadı.');
@@ -200,8 +163,6 @@ async function findCustomerAppointment(customerId, appointmentId) {
 export async function bookAppointment(customer, { salonId, serviceId, date, startTime, notes }) {
   await assertSalonExists(salonId);
 
-  // Müşteri kimliği body'den değil, doğrulanmış oturumdan alınır; kimse
-  // başkası adına randevu oluşturamaz.
   const appointment = await createAppointment({
     salonId,
     serviceId,
@@ -264,20 +225,12 @@ export async function cancelCustomerAppointment(customerId, appointmentId, reaso
   return appointment.populate('salon', SALON_SUMMARY);
 }
 
-// ---------------------------------------------------------------------------
-// Salon işlemleri
-// ---------------------------------------------------------------------------
-
-// Salon yalnızca kendi salonuna ait randevuları yönetebilir. salonId
-// istekten değil, oturumdaki kullanıcının salonundan (req.salon) gelir.
 async function findSalonAppointment(salonId, appointmentId) {
   const appointment = await Appointment.findOne({ _id: appointmentId, salon: salonId });
   if (!appointment) throw new ApiError(404, 'Randevu bulunamadı.');
   return appointment;
 }
 
-// Panel randevu listesindeki sekmeler. "Geçmiş": tarihi geçmiş ya da artık
-// aktif olmayan (iptal, tamamlandı, gelmedi) randevular.
 function scopeFilters(today) {
   return {
     today: { date: today },
@@ -302,7 +255,6 @@ export async function listSalonAppointments({ salonId, scope, search, date, from
 
   const [items, total, today, upcoming, past, all] = await Promise.all([
     Appointment.find(filter)
-      // Geçmiş sekmesinde en yeni randevu en üstte görünür.
       .sort(scope === 'past' ? { date: -1, startTime: -1 } : { date: 1, startTime: 1 })
       .skip((page - 1) * limit)
       .limit(limit),
@@ -310,12 +262,9 @@ export async function listSalonAppointments({ salonId, scope, search, date, from
     ...['today', 'upcoming', 'past', 'all'].map(countScope),
   ]);
 
-  // counts: sekme başlıklarındaki sayılar (arama ve diğer filtrelerden bağımsız).
   return { items, counts: { today, upcoming, past, all }, pagination: buildPagination({ page, limit, total }) };
 }
 
-// Salonun elle eklediği randevu da müşterininkiyle aynı kurallardan geçer
-// ve doğrudan BOOKED olur.
 export function createSalonAppointment(salonId, { serviceId, date, startTime, notes, customerName, customerPhone }) {
   return createAppointment({
     salonId,
@@ -337,9 +286,6 @@ export async function updateSalonAppointment(salonId, appointmentId, { status, c
 
   if (status === COMPLETED || status === NO_SHOW) {
     assertBooked(appointment);
-    // Henüz başlamamış bir randevu "tamamlandı" ya da "gelmedi" olamaz.
-    // Bu kontrol olmasaydı ileri tarihli bir randevu tamamlanmış sayılıp
-    // müşteriye değerlendirme hakkı açılabilirdi.
     if (!hasStarted(appointment)) {
       throw new ApiError(409, 'Randevu saati gelmeden bu işlem yapılamaz.');
     }
@@ -353,8 +299,6 @@ export async function updateSalonAppointment(salonId, appointmentId, { status, c
     return appointment;
   }
 
-  // Online randevuda müşteri adı ve telefonu müşterinin hesabından gelir;
-  // salon bunları yalnızca elle oluşturduğu randevularda düzenleyebilir.
   if (appointment.source !== APPOINTMENT_SOURCE.MANUAL) {
     delete changes.customerName;
     delete changes.customerPhone;

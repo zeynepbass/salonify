@@ -17,7 +17,6 @@ describe('örnek veri', () => {
     assert.equal(result.salons, 8);
     assert.ok(result.appointments >= 20 && result.reviews >= 10 && result.portfolio >= 15 && result.notifications >= 9);
 
-    // Türetilen alanlar yazılan veriden hesaplanmış olmalı.
     const salons = (await api().get('/api/salons').query({ search: 'ayşe yılmaz' })).body.data.items;
     assert.equal(salons.length, 1);
     assert.equal(salons[0].reviewCount, 5);
@@ -41,7 +40,6 @@ describe('örnek veri', () => {
     assert.ok(panel.counts.upcoming >= 3 && panel.counts.past >= 7);
     assert.equal((await api().get('/api/salon/me/services').set(auth(salon))).body.data.length, 8);
 
-    // Rıza: izin verilmeyen fotoğraf panelde görünür ama herkese açık portföyde yoktur.
     const portfolio = (await api().get('/api/salon/me/portfolio').set(auth(salon))).body.data;
     const salonId = portfolio[0].salon;
     const publicPortfolio = (await api().get(`/api/salons/${salonId}/portfolio`)).body.data;

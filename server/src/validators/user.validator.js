@@ -2,8 +2,6 @@ import { z } from 'zod';
 import { password } from './auth.validator.js';
 import { atLeastOneField, email, phone, requiredText, text } from './common.js';
 
-// role, passwordHash gibi alanlar şemada olmadığı için gönderilse bile
-// atılır; profil güncellemesiyle yetki yükseltilemez.
 export const updateProfileSchema = {
   body: z
     .object({

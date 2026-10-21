@@ -3,8 +3,6 @@ import { after, before, describe, it } from 'node:test';
 import { addDays, getDayOfWeek, getSalonNow } from '../src/utils/time.js';
 import { api, auth, createService, registerCustomer, registerSalon, startApp, stopApp } from './helpers.js';
 
-// Bugünden en az `offset` gün sonraki ilk Pazartesi-Cumartesi günü
-// (varsayılan düzende Pazar kapalıdır).
 function openDay(offset = 2) {
   let date = addDays(getSalonNow().date, offset);
   while (getDayOfWeek(date) === 0) date = addDays(date, 1);
@@ -77,7 +75,6 @@ describe('auth', () => {
     const secondCookie = refreshed.headers['set-cookie'][0].split(';')[0];
     assert.notEqual(secondCookie, firstCookie);
 
-    // Eski token tekrar kullanılamaz ve yeni token da iptal edilir.
     assert.equal((await api().post('/api/auth/refresh').set('Cookie', firstCookie)).status, 401);
     assert.equal((await api().post('/api/auth/refresh').set('Cookie', secondCookie)).status, 401);
   });
@@ -151,7 +148,6 @@ describe('salon listesi ve detayı', () => {
 
     assert.equal((await api().get('/api/salons').query({ category: 'balayage' })).body.data.items.length, 1);
     assert.equal((await api().get('/api/salons').query({ city: 'İzmir', category: 'gelin' })).body.data.items.length, 0);
-    // Türkçe büyük/küçük harf: "IŞILTI" -> "ışıltı".
     assert.equal((await api().get('/api/salons').query({ search: 'IŞILTI' })).body.data.items.length, 1);
     assert.equal((await api().get('/api/salons').query({ search: 'balayage', city: 'İzmir' })).body.data.items.length, 1);
     assert.equal((await api().get('/api/salons').query({ search: '.*', city: 'İzmir' })).body.data.items.length, 0);
@@ -189,7 +185,6 @@ describe('müsaitlik', () => {
     const data = await slotsOf();
     const available = data.slots.filter((slot) => slot.available).map((slot) => slot.time);
 
-    // 09:00-19:00, mola 12:00-13:00, hizmet 60 dk.
     assert.equal(data.isClosed, false);
     assert.equal(available[0], '09:00');
     assert.ok(available.includes('11:00'));
@@ -211,7 +206,6 @@ describe('müsaitlik', () => {
     assert.equal(isFree('10:30'), false);
     assert.equal(isFree('11:00'), true);
 
-    // Randevu düzenlenirken kendi saati dolu sayılmaz.
     slots = (await slotsOf({ excludeAppointmentId: booked.body.data.id })).slots;
     assert.equal(isFree('10:00'), true);
 
@@ -325,7 +319,6 @@ describe('randevu', () => {
     };
 
     await assert.rejects(Appointment.create(overlapping), (error) => error.code === 11000 && 'slots' in error.keyPattern);
-    // İptal edilmiş bir kayıt aynı saati kilitlemez.
     const cancelled = await Appointment.create({ ...overlapping, status: 'CANCELLED' });
     await cancelled.deleteOne();
   });
@@ -368,7 +361,6 @@ describe('randevu', () => {
     assert.equal(moved.body.data.endTime, '17:00');
     assert.equal(moved.body.data.status, 'BOOKED');
 
-    // Eski saat serbest kaldı.
     assert.equal((await book(stranger.token, body({ startTime: '09:00' }))).status, 201);
   });
 
@@ -449,8 +441,6 @@ describe('değerlendirme, rıza ve portföy', () => {
   let salon, service, customer, secondCustomer, stranger, Appointment;
   const past = addDays(getSalonNow().date, -3);
 
-  // Geçmiş tarihe API üzerinden randevu alınamadığı için tamamlanacak
-  // randevuları doğrudan veritabanına yazıyoruz.
   async function seedPastAppointment(owner, startTime) {
     const appointment = await Appointment.create({
       reference: `SL-T${startTime.replace(':', '')}${owner.user.id.slice(-4)}`,
@@ -540,7 +530,6 @@ describe('değerlendirme, rıza ve portföy', () => {
     const id = await seedPastAppointment(secondCustomer, '11:00');
     await complete(id);
 
-    // isPublic gönderilmezse varsayılan false olmalı.
     const created = await review(secondCustomer.token, id, { rating: 2, comment: 'Özel yorum', hairPhoto: 'https://img.test/gizli.jpg' });
     assert.equal(created.status, 201);
     assert.equal(created.body.data.isPublic, false);
@@ -569,7 +558,6 @@ describe('değerlendirme, rıza ve portföy', () => {
     const withheld = panel.body.data.find((item) => !item.hasConsent);
     const publicUrl = `/api/salons/${salon.salon.id}/portfolio`;
 
-    // Salon yayınlamadan önce hiçbiri herkese açık değil.
     assert.deepEqual((await api().get(publicUrl)).body.data, []);
 
     const blocked = await api().patch(`/api/salon/me/portfolio/${withheld.id}`).set(auth(salon.token)).send({ isPublished: true });
@@ -705,7 +693,6 @@ describe('profil: şifre değiştirme ve hesap silme', () => {
     const customer = await registerCustomer({ email: 'silinecek@test.com', name: 'Silinecek Kişi' });
     const date = openDay(6);
 
-    // İleri tarihli bir randevu + değerlendirilmiş geçmiş bir randevu.
     const future = await book(customer.token, { salonId: salon.salon.id, serviceId: service.id, date, startTime: '10:00' });
     const past = await Appointment.create({
       reference: 'SL-DELETE01',
@@ -745,7 +732,6 @@ describe('profil: şifre değiştirme ve hesap silme', () => {
     assert.equal(appointments.find((item) => item.id === future.body.data.id).status, 'CANCELLED');
     assert.ok(!JSON.stringify(appointments).includes('Silinecek Kişi'));
 
-    // İptal edilen randevunun saati yeniden alınabilir.
     const other = await registerCustomer();
     assert.equal((await book(other.token, { salonId: salon.salon.id, serviceId: service.id, date, startTime: '10:00' })).status, 201);
   });
@@ -780,7 +766,6 @@ describe('görsel yükleme', () => {
     assert.equal((await api().post('/api/uploads').attach('file', PNG, 'sac.png')).status, 401);
     assert.equal((await api().post('/api/uploads').set(auth(customer.token))).status, 400);
 
-    // Uzantısı ve Content-Type'ı görsel gibi görünen ama içeriği HTML olan dosya.
     const fake = await api()
       .post('/api/uploads')
       .set(auth(customer.token))
@@ -831,7 +816,6 @@ describe('görsel yükleme', () => {
 });
 
 describe('konum ve uygunluk filtreleri', () => {
-  // Kızılay merkezli; yakın salon ~1 km, uzak salon ~9 km.
   const origin = { lat: 39.9208, lng: 32.8541 };
   let near, far, noLocation, closed;
   const list = async (query) => (await api().get('/api/salons').query({ city: 'Ankara', ...query })).body.data;
@@ -848,7 +832,6 @@ describe('konum ve uygunluk filtreleri', () => {
     await createService(near.token);
     await createService(far.token);
     await createService(closed.token);
-    // "Konumsuz Salon"un hizmeti yok; "Kapalı Salon" haftanın her günü kapalı.
     await api()
       .patch('/api/salon/me/working-hours')
       .set(auth(closed.token))
@@ -897,7 +880,6 @@ describe('konum ve uygunluk filtreleri', () => {
 
   it('uygunluk filtresi boş saati olmayan salonları eler', async () => {
     const week = await list({ availability: 'week' });
-    // Kapalı salon ve hizmeti olmayan salon elenir.
     assert.deepEqual(week.items.map((item) => item.name).sort(), ['Uzak Salon', 'Yakın Salon']);
     assert.equal(week.pagination.total, 2);
 
@@ -914,7 +896,6 @@ describe('konum ve uygunluk filtreleri', () => {
     const today = getSalonNow().date;
     const salonId = near.salon.id;
 
-    // Yalnızca bugünü açık bırak ve günün tamamını tek randevuyla doldur.
     await WorkingHours.updateMany({ salon: salonId }, { isClosed: true });
     await WorkingHours.updateOne({ salon: salonId, dayOfWeek: getDayOfWeek(today) }, { isClosed: false, openTime: '00:00', closeTime: '23:30', breaks: [] });
     const service = (await api().get(`/api/salons/${salonId}/services`)).body.data[0];
@@ -935,7 +916,6 @@ describe('konum ve uygunluk filtreleri', () => {
     const id = new Types.ObjectId(salonId);
     assert.deepEqual(await filterSalonsWithOpenSlot([id], 6), []);
     await Appointment.updateOne({ _id: fullDay._id }, { status: 'CANCELLED' });
-    // Saat 22:30'dan sonra bugün için 60 dakikalık yer kalmayabilir; yalnızca erken saatlerde doğrula.
     if (getSalonNow().minutes < 22 * 60) assert.deepEqual(await filterSalonsWithOpenSlot([id], 6), [id]);
   });
 });
@@ -975,7 +955,6 @@ describe('panel: randevu sekmeleri ve günlük özet', () => {
     assert.equal((await list({ search: 'elif', scope: 'past' })).items.length, 2);
     assert.equal((await list({ search: 'aksoy' })).items.length, 1);
     assert.equal((await list({ search: '.*' })).items.length, 0);
-    // Arama sekme sayılarını değiştirmez.
     assert.equal((await list({ search: 'aksoy' })).counts.all, 4);
   });
 

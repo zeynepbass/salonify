@@ -26,9 +26,6 @@ export const availabilitySchema = {
   }),
 };
 
-// Müşteri yalnızca salon, hizmet, tarih, saat ve not gönderebilir. status,
-// customer, price, endTime gibi alanlar şemada yoktur; gönderilseler bile
-// atılır ve sunucu tarafında hesaplanır.
 export const bookAppointmentSchema = {
   body: z.object({
     salonId: objectId('Salon kimliği'),
@@ -62,7 +59,6 @@ export const updateCustomerAppointmentSchema = {
 
 export const cancelAppointmentSchema = {
   params: appointmentIdParams,
-  // DELETE isteklerinde body olmayabilir; iptal nedeni isteğe bağlıdır.
   body: z.object({ reason: cancellationReason.optional() }),
 };
 
@@ -95,8 +91,6 @@ export const updateSalonAppointmentSchema = {
   params: appointmentIdParams,
   body: z
     .object({
-      // Salon bir randevuyu yalnızca bu üç duruma taşıyabilir. BOOKED'a geri
-      // dönüş yoktur; PENDING / CONFIRMED gibi durumlar ise hiç tanımlı değildir.
       status: z
         .enum(
           [APPOINTMENT_STATUS.COMPLETED, APPOINTMENT_STATUS.NO_SHOW, APPOINTMENT_STATUS.CANCELLED],
@@ -112,8 +106,6 @@ export const updateSalonAppointmentSchema = {
       notes: notes.optional(),
     })
     .refine(...atLeastOneField)
-    // Durum değişikliği ile düzenleme ayrı işlemlerdir. İkisi aynı istekte
-    // gelirse hangisinin geçerli olacağı belirsizleşir; bu yüzden reddediyoruz.
     .refine((data) => !data.status || SCHEDULE_FIELDS.every((field) => data[field] === undefined), {
       message: 'Durum değişikliği diğer alanlarla aynı istekte gönderilemez.',
       path: ['status'],

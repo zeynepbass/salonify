@@ -5,7 +5,6 @@ import { availabilitySchema } from '../validators/appointment.validator.js';
 import { paginationOnlyQuery, salonIdParams } from '../validators/common.js';
 import { listSalonsSchema } from '../validators/salon.validator.js';
 
-// Herkese açık uçlar: salonları keşfetmek için giriş yapmak gerekmez.
 const router = Router();
 const salonId = validate({ params: salonIdParams });
 

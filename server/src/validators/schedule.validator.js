@@ -12,9 +12,6 @@ const daySchema = z
     breaks: z.array(breakSchema).max(5, 'Bir güne en fazla 5 mola eklenebilir.').default([]),
     isClosed: z.boolean().default(false),
   })
-  // Saatler arası tutarlılık: açılış kapanıştan önce olmalı, molalar çalışma
-  // saatlerinin içinde kalmalı ve birbirleriyle çakışmamalı. Tutarsız bir
-  // düzen kaydedilirse müsaitlik hesabı anlamsız sonuçlar üretir.
   .superRefine((day, ctx) => {
     const open = timeToMinutes(day.openTime);
     const close = timeToMinutes(day.closeTime);

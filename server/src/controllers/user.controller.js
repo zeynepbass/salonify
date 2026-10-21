@@ -6,10 +6,6 @@ import * as userService from '../services/user.service.js';
 import { sendSuccess } from '../utils/response.js';
 import { clearSession, sendSession } from '../utils/session.js';
 
-// Bu dosyadaki bütün uçlar "me" üzerinden çalışır: kullanıcı kimliği URL'den
-// değil, doğrulanmış oturumdan (req.user) alınır. Bu yüzden bir müşterinin
-// başka bir müşterinin özel verisini istemesinin bir yolu yoktur.
-
 export async function getMe(req, res) {
   sendSuccess(res, await buildProfile(req.user));
 }

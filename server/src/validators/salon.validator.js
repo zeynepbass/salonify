@@ -25,10 +25,8 @@ export const listSalonsSchema = {
         .optional(),
       hairStyle: csvList.optional(),
       rating: z.coerce.number('Puan filtresi geçersiz.').min(0, 'Puan 0-5 arasında olmalı.').max(5, 'Puan 0-5 arasında olmalı.').optional(),
-      // Kullanıcının konumu (tarayıcıdan). Verilirse sonuçlara distanceKm eklenir.
       lat: latitude(z.coerce.number('Enlem geçersiz.')).optional(),
       lng: longitude(z.coerce.number('Boylam geçersiz.')).optional(),
-      // Kilometre cinsinden en fazla uzaklık.
       distance: z.coerce.number('Mesafe geçersiz.').positive('Mesafe 0\'dan büyük olmalı.').max(100, 'Mesafe en fazla 100 km olabilir.').optional(),
       availability: z.enum(['today', 'tomorrow', 'week'], 'Uygunluk today, tomorrow veya week olmalı.').optional(),
       sort: z.enum(['rating', 'popular', 'price', 'newest', 'nearest'], 'Geçersiz sıralama.').default('rating'),

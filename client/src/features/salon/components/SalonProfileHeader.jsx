@@ -39,7 +39,7 @@ export default function SalonProfileHeader({ salon }) {
           </Tag>
           <Tag>{salon.audience}</Tag>
         </div>
-        <h1 className="text-[clamp(32px,4vw,48px)] tracking-[-0.025em]">{salon.name}</h1>
+        <h1 className="text-[clamp(32px,4vw,48px)]">{salon.name}</h1>
         <a href="#degerlendirmeler" className="flex items-center gap-2 self-start text-[15px]">
           <Icon name="star" filled className="text-accent" />
           <strong className="text-[18px]">{formatRating(salon.rating)}</strong>
