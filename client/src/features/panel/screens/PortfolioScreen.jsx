@@ -8,7 +8,7 @@ import Tag from "@/components/atoms/Tag";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/customer/PanelProvider";
+import { usePanel } from "@/features/panel/PanelProvider";
 import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 
@@ -34,7 +34,6 @@ function PortfolioCard({ item, onToggle }) {
         <ImagePlaceholder
           src={item.image}
           alt={item.title || item.customer}
-          label="müşteri fotoğrafı"
           stripe={12}
           className="aspect-[4/5]"
           imageClassName={item.consent ? undefined : "opacity-50"}

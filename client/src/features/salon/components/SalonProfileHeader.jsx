@@ -23,18 +23,14 @@ export default function SalonProfileHeader({ salon, hours, closedDays }) {
   return (
     <div className="mt-4 flex flex-wrap gap-10">
       <div className="flex min-w-0 flex-[1_1_480px] flex-col gap-2">
-        <ImagePlaceholder src={salon.coverImage} alt={salon.name} label="salon profil görseli" className="aspect-[4/3]" />
-        <div className="grid grid-cols-4 gap-2">
-          {[0, 1, 2, 3].map((index) => (
-            <ImagePlaceholder
-              key={thumbnails[index]?.id ?? index}
-              src={thumbnails[index]?.image}
-              alt={thumbnails[index]?.title ?? ""}
-              stripe={10}
-              className="aspect-square"
-            />
-          ))}
-        </div>
+        <ImagePlaceholder src={salon.coverImage} alt={salon.name} className="aspect-[4/3]" />
+        {thumbnails.length > 0 && (
+          <div className="grid grid-cols-4 gap-2">
+            {thumbnails.map((item) => (
+              <ImagePlaceholder key={item.id} src={item.image} alt={item.title ?? ""} stripe={10} className="aspect-square" />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex min-w-0 flex-[1_1_400px] flex-col gap-4">

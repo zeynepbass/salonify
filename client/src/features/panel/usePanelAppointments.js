@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { usePanel } from "@/features/customer/PanelProvider";
-import { toAppointmentView } from "@/features/customer/scheduling";
+import { usePanel } from "@/features/panel/PanelProvider";
+import { toAppointmentView } from "@/features/panel/scheduling";
 
 export function usePanelAppointments() {
   const { appointments } = usePanel();

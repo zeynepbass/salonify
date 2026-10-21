@@ -7,8 +7,8 @@ import { Input, Select } from "@/components/atoms/Input";
 import Switch from "@/components/atoms/Switch";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/customer/PanelProvider";
-import { getOpenDates } from "@/features/customer/scheduling";
+import { usePanel } from "@/features/panel/PanelProvider";
+import { getOpenDates } from "@/features/panel/scheduling";
 import { getErrorMessage } from "@/lib/api";
 import { WEEKDAYS, formatDayWithWeekday } from "@/lib/date";
 
@@ -128,7 +128,7 @@ export default function WorkingHoursScreen() {
           {saving ? "Kaydediliyor…" : "Değişiklikleri kaydet"}
         </Button>
         <p className="mt-2 text-[12px] text-neutral-700">
-          Mevcut randevular etkilenmez; yeni saatler müşteri tarafındaki boş slotlara anında yansır.
+          Mevcut randevular etkilenmez; yeni saatler müşterilerin randevu alırken gördüğü uygun saatlere anında yansır.
         </p>
       </section>
 

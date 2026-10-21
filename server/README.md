@@ -93,7 +93,7 @@ Dosya: `src/routes/user.routes.js`
 | Metot | Uç | Sayfa | Ne işe yarıyor | Yetki |
 | --- | --- | --- | --- | --- |
 | GET | `/users/me` | Profil `/profil` | Ad, e-posta, telefon gibi profil bilgilerini getirir | Giriş yapmış |
-| PATCH | `/users/me` | Profil `/profil` | Profil bilgilerini ve bildirim tercihlerini kaydeder | Giriş yapmış |
+| PATCH | `/users/me` | Profil `/profil` | Profil bilgilerini kaydeder | Giriş yapmış |
 | PATCH | `/users/me/password` | Profil `/profil` | Şifre değiştirir | Giriş yapmış |
 | DELETE | `/users/me` | Profil `/profil` | Hesabı siler | Müşteri |
 | GET | `/users/me/appointments` | Randevularım `/randevularim` | Müşterinin randevularını listeler | Müşteri |

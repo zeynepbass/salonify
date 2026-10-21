@@ -8,7 +8,7 @@ import { Input, Textarea } from "@/components/atoms/Input";
 import Tag from "@/components/atoms/Tag";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/customer/PanelProvider";
+import { usePanel } from "@/features/panel/PanelProvider";
 import { getErrorMessage, uploadImage } from "@/lib/api";
 import { WEEKDAYS } from "@/lib/date";
 

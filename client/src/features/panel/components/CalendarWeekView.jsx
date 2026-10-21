@@ -1,4 +1,4 @@
-import CalendarBlock from "@/features/customer/components/CalendarBlock";
+import CalendarBlock from "@/features/panel/components/CalendarBlock";
 import { cn } from "@/lib/cn";
 import { getDateParts, minutesToTime } from "@/lib/date";
 

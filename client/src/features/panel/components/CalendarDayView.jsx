@@ -1,7 +1,7 @@
 import Icon from "@/components/atoms/Icon";
 import StateMessage from "@/components/molecules/StateMessage";
-import CalendarBlock from "@/features/customer/components/CalendarBlock";
-import { NOW_MINUTES, SLOT_INTERVAL } from "@/features/customer/scheduling";
+import CalendarBlock from "@/features/panel/components/CalendarBlock";
+import { NOW_MINUTES, SLOT_INTERVAL } from "@/features/panel/scheduling";
 import { CURRENT_TIME, TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { minutesToTime } from "@/lib/date";

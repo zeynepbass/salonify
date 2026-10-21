@@ -1,4 +1,4 @@
-import PortfolioScreen from "@/features/customer/screens/PortfolioScreen";
+import PortfolioScreen from "@/features/panel/screens/PortfolioScreen";
 
 export const metadata = { title: "Portföy" };
 
