@@ -1,23 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
+import Spinner from "@/components/atoms/Spinner";
 import BackLink from "@/components/molecules/BackLink";
 import StatusTag from "@/components/molecules/StatusTag";
 import AppointmentNotFound from "@/features/appointments/components/AppointmentNotFound";
 import CancelAppointmentDialog from "@/features/appointments/components/CancelAppointmentDialog";
 import { useAddToCalendar } from "@/features/appointments/useAddToCalendar";
-import { useAppointment } from "@/features/appointments/useAppointment";
+import { toAppointmentView } from "@/features/appointments/appointmentView";
+import { api } from "@/lib/api";
 import { STATUS_META } from "@/lib/appointmentStatus";
 import { formatLongDate } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 
 export default function AppointmentDetailPage({ appointmentId }) {
-  const appointment = useAppointment(appointmentId);
   const addToCalendar = useAddToCalendar();
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [state, setState] = useState({ status: "loading", appointment: null });
 
+  const loadAppointment = useCallback(async () => {
+    try {
+      const appointment = await api.get(`/appointments/${appointmentId}`);
+      setState({ status: "success", appointment: toAppointmentView(appointment) });
+    } catch {
+      setState({ status: "error", appointment: null });
+    }
+  }, [appointmentId]);
+
+  useEffect(() => {
+    loadAppointment();
+  }, [loadAppointment]);
+
+  if (state.status === "loading") {
+    return (
+      <div aria-busy="true" className="grid min-h-[50vh] place-items-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  const { appointment } = state;
   if (!appointment) return <AppointmentNotFound />;
 
   const { salon, service } = appointment;
@@ -28,10 +52,10 @@ export default function AppointmentDetailPage({ appointmentId }) {
     { label: "Saat", value: appointment.time },
     { label: "Süre", value: formatDuration(service.duration, { long: true }) },
     { label: "Fiyat", value: formatPrice(service.price) },
-    { label: "Konum", value: `${salon.neighborhood}, ${salon.district} · ${salon.city}` },
+    { label: "Konum", value: [[salon.neighborhood, salon.district].filter(Boolean).join(", "), salon.city].filter(Boolean).join(" · ") },
     { label: "Durum", value: STATUS_META[appointment.status].label },
+    { label: "Randevu no", value: appointment.reference },
   ];
-
 
   return (
     <div className="page-container max-w-[1080px] pt-6">
@@ -57,10 +81,12 @@ export default function AppointmentDetailPage({ appointmentId }) {
             <Icon name="calendarPlus" />
             Takvime ekle
           </Button>
-          <Button size="md" align="start" className="gap-2.5 px-3" href={`tel:${salon.phone.replace(/\s/g, "")}`}>
-            <Icon name="phone" />
-            Kuaförü ara
-          </Button>
+          {salon.phone && (
+            <Button size="md" align="start" className="gap-2.5 px-3" href={`tel:${salon.phone.replace(/\s/g, "")}`}>
+              <Icon name="phone" />
+              Kuaförü ara
+            </Button>
+          )}
           {appointment.upcoming && (
             <>
               <Button variant="danger" size="md" align="start" className="gap-2.5 px-3" onClick={() => setCancelOpen(true)}>
@@ -90,7 +116,9 @@ export default function AppointmentDetailPage({ appointmentId }) {
         </aside>
       </div>
 
-      {cancelOpen && <CancelAppointmentDialog appointment={appointment} onClose={() => setCancelOpen(false)} />}
+      {cancelOpen && (
+        <CancelAppointmentDialog appointment={appointment} onCancelled={loadAppointment} onClose={() => setCancelOpen(false)} />
+      )}
     </div>
   );
 }

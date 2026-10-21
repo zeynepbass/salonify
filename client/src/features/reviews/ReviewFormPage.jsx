@@ -1,21 +1,22 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import { Textarea } from "@/components/atoms/Input";
+import Spinner from "@/components/atoms/Spinner";
 import Switch from "@/components/atoms/Switch";
 import BackLink from "@/components/molecules/BackLink";
 import Field from "@/components/molecules/Field";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { useAppointments } from "@/features/appointments/AppointmentsProvider";
+import { toAppointmentView } from "@/features/appointments/appointmentView";
 import AppointmentNotFound from "@/features/appointments/components/AppointmentNotFound";
-import { useAppointment } from "@/features/appointments/useAppointment";
 import PhotoPicker from "@/features/reviews/components/PhotoPicker";
 import StarInput from "@/features/reviews/components/StarInput";
+import { api, getErrorMessage, uploadImage } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 
 const MAX_COMMENT_LENGTH = 500;
@@ -25,14 +26,35 @@ export default function ReviewFormPage({ appointmentId }) {
   const router = useRouter();
   const commentId = useId();
   const shareLabelId = useId();
-  const appointment = useAppointment(appointmentId);
-  const { markReviewed } = useAppointments();
   const { showToast } = useToast();
+  const [state, setState] = useState({ status: "loading", appointment: null });
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [photos, setPhotos] = useState([]);
   const [share, setShare] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    let ignore = false;
+    api
+      .get(`/appointments/${appointmentId}`)
+      .then((appointment) => !ignore && setState({ status: "success", appointment: toAppointmentView(appointment) }))
+      .catch(() => !ignore && setState({ status: "error", appointment: null }));
+    return () => {
+      ignore = true;
+    };
+  }, [appointmentId]);
+
+  if (state.status === "loading") {
+    return (
+      <div aria-busy="true" className="grid min-h-[50vh] place-items-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  const { appointment } = state;
   if (!appointment) return <AppointmentNotFound />;
 
   if (!appointment.canReview) {
@@ -51,18 +73,33 @@ export default function ReviewFormPage({ appointmentId }) {
     );
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    markReviewed(appointment.id);
-    showToast(share ? "Değerlendirmen gönderildi ve profilde paylaşıldı." : "Değerlendirmen gönderildi.");
-    router.push("/randevularim?sekme=gecmis");
+    if (rating === 0 || submitting) return;
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      const uploads = await Promise.all(photos.map((photo) => uploadImage(photo.file)));
+      await api.post(`/appointments/${appointment.id}/review`, {
+        rating,
+        comment: comment.trim(),
+        hairPhotos: uploads.map((upload) => upload.url),
+        isPublic: share,
+      });
+      showToast(share ? "Değerlendirmen gönderildi ve profilde paylaşıldı." : "Değerlendirmen gönderildi.");
+      router.push("/randevularim?sekme=gecmis");
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+      setSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="page-container max-w-[720px] pt-6">
       <BackLink href="/randevularim">Randevularım</BackLink>
       <div className="mt-4 mb-8 flex items-center gap-4 bg-surface p-4">
-        <ImagePlaceholder stripe={8} className="size-14 flex-none" />
+        <ImagePlaceholder src={appointment.salon.coverImage} alt={appointment.salon.name} stripe={8} className="size-14 flex-none" />
         <div>
           <div className="font-extrabold">{appointment.salon.name}</div>
           <div className="text-[13px] text-neutral-700">
@@ -107,10 +144,17 @@ export default function ReviewFormPage({ appointmentId }) {
         </div>
       </div>
 
+      {error && (
+        <p role="alert" className="mt-5 flex gap-2 bg-accent-100 p-3 text-[14px] text-accent-800">
+          <Icon name="alert" size={16} className="mt-0.5" />
+          {error}
+        </p>
+      )}
+
       <div className="mt-6 flex flex-wrap gap-2">
-        <Button type="submit" variant="primary" size="lg" disabled={rating === 0} className="gap-3">
-          Değerlendirmeyi Gönder
-          <Icon name="arrowRight" />
+        <Button type="submit" variant="primary" size="lg" disabled={rating === 0 || submitting} className="gap-3">
+          {submitting ? "Gönderiliyor…" : "Değerlendirmeyi Gönder"}
+          {submitting ? <Spinner /> : <Icon name="arrowRight" />}
         </Button>
         <Button size="lg" href="/randevularim" className="text-[14px]">
           Vazgeç

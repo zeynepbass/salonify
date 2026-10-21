@@ -79,8 +79,8 @@ salonify/
 │       ├── app/            sayfalar (rotalar)
 │       ├── components/     ortak bileşenler (atoms, molecules, organisms)
 │       ├── features/       sayfa bazlı modüller
-│       ├── data/mock/      örnek veriler
-│       ├── lib/            yardımcı fonksiyonlar
+│       ├── data/           sabit listeler (kategoriler, şehirler)
+│       ├── lib/            yardımcı fonksiyonlar, API istemcisi (axios)
 │       └── styles/         genel stiller ve renk paleti
 ├── server/                 Express API
 │   ├── src/                routes, controllers, services, models, validators
@@ -92,6 +92,14 @@ salonify/
 ## Kurulum
 
 Gereksinim: Node.js 20 veya üzeri, MongoDB (yerel kurulum veya MongoDB Atlas ücretsiz paket).
+
+Arayüz ve API aynı ortam dosyasını kullanır. Proje kökündeki `.env.example` dosyası `.env` olarak kopyalanıp doldurulur:
+
+```bash
+cp .env.example .env
+```
+
+Değişkenlerin açıklaması: [server/README.md](server/README.md#kurulum)
 
 ### Arayüz
 

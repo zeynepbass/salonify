@@ -9,7 +9,7 @@ import SegmentedControl from "@/components/molecules/SegmentedControl";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/dashboard/PanelProvider";
-import { getServiceName } from "@/lib/catalog";
+import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 
 const FILTERS = [
@@ -32,6 +32,8 @@ function PortfolioCard({ item, onToggle }) {
     <div className="flex flex-col bg-surface">
       <div className="relative">
         <ImagePlaceholder
+          src={item.image}
+          alt={item.title || item.customer}
           label="müşteri fotoğrafı"
           stripe={12}
           className="aspect-[4/5]"
@@ -48,11 +50,13 @@ function PortfolioCard({ item, onToggle }) {
           <span className="text-[12px] text-neutral-700">{formatDayMonth(item.date)}</span>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[13px]">{getServiceName(item.serviceId)}</span>
-          <span className="flex items-center gap-1 text-[13px] font-extrabold">
-            <Icon name="star" size={14} filled className="text-accent" />
-            {item.rating}
-          </span>
+          <span className="text-[13px]">{item.title}</span>
+          {item.rating && (
+            <span className="flex items-center gap-1 text-[13px] font-extrabold">
+              <Icon name="star" size={14} filled className="text-accent" />
+              {item.rating}
+            </span>
+          )}
         </div>
         <div className="mt-1 flex items-center justify-between border-t border-line pt-2.5">
           <span id={labelId} className="text-[13px]">
@@ -78,9 +82,13 @@ export default function PortfolioScreen() {
 
   const items = portfolio.filter(FILTERS.find((option) => option.value === filter).match);
 
-  const handleToggle = (item) => {
-    togglePortfolioItem(item.id);
-    showToast(item.published ? "Profilden kaldırıldı." : "Profilde yayınlandı.");
+  const handleToggle = async (item) => {
+    try {
+      await togglePortfolioItem(item);
+      showToast(item.published ? "Profilden kaldırıldı." : "Profilde yayınlandı.");
+    } catch (error) {
+      showToast(getErrorMessage(error), { tone: "error" });
+    }
   };
 
   return (

@@ -1,8 +1,8 @@
 import Icon from "@/components/atoms/Icon";
 import StateMessage from "@/components/molecules/StateMessage";
-import { CURRENT_TIME, TODAY } from "@/data/mock/clock";
 import CalendarBlock from "@/features/dashboard/components/CalendarBlock";
 import { NOW_MINUTES, SLOT_INTERVAL } from "@/features/dashboard/scheduling";
+import { CURRENT_TIME, TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { minutesToTime } from "@/lib/date";
 

@@ -3,8 +3,7 @@ import Checkbox from "@/components/atoms/Checkbox";
 import Icon from "@/components/atoms/Icon";
 import Radio from "@/components/atoms/Radio";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
-import { salons } from "@/data/mock/salons";
-import { hairStyles, services } from "@/data/mock/services";
+import { hairStyles, serviceCategories } from "@/data/catalog";
 import { AVAILABILITY_OPTIONS, DISTANCE_OPTIONS, RATING_OPTIONS } from "@/features/search/salonQuery";
 import { cn } from "@/lib/cn";
 
@@ -19,7 +18,16 @@ function Section({ title, className, children }) {
   );
 }
 
-export default function FilterPanel({ filters, locationLabel, resultCount, onChange, onReset, onChangeLocation, onClose }) {
+export default function FilterPanel({
+  filters,
+  locationLabel,
+  resultCount,
+  showDistance,
+  onChange,
+  onReset,
+  onChangeLocation,
+  onClose,
+}) {
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between border-b-2 border-line pb-3 md:hidden">
@@ -41,28 +49,27 @@ export default function FilterPanel({ filters, locationLabel, resultCount, onCha
         </button>
       </Section>
 
-      <Section title="Mesafe">
-        <SegmentedControl
-          label="Mesafe"
-          options={DISTANCE_OPTIONS}
-          value={filters.distance}
-          onChange={(distance) => onChange({ distance })}
-          className="grid grid-cols-4"
-          optionClassName="px-0"
-        />
-      </Section>
+      {showDistance && (
+        <Section title="Mesafe">
+          <SegmentedControl
+            label="Mesafe"
+            options={DISTANCE_OPTIONS}
+            value={filters.distance}
+            onChange={(distance) => onChange({ distance })}
+            className="grid grid-cols-4"
+            optionClassName="px-0"
+          />
+        </Section>
+      )}
 
       <Section title="Hizmet">
-        {services.map((service) => (
+        {serviceCategories.map((category) => (
           <Checkbox
-            key={service.id}
-            checked={filters.serviceIds.includes(service.id)}
-            onChange={() => onChange({ serviceIds: toggleItem(filters.serviceIds, service.id) })}
+            key={category.id}
+            checked={filters.serviceIds.includes(category.id)}
+            onChange={() => onChange({ serviceIds: toggleItem(filters.serviceIds, category.id) })}
           >
-            {service.name}
-            <span className="ml-auto text-[12px] text-neutral-600">
-              {salons.filter((salon) => salon.featuredServiceIds.includes(service.id)).length}
-            </span>
+            {category.label}
           </Checkbox>
         ))}
       </Section>

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { defaultLocation } from "@/data/mock/locations";
+import { defaultLocation } from "@/data/catalog";
 import LocationDialog from "@/features/location/LocationDialog";
 
 const LocationContext = createContext(null);
@@ -14,7 +14,12 @@ export function LocationProvider({ children }) {
   const closeLocationDialog = useCallback(() => setDialogOpen(false), []);
 
   const value = useMemo(
-    () => ({ location, locationLabel: `${location.city}, ${location.district}`, openLocationDialog }),
+    () => ({
+      location,
+      locationLabel: `${location.city}, ${location.district}`,
+      hasCoordinates: location.lat !== undefined && location.lng !== undefined,
+      openLocationDialog,
+    }),
     [location, openLocationDialog],
   );
 

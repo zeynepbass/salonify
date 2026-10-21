@@ -1,18 +1,19 @@
+import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 
-dotenv.config({ quiet: true });
+dotenv.config({ path: fileURLToPath(new URL('../../../.env', import.meta.url)), quiet: true });
 
 const REQUIRED = ['MONGODB_URI', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
 
 const missing = REQUIRED.filter((key) => !process.env[key]?.trim());
 if (missing.length > 0) {
   throw new Error(
-    `Eksik environment değişkenleri: ${missing.join(', ')}. .env.example dosyasını .env olarak kopyalayıp doldurun.`,
+    `Eksik environment değişkenleri: ${missing.join(', ')}. Proje kökündeki .env.example dosyasını .env olarak kopyalayıp doldurun.`,
   );
 }
 
 if (/<[^>]+>/.test(process.env.MONGODB_URI)) {
-  throw new Error('MONGODB_URI içinde doldurulmamış bir alan var (ör. <db_password>). Gerçek değeri .env dosyasına yazın.');
+  throw new Error('MONGODB_URI içinde doldurulmamış bir alan var (ör. <db_password>). Gerçek değeri proje kökündeki .env dosyasına yazın.');
 }
 
 if (process.env.JWT_SECRET === process.env.JWT_REFRESH_SECRET) {

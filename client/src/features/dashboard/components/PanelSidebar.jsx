@@ -2,6 +2,7 @@ import Link from "next/link";
 import Icon from "@/components/atoms/Icon";
 import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import Logo from "@/components/atoms/Logo";
+import LogoutButton from "@/features/dashboard/components/LogoutButton";
 import { PANEL_NAV } from "@/features/dashboard/panelNav";
 import { cn } from "@/lib/cn";
 
@@ -18,11 +19,11 @@ export default function PanelSidebar({ salon, pathname, unreadCount }) {
         <Logo size="md" className="hidden text-[18px] rail:inline-flex" />
       </Link>
       <div className="hidden items-center gap-2.5 border-b border-line px-5 py-4 rail:flex">
-        <ImagePlaceholder stripe={6} className="size-9 flex-none" />
+        <ImagePlaceholder src={salon.coverImage} alt={salon.name} stripe={6} className="size-9 flex-none" />
         <div className="min-w-0">
           <div className="truncate text-[14px] font-extrabold">{salon.name}</div>
           <div className="text-[12px] text-neutral-700">
-            {salon.neighborhood}, {salon.district}
+            {[salon.neighborhood, salon.district].filter(Boolean).join(", ")}
           </div>
         </div>
       </div>
@@ -57,10 +58,10 @@ export default function PanelSidebar({ salon, pathname, unreadCount }) {
           <Icon name="external" />
           <span className="hidden rail:inline">Müşteri sitesini aç</span>
         </Link>
-        <Link href="/panel/giris" title="Çıkış yap" className={FOOTER_LINK}>
+        <LogoutButton className={`${FOOTER_LINK} text-left`}>
           <Icon name="logout" />
           <span className="hidden rail:inline">Çıkış yap</span>
-        </Link>
+        </LogoutButton>
       </div>
     </aside>
   );

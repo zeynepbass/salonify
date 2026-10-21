@@ -1,27 +1,25 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
+import Spinner from "@/components/atoms/Spinner";
 import BackLink from "@/components/molecules/BackLink";
 import MobileActionBar from "@/components/molecules/MobileActionBar";
-import { services } from "@/data/mock/services";
-import { useAppointments } from "@/features/appointments/AppointmentsProvider";
-import { BOOKING_MONTHS, SLOT_INTERVAL, getBookingMonth, getDayAvailability, getSlots } from "@/features/booking/availability";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { BOOKING_MONTHS, SLOT_INTERVAL, createDayAvailability, getBookingMonth } from "@/features/booking/availability";
 import BookingSteps from "@/features/booking/components/BookingSteps";
 import BookingSummary from "@/features/booking/components/BookingSummary";
 import DatePicker from "@/features/booking/components/DatePicker";
 import ServicePicker from "@/features/booking/components/ServicePicker";
 import SlotPicker from "@/features/booking/components/SlotPicker";
-import { getService } from "@/lib/catalog";
+import { useNotifications } from "@/features/notifications/NotificationsProvider";
+import SalonNotFound from "@/features/salon/SalonNotFound";
+import { api, getErrorMessage, isNotFound } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
-
-const SLOT_LOADING_MS = 450;
-const SUBMIT_MS = 900;
-
-const bookableServices = services.filter((service) => service.active);
+import { toWorkingHours } from "@/lib/schedule";
 
 function StepSection({ id, title, aside, children }) {
   return (
@@ -37,52 +35,113 @@ function StepSection({ id, title, aside, children }) {
   );
 }
 
-export default function BookingPage({ salon, initialServiceId }) {
+export default function BookingPage({ salonId, initialServiceId }) {
   const router = useRouter();
-  const { appointments, createAppointment } = useAppointments();
+  const pathname = usePathname();
+  const { status, user } = useAuth();
+  const { reloadNotifications } = useNotifications();
+  const [salonState, setSalonState] = useState({ status: "loading", salon: null, error: null });
   const [serviceId, setServiceId] = useState(initialServiceId ?? null);
   const [monthOffset, setMonthOffset] = useState(0);
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
+  const [slots, setSlots] = useState([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slotsVersion, setSlotsVersion] = useState(0);
   const [submitting, setSubmitting] = useState(false);
-  const timers = useRef([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const scheduled = timers.current;
-    return () => scheduled.forEach(clearTimeout);
-  }, []);
+    let ignore = false;
+    api
+      .get(`/salons/${salonId}`)
+      .then((salon) => !ignore && setSalonState({ status: "success", salon, error: null }))
+      .catch((requestError) => {
+        if (ignore) return;
+        setSalonState({ status: isNotFound(requestError) ? "not-found" : "error", salon: null, error: getErrorMessage(requestError) });
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [salonId]);
 
-  const service = serviceId ? getService(serviceId) : null;
+  const salon = salonState.salon;
+  const services = salon?.services ?? [];
+  const service = services.find((item) => item.id === serviceId) ?? null;
+
+  useEffect(() => {
+    if (!service || !date) return undefined;
+
+    let ignore = false;
+    setSlotsLoading(true);
+    api
+      .get(`/salons/${salonId}/availability`, { params: { serviceId: service.id, date } })
+      .then((data) => !ignore && setSlots(data.slots))
+      .catch((requestError) => {
+        if (ignore) return;
+        setSlots([]);
+        setError(getErrorMessage(requestError));
+      })
+      .finally(() => !ignore && setSlotsLoading(false));
+
+    return () => {
+      ignore = true;
+    };
+  }, [salonId, service, date, slotsVersion]);
+
+  if (salonState.status === "loading") {
+    return (
+      <div aria-busy="true" className="grid min-h-[50vh] place-items-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (salonState.status === "not-found") return <SalonNotFound />;
+  if (salonState.status === "error") return <SalonNotFound description={salonState.error} />;
+
+  const hours = toWorkingHours(salon.workingHours);
+  const getDayAvailability = createDayAvailability(hours, salon.blockedDates);
   const { year, monthIndex } = getBookingMonth(monthOffset);
-
-  const takenTimes = appointments
-    .filter((item) => item.salonId === salon.id && item.date === date && item.status === "BOOKED")
-    .map((item) => item.time);
-  const slots = date ? getSlots(date, takenTimes) : [];
-  const freeCount = slots.filter((slot) => slot.available).length;
+  const visibleSlots = service && date ? slots : [];
+  const freeCount = visibleSlots.filter((slot) => slot.available).length;
 
   const dateLabel = date ? formatLongDate(date, { withWeekday: true }) : null;
   const canSubmit = Boolean(service && date && time);
   const currentStep = !service ? 0 : !date ? 1 : !time ? 2 : 3;
 
+  const selectService = (nextServiceId) => {
+    setServiceId(nextServiceId);
+    setTime(null);
+    setError(null);
+  };
+
   const selectDate = (nextDate) => {
     setDate(nextDate);
     setTime(null);
-    setSlotsLoading(true);
-    timers.current.push(setTimeout(() => setSlotsLoading(false), SLOT_LOADING_MS));
+    setError(null);
   };
 
-  const submit = () => {
+  const submit = async () => {
     if (!canSubmit || submitting) return;
 
+    if (status !== "authenticated" || user.role !== "CUSTOMER") {
+      router.push(`/giris?next=${encodeURIComponent(`${pathname}?hizmet=${service.id}`)}`);
+      return;
+    }
+
     setSubmitting(true);
-    timers.current.push(
-      setTimeout(() => {
-        const appointment = createAppointment({ salonId: salon.id, serviceId, date, time });
-        router.push(`/randevularim/${appointment.id}/basarili`);
-      }, SUBMIT_MS),
-    );
+    setError(null);
+    try {
+      const appointment = await api.post("/appointments", { salonId: salon.id, serviceId: service.id, date, startTime: time });
+      reloadNotifications();
+      router.push(`/randevularim/${appointment.id}/basarili`);
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+      setTime(null);
+      setSlotsVersion((version) => version + 1);
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -91,10 +150,17 @@ export default function BookingPage({ salon, initialServiceId }) {
       <h1 className="mt-2 mb-5 text-[clamp(28px,3.4vw,40px)]">Randevu al</h1>
       <BookingSteps current={currentStep} />
 
+      {error && (
+        <p role="alert" className="mb-6 flex gap-2 bg-accent-100 p-3 text-[14px] text-accent-800">
+          <Icon name="alert" size={16} className="mt-0.5" />
+          {error}
+        </p>
+      )}
+
       <div className="flex flex-wrap items-start gap-10">
         <div className="flex min-w-0 flex-[1_1_560px] flex-col gap-10">
           <StepSection id="adim-hizmet" title="1. Hizmet">
-            <ServicePicker services={bookableServices} value={serviceId} onChange={setServiceId} labelledBy="adim-hizmet" />
+            <ServicePicker services={services} value={serviceId} onChange={selectService} labelledBy="adim-hizmet" />
           </StepSection>
 
           <StepSection id="adim-tarih" title="2. Tarih">
@@ -113,12 +179,18 @@ export default function BookingPage({ salon, initialServiceId }) {
             id="adim-saat"
             title="3. Müsait saat"
             aside={
-              date && !slotsLoading
+              service && date && !slotsLoading
                 ? `${dateLabel} · ${freeCount} boş saat`
                 : `${SLOT_INTERVAL} dakikalık aralıklarla müsait saatler`
             }
           >
-            <SlotPicker slots={slots} value={time} loading={slotsLoading} hasDate={Boolean(date)} onChange={setTime} />
+            {date && !service ? (
+              <p className="border border-dashed border-line px-5 py-7 text-[14px] text-neutral-700">
+                Uygun saatleri görmek için önce bir hizmet seç.
+              </p>
+            ) : (
+              <SlotPicker slots={visibleSlots} value={time} loading={slotsLoading} hasDate={Boolean(date)} onChange={setTime} />
+            )}
           </StepSection>
         </div>
 

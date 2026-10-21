@@ -1,32 +1,36 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { Select } from "@/components/atoms/Input";
 import ConfirmDialog from "@/components/molecules/ConfirmDialog";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { cancellationReasons } from "@/data/mock/appointments";
-import { useAppointments } from "@/features/appointments/AppointmentsProvider";
+import { cancellationReasons } from "@/data/catalog";
+import { useNotifications } from "@/features/notifications/NotificationsProvider";
+import { api, getErrorMessage } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 
-const CANCEL_MS = 700;
-
-export default function CancelAppointmentDialog({ appointment, onClose }) {
+export default function CancelAppointmentDialog({ appointment, onCancelled, onClose }) {
   const reasonId = useId();
-  const { cancelAppointment } = useAppointments();
   const { showToast } = useToast();
+  const { reloadNotifications } = useNotifications();
+  const [reason, setReason] = useState("");
   const [cancelling, setCancelling] = useState(false);
-  const timer = useRef(null);
+  const [error, setError] = useState(null);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
-
-  const confirm = () => {
+  const confirm = async () => {
     setCancelling(true);
-    timer.current = setTimeout(() => {
-      cancelAppointment(appointment.id);
+    setError(null);
+    try {
+      const cancelled = await api.delete(`/appointments/${appointment.id}`, { data: reason ? { reason } : {} });
       showToast("Randevun iptal edildi. Kuaföre bildirim gönderildi.");
+      onCancelled?.(cancelled);
+      reloadNotifications();
       onClose();
-    }, CANCEL_MS);
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+      setCancelling(false);
+    }
   };
 
   return (
@@ -44,13 +48,18 @@ export default function CancelAppointmentDialog({ appointment, onClose }) {
       </p>
       <p className="mt-3">Bu işlem geri alınamaz. Saat tekrar müsait olur ve kuaföre bildirim gönderilir.</p>
       <Field label="İptal nedeni (isteğe bağlı)" htmlFor={reasonId} className="mt-4 text-ink">
-        <Select id={reasonId} defaultValue="">
+        <Select id={reasonId} value={reason} onChange={(event) => setReason(event.target.value)}>
           <option value="">Seçiniz</option>
-          {cancellationReasons.map((reason) => (
-            <option key={reason}>{reason}</option>
+          {cancellationReasons.map((item) => (
+            <option key={item}>{item}</option>
           ))}
         </Select>
       </Field>
+      {error && (
+        <p role="alert" className="mt-3 text-[13px] text-accent-700">
+          {error}
+        </p>
+      )}
     </ConfirmDialog>
   );
 }

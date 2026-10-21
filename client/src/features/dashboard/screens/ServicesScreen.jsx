@@ -9,6 +9,7 @@ import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/dashboard/PanelProvider";
 import ServiceFormDialog from "@/features/dashboard/components/ServiceFormDialog";
 import { cn } from "@/lib/cn";
+import { getErrorMessage } from "@/lib/api";
 import { formatDuration, formatPrice } from "@/lib/format";
 
 export default function ServicesScreen() {
@@ -16,15 +17,25 @@ export default function ServicesScreen() {
   const { showToast } = useToast();
   const [form, setForm] = useState(null);
 
-  const handleToggle = (service) => {
-    toggleService(service.id);
-    showToast(`${service.name} ${service.active ? "pasife alındı" : "aktif edildi"}.`);
+  const showError = (error) => showToast(getErrorMessage(error), { tone: "error" });
+
+  const handleToggle = async (service) => {
+    try {
+      await toggleService(service);
+      showToast(`${service.name} ${service.active ? "pasife alındı" : "aktif edildi"}.`);
+    } catch (error) {
+      showError(error);
+    }
   };
 
-  const handleSave = (service) => {
-    saveService(service);
-    setForm(null);
-    showToast("Hizmet kaydedildi.");
+  const handleSave = async (service) => {
+    try {
+      await saveService(service);
+      setForm(null);
+      showToast("Hizmet kaydedildi.");
+    } catch (error) {
+      showError(error);
+    }
   };
 
   const handleDelete = (service) => {
@@ -32,10 +43,15 @@ export default function ServicesScreen() {
       title: `“${service.name}” silinsin mi?`,
       body: "Hizmet müşteri sitesinden kaldırılır. Mevcut randevular etkilenmez. Geçici olarak gizlemek için pasife almayı tercih edebilirsin.",
       confirmLabel: "Hizmeti sil",
-      onConfirm: () => {
-        deleteService(service.id);
-        closeConfirmation();
-        showToast("Hizmet silindi.");
+      onConfirm: async () => {
+        try {
+          await deleteService(service.id);
+          showToast("Hizmet silindi.");
+        } catch (error) {
+          showError(error);
+        } finally {
+          closeConfirmation();
+        }
       },
     });
   };

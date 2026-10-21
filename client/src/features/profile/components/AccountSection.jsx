@@ -7,19 +7,42 @@ import Icon from "@/components/atoms/Icon";
 import { Input } from "@/components/atoms/Input";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { useLocation } from "@/features/location/LocationProvider";
+import { api, getErrorMessage } from "@/lib/api";
+import { formatMonthYear } from "@/lib/date";
 
 export default function AccountSection({ user }) {
   const { location, locationLabel, openLocationDialog } = useLocation();
+  const { updateSession } = useAuth();
   const { showToast } = useToast();
   const [form, setForm] = useState({ name: user.name, email: user.email, phone: user.phone });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const setField = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
   const invalid = !form.name.trim() || !form.email.trim();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    showToast("Hesap bilgilerin güncellendi.");
+    if (invalid || saving) return;
+
+    setSaving(true);
+    setError(null);
+    try {
+      const profile = await api.patch("/users/me", {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        location: { city: location.city, district: location.district },
+      });
+      updateSession({ user: profile.user });
+      showToast("Hesap bilgilerin güncellendi.");
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -29,11 +52,8 @@ export default function AccountSection({ user }) {
         <div>
           <div className="text-[22px] font-extrabold">{form.name || user.name}</div>
           <div className="text-[13px] text-neutral-700">
-            Üyelik: {user.memberSince} · {location.city}, {location.district}
+            Üyelik: {formatMonthYear(user.createdAt)} · {location.city}, {location.district}
           </div>
-          <Button variant="ghost" className="mt-1 -ml-3">
-            Fotoğrafı değiştir
-          </Button>
         </div>
       </div>
 
@@ -66,8 +86,13 @@ export default function AccountSection({ user }) {
           </button>
         </Field>
       </div>
-      <Button type="submit" variant="primary" size="md" disabled={invalid} className="mt-5 px-[18px]">
-        Kaydet
+      {error && (
+        <p role="alert" className="mt-4 text-[13px] text-accent-700">
+          {error}
+        </p>
+      )}
+      <Button type="submit" variant="primary" size="md" disabled={invalid || saving} className="mt-5 px-[18px]">
+        {saving ? "Kaydediliyor…" : "Kaydet"}
       </Button>
     </form>
   );

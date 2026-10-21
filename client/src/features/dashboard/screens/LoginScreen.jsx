@@ -1,20 +1,51 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import { Input } from "@/components/atoms/Input";
 import Logo from "@/components/atoms/Logo";
+import Spinner from "@/components/atoms/Spinner";
 import Field from "@/components/molecules/Field";
-import { salonOwner } from "@/data/mock/users";
+import { demoAccounts } from "@/data/catalog";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { getErrorMessage } from "@/lib/api";
+
+function getSafeNext(value) {
+  return value?.startsWith("/panel") ? value : "/panel";
+}
 
 export default function LoginScreen() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { status, user, login, logout } = useAuth();
+  const [form, setForm] = useState(demoAccounts.salon);
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event) => {
+  const next = getSafeNext(searchParams.get("next"));
+
+  useEffect(() => {
+    if (status === "authenticated" && user.role === "SALON") router.replace(next);
+  }, [status, user, next, router]);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    router.push("/panel");
+    setError(null);
+    setSubmitting(true);
+    try {
+      const signedIn = await login(form);
+      if (signedIn.role !== "SALON") {
+        await logout();
+        setError("Bu hesap bir kuaför hesabı değil. Müşteri girişini kullanın.");
+      }
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -29,14 +60,37 @@ export default function LoginScreen() {
         <h1 className="text-[clamp(32px,4vw,44px)]">Panele giriş yap</h1>
         <form onSubmit={handleSubmit} className="flex max-w-[420px] flex-col gap-4">
           <Field label="E-posta" htmlFor="login-email">
-            <Input id="login-email" type="email" defaultValue={salonOwner.email} autoComplete="email" required className="min-h-11" />
+            <Input
+              id="login-email"
+              type="email"
+              value={form.email}
+              onChange={(event) => setForm({ ...form, email: event.target.value })}
+              autoComplete="email"
+              required
+              className="min-h-11"
+            />
           </Field>
           <Field label="Şifre" htmlFor="login-password">
-            <Input id="login-password" type="password" autoComplete="current-password" placeholder="••••••••" className="min-h-11" />
+            <Input
+              id="login-password"
+              type="password"
+              value={form.password}
+              onChange={(event) => setForm({ ...form, password: event.target.value })}
+              autoComplete="current-password"
+              placeholder="••••••••"
+              required
+              className="min-h-11"
+            />
           </Field>
-          <Button type="submit" variant="primary" size="lg" align="between">
+          {error && (
+            <p role="alert" className="flex gap-2 bg-accent-100 p-3 text-[13px] text-accent-800">
+              <Icon name="alert" size={16} />
+              {error}
+            </p>
+          )}
+          <Button type="submit" variant="primary" size="lg" align="between" disabled={submitting}>
             Giriş yap
-            <Icon name="arrowRight" />
+            {submitting ? <Spinner /> : <Icon name="arrowRight" />}
           </Button>
           <span className="text-[13px] text-neutral-700">Adminden email şifre talep et.</span>
         </form>

@@ -2,8 +2,7 @@ import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import Tag from "@/components/atoms/Tag";
-import { TODAY, CURRENT_TIME } from "@/data/mock/clock";
-import { closedDays, workingHours } from "@/data/mock/workingHours";
+import { CURRENT_TIME, TODAY } from "@/lib/clock";
 import { getDaySchedule, getOpeningStatus } from "@/lib/schedule";
 import { formatRating } from "@/lib/format";
 
@@ -16,17 +15,24 @@ function ContactRow({ icon, children }) {
   );
 }
 
-export default function SalonProfileHeader({ salon }) {
-  const status = getOpeningStatus(workingHours, closedDays, TODAY, CURRENT_TIME);
-  const today = getDaySchedule(workingHours, closedDays, TODAY);
+export default function SalonProfileHeader({ salon, hours, closedDays }) {
+  const status = getOpeningStatus(hours, closedDays, TODAY, CURRENT_TIME);
+  const today = getDaySchedule(hours, closedDays, TODAY);
+  const thumbnails = salon.portfolio.slice(0, 4);
 
   return (
     <div className="mt-4 flex flex-wrap gap-10">
       <div className="flex min-w-0 flex-[1_1_480px] flex-col gap-2">
-        <ImagePlaceholder label="salon profil görseli" className="aspect-[4/3]" />
+        <ImagePlaceholder src={salon.coverImage} alt={salon.name} label="salon profil görseli" className="aspect-[4/3]" />
         <div className="grid grid-cols-4 gap-2">
-          {[1, 2, 3, 4].map((index) => (
-            <ImagePlaceholder key={index} stripe={10} className="aspect-square" />
+          {[0, 1, 2, 3].map((index) => (
+            <ImagePlaceholder
+              key={thumbnails[index]?.id ?? index}
+              src={thumbnails[index]?.image}
+              alt={thumbnails[index]?.title ?? ""}
+              stripe={10}
+              className="aspect-square"
+            />
           ))}
         </div>
       </div>
@@ -37,7 +43,7 @@ export default function SalonProfileHeader({ salon }) {
             <span className={status.open ? "size-1.5 bg-accent-700" : "size-1.5 bg-neutral-500"} />
             {status.label}
           </Tag>
-          <Tag>{salon.audience}</Tag>
+          {salon.audience && <Tag>{salon.audience}</Tag>}
         </div>
         <h1 className="text-[clamp(32px,4vw,48px)]">{salon.name}</h1>
         <a href="#degerlendirmeler" className="flex items-center gap-2 self-start text-[15px]">
@@ -51,16 +57,20 @@ export default function SalonProfileHeader({ salon }) {
           <ContactRow icon="pin">
             <span>{salon.address}</span>
           </ContactRow>
-          <ContactRow icon="phone">
-            <a href={`tel:${salon.phone.replace(/\s/g, "")}`} className="hover:text-accent">
-              {salon.phone}
-            </a>
-          </ContactRow>
-          <ContactRow icon="mail">
-            <a href={`mailto:${salon.email}`} className="break-all hover:text-accent">
-              {salon.email}
-            </a>
-          </ContactRow>
+          {salon.phone && (
+            <ContactRow icon="phone">
+              <a href={`tel:${salon.phone.replace(/\s/g, "")}`} className="hover:text-accent">
+                {salon.phone}
+              </a>
+            </ContactRow>
+          )}
+          {salon.email && (
+            <ContactRow icon="mail">
+              <a href={`mailto:${salon.email}`} className="break-all hover:text-accent">
+                {salon.email}
+              </a>
+            </ContactRow>
+          )}
           <ContactRow icon="clock">
             <a href="#calisma-saatleri" className="hover:text-accent">
               {today.closed ? "Bugün kapalı" : `Bugün ${today.start}–${today.end}`} · Tüm saatleri gör

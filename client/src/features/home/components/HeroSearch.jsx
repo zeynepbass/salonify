@@ -6,14 +6,14 @@ import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
-import { popularSearches } from "@/data/mock/services";
+import { popularSearches } from "@/data/catalog";
 import { useLocation } from "@/features/location/LocationProvider";
 import { buildSearchHref } from "@/features/search/useSalonFilters";
 
 const SEARCH_LABEL = "Kuaför, hizmet veya saç stili ara";
 
-function getPopularHref({ serviceId, hairStyle }) {
-  return buildSearchHref(serviceId ? { serviceIds: [serviceId] } : { hairStyles: [hairStyle] });
+function getPopularHref({ categoryId, hairStyle }) {
+  return buildSearchHref(categoryId ? { serviceIds: [categoryId] } : { hairStyles: [hairStyle] });
 }
 
 export default function HeroSearch() {

@@ -10,7 +10,7 @@ npm run seed     # örnek veriyi yazar
 npm run dev      # http://localhost:5000/api
 ```
 
-`server` klasöründe bir `.env` dosyası oluşturulur:
+Proje kökünde (`salonify/.env`) bir `.env` dosyası oluşturulur. Arayüz de aynı dosyayı okur:
 
 | Değişken | Açıklama |
 | --- | --- |
@@ -20,6 +20,7 @@ npm run dev      # http://localhost:5000/api
 | `PORT` | Sunucu portu, varsayılan `5000` |
 | `CLIENT_URL` | Arayüzün adresi, birden fazlaysa virgülle ayrılır. Varsayılan `http://localhost:3000` |
 | `SEED_PASSWORD` | Örnek hesapların şifresi, varsayılan `Salonabox123` |
+| `NEXT_PUBLIC_API_URL` | Arayüzün istek attığı API adresi, örn. `http://localhost:5000/api` |
 
 ## Komutlar
 
@@ -33,16 +34,14 @@ npm run dev      # http://localhost:5000/api
 
 ## Örnek hesaplar
 
-`npm run seed` ile yazılan örnek veri arayüzdeki örnek verilerle aynı 8 salonu ve aynı kişileri içerir. Tarihler script'in çalıştığı güne göre hesaplanır; veriler eskidiğinde `npm run seed -- --reset` ile yenilenir.
+`npm run seed` tek bir salon, tek bir müşteri ve aralarında 5 bağlantılı randevu yazar. Tarihler script'in çalıştığı güne göre hesaplanır; veriler eskidiğinde `npm run seed -- --reset` ile yenilenir.
 
-Bütün örnek hesapların şifresi: **`Salonabox123`**
+Bütün örnek hesapların şifresi: **`Salonabox123`**. Arayüzdeki giriş formları bu hesaplarla dolu açılır.
 
 | Hesap | E-posta | İçinde ne var |
 | --- | --- | --- |
-| Müşteri | `elif.kaya@posta.com` | Yaklaşan, tamamlanmış, değerlendirilmiş, iptal edilmiş ve gelinmemiş randevular, bildirimler |
-| Salon | `ayse@ayseyilmazstudio.com` | Ayşe Yılmaz Studio: hizmetler, bugünkü ve ileri tarihli randevular, değerlendirmeler, portföy, kapalı gün, bildirimler |
-| Diğer müşteriler | `zeynep.bas@`, `selin.aksoy@`, `mert.gunes@`, `gizem.tan@`, `asli.er@` + `posta.com` | Ayşe Yılmaz Studio'daki randevu ve yorumların sahipleri |
-| Diğer salonlar | `nur@ateliernur.com`, `kerem@kesikhairlab.com`, `hakan@formkuafor.com`, `isik@tonisik.com`, `deniz@mavimakas.com`, `lina@linahairatelier.com`, `kuzey@kuzeysacevi.com` | Hizmetler, portföy görselleri, değerlendirmeler |
+| Müşteri | `elif.kaya@posta.com` | 2 yaklaşan, 2 tamamlanmış (biri değerlendirilmiş), 1 iptal edilmiş randevu ve bildirimler |
+| Salon | `ayse@ayseyilmazstudio.com` | Ayşe Yılmaz Studio: 3 hizmet, aynı 5 randevu, 1 değerlendirme, 2 portföy görseli, bildirimler |
 
 ## Klasör yapısı
 
@@ -293,7 +292,7 @@ Tanınmayan alanlar sessizce yok sayılır. Örneğin randevu oluştururken `sta
 
 Her yenileme eski yenileme anahtarını geçersiz kılar. Aynı anda iki yenileme isteği gönderilirse ikincisi 401 alır ve güvenlik gereği bütün oturumlar kapanır; bu yüzden yenileme isteği tek seferde yapılmalıdır.
 
-Arayüzün `.env.local` dosyasına `NEXT_PUBLIC_API_URL=http://localhost:5000/api` yazılır. Sunucudaki `CLIENT_URL` arayüzün adresiyle aynı olmalıdır, yoksa tarayıcı CORS hatası verir.
+Kök `.env` dosyasındaki `NEXT_PUBLIC_API_URL`, `PORT` ile aynı portu göstermelidir. Sunucudaki `CLIENT_URL` arayüzün adresiyle aynı olmalıdır, yoksa tarayıcı CORS hatası verir.
 
 ## Önemli istekler
 

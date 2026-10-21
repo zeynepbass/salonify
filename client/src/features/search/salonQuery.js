@@ -1,6 +1,3 @@
-import { services } from "@/data/mock/services";
-import { includesText } from "@/lib/format";
-
 export const SORT_OPTIONS = [
   { value: "puan", label: "En yüksek puan" },
   { value: "yakin", label: "En yakın" },
@@ -17,10 +14,10 @@ export const RATING_OPTIONS = [
 ];
 
 export const AVAILABILITY_OPTIONS = [
-  { value: "any", label: "Herhangi bir zaman", withinDays: Infinity },
-  { value: "today", label: "Bugün", withinDays: 0 },
-  { value: "tomorrow", label: "Yarın", withinDays: 1 },
-  { value: "week", label: "Bu hafta", withinDays: 6 },
+  { value: "any", label: "Herhangi bir zaman" },
+  { value: "today", label: "Bugün" },
+  { value: "tomorrow", label: "Yarın" },
+  { value: "week", label: "Bu hafta" },
 ];
 
 export const DEFAULT_FILTERS = {
@@ -34,36 +31,28 @@ export const DEFAULT_FILTERS = {
   page: 1,
 };
 
-const SORTERS = {
-  puan: (a, b) => b.rating - a.rating,
-  yakin: (a, b) => a.distanceKm - b.distanceKm,
-  populer: (a, b) => b.popularity - a.popularity,
-};
+const API_SORTS = { puan: "rating", yakin: "nearest", populer: "popular" };
 
-export function sortSalons(salons, sort) {
-  return [...salons].sort(SORTERS[sort] ?? SORTERS.puan);
+export function getSortOptions(hasCoordinates) {
+  return hasCoordinates ? SORT_OPTIONS : SORT_OPTIONS.filter((option) => option.value !== "yakin");
 }
 
-function matchesQuery(salon, query) {
-  if (!query.trim()) return true;
+export function buildSalonParams(filters, location, { limit, withDistance = true } = {}) {
+  const hasCoordinates = location.lat !== undefined && location.lng !== undefined;
+  const sort = API_SORTS[filters.sort] ?? API_SORTS.puan;
 
-  const serviceNames = services
-    .filter((service) => salon.featuredServiceIds.includes(service.id))
-    .map((service) => service.name);
-
-  return [salon.name, salon.neighborhood, ...serviceNames, ...salon.hairStyles].some((text) => includesText(text, query));
-}
-
-export function filterSalons(salons, filters) {
-  const { withinDays } = AVAILABILITY_OPTIONS.find((option) => option.value === filters.availability);
-
-  return salons.filter(
-    (salon) =>
-      salon.distanceKm <= filters.distance &&
-      salon.rating >= filters.minRating &&
-      salon.nextAvailableInDays <= withinDays &&
-      (filters.serviceIds.length === 0 || filters.serviceIds.some((id) => salon.featuredServiceIds.includes(id))) &&
-      (filters.hairStyles.length === 0 || filters.hairStyles.some((style) => salon.hairStyles.includes(style))) &&
-      matchesQuery(salon, filters.query),
-  );
+  return {
+    city: location.city,
+    district: location.district,
+    ...(filters.query?.trim() && { search: filters.query.trim() }),
+    ...(filters.serviceIds?.length && { category: filters.serviceIds.join(",") }),
+    ...(filters.hairStyles?.length && { hairStyle: filters.hairStyles.join(",") }),
+    ...(filters.minRating && { rating: filters.minRating }),
+    ...(filters.availability && filters.availability !== "any" && { availability: filters.availability }),
+    ...(hasCoordinates && { lat: location.lat, lng: location.lng }),
+    ...(hasCoordinates && withDistance && filters.distance && { distance: filters.distance }),
+    sort: sort === "nearest" && !hasCoordinates ? API_SORTS.puan : sort,
+    page: filters.page ?? 1,
+    ...(limit && { limit }),
+  };
 }

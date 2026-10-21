@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Icon from "@/components/atoms/Icon";
+import LogoutButton from "@/features/dashboard/components/LogoutButton";
 import { PANEL_NAV } from "@/features/dashboard/panelNav";
 import { cn } from "@/lib/cn";
 import { useBodyScrollLock, useEscapeKey } from "@/lib/hooks";
@@ -37,10 +38,10 @@ export default function PanelMenuSheet({ pathname, salonId, onClose }) {
           <Icon name="external" />
           Müşteri sitesini aç
         </Link>
-        <Link href="/panel/giris" onClick={onClose} className={cn(ITEM, "border-b-0")}>
+        <LogoutButton onDone={onClose} className={cn(ITEM, "border-b-0 text-left")}>
           <Icon name="logout" />
           Çıkış yap
-        </Link>
+        </LogoutButton>
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ export default function PhotoPicker({ photos, max, onChange }) {
 
   const addPhotos = (event) => {
     const files = Array.from(event.target.files).slice(0, max - photos.length);
-    onChange([...photos, ...files.map((file) => ({ id: crypto.randomUUID(), url: URL.createObjectURL(file) }))]);
+    onChange([...photos, ...files.map((file) => ({ id: crypto.randomUUID(), file, url: URL.createObjectURL(file) }))]);
     event.target.value = "";
   };
 
@@ -57,7 +57,7 @@ export default function PhotoPicker({ photos, max, onChange }) {
           </button>
         )}
       </div>
-      <input ref={inputRef} type="file" accept="image/*" multiple hidden onChange={addPhotos} />
+      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={addPhotos} />
     </div>
   );
 }
