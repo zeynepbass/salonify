@@ -2,7 +2,7 @@
 
 Kuaför ve güzellik salonu randevu platformu. Müşteri salonları puan, portföy ve gerçek boş saatlere göre karşılaştırır, uygun saati seçer ve randevusu onay beklemeden oluşur. Salon sahibi ise randevularını, takvimini, hizmetlerini ve portföyünü tek bir panelden yönetir.
 
-![Ana sayfa](docs/ekran-goruntuleri/anasayfa.png)
+![Ana sayfa](docs/screenshots/anasayfa.png)
 
 ## İçindekiler
 
@@ -41,19 +41,19 @@ Kuaför ve güzellik salonu randevu platformu. Müşteri salonları puan, portf�
 
 | Kuaför arama | Salon detayı |
 | --- | --- |
-| ![Kuaför arama](docs/ekran-goruntuleri/kuaforler.png) | ![Salon detayı](docs/ekran-goruntuleri/salon-detay.png) |
+| ![Kuaför arama](docs/screenshots/kuaforler.png) | ![Salon detayı](docs/screenshots/salon-detay.png) |
 
 | Randevu alma | Randevularım |
 | --- | --- |
-| ![Randevu alma](docs/ekran-goruntuleri/randevu.png) | ![Randevularım](docs/ekran-goruntuleri/randevularim.png) |
+| ![Randevu alma](docs/screenshots/randevu.png) | ![Randevularım](docs/screenshots/randevularim.png) |
 
 | Panel girişi | Panel özeti |
 | --- | --- |
-| ![Panel girişi](docs/ekran-goruntuleri/panel-giris.png) | ![Panel özeti](docs/ekran-goruntuleri/panel.png) |
+| ![Panel girişi](docs/screenshots/panel-giris.png) | ![Panel özeti](docs/screenshots/panel.png) |
 
 | Panel takvimi | Mobil görünüm |
 | --- | --- |
-| ![Panel takvimi](docs/ekran-goruntuleri/panel-takvim.png) | <img src="docs/ekran-goruntuleri/mobil.png" alt="Mobil görünüm" width="320"> |
+| ![Panel takvimi](docs/screenshots/panel-takvim.png) | <img src="docs/screenshots/mobil.png" alt="Mobil görünüm" width="320"> |
 
 ## Kullanılan teknolojiler
 
@@ -86,7 +86,7 @@ salonify/
 │   ├── src/                routes, controllers, services, models, validators
 │   ├── scripts/            örnek veri script'i
 │   └── tests/              API testleri
-└── docs/ekran-goruntuleri/ README görselleri
+└── docs/screenshots/ README görselleri
 ```
 
 ## Kurulum
