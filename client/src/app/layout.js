@@ -1,4 +1,5 @@
 import { Inter } from "next/font/google";
+import { QueryProvider } from "@/components/organisms/QueryProvider";
 import { AuthProvider } from "@/features/customer/auth/AuthProvider";
 import "@/styles/globals.css";
 
@@ -25,7 +26,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="tr" className={inter.variable}>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <QueryProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
