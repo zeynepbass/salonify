@@ -2,9 +2,6 @@ import * as appointmentService from '../services/appointment.service.js';
 import * as reviewService from '../services/review.service.js';
 import { sendSuccess } from '../utils/response.js';
 
-// Müşterinin kendi randevuları. Bütün servis çağrılarına req.user._id
-// verilir; servis katmanı randevuyu yalnızca bu müşteriye aitse bulur.
-
 export async function book(req, res) {
   sendSuccess(res, await appointmentService.bookAppointment(req.user, req.body), 201);
 }
@@ -24,8 +21,6 @@ export async function update(req, res) {
   );
 }
 
-// DELETE kaydı silmez, randevuyu CANCELLED durumuna alır. Randevu geçmişi
-// hem müşteri hem salon için korunur.
 export async function cancel(req, res) {
   sendSuccess(
     res,

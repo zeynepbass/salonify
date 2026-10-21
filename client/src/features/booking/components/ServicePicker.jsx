@@ -22,8 +22,8 @@ export default function ServicePicker({ services, value, onChange, labelledBy })
               <span className={cn("size-2", selected && "bg-accent")} />
             </span>
             <span className="min-w-0 text-[15px] font-bold">{service.name}</span>
-            <span className="text-[13px] flex-1  text-neutral-700">{formatDuration(service.duration)}</span>
-            <span className="min-w-[84px] text-right font-extrabold  text-red-600">{formatPrice(service.price)}</span>
+            <span className="flex-1 text-[13px] text-neutral-700">{formatDuration(service.duration)}</span>
+            <span className="min-w-[84px] text-right font-extrabold text-ink">{formatPrice(service.price)}</span>
           </button>
         );
       })}

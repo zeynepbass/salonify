@@ -1,4 +1,3 @@
-import { env } from '../config/env.js';
 import { UPLOAD_MAX_BYTES } from '../constants/index.js';
 import { ApiError, isDuplicateKeyError } from '../utils/ApiError.js';
 
@@ -6,7 +5,6 @@ export function notFoundHandler(req, _res, next) {
   next(new ApiError(404, `${req.method} ${req.originalUrl} bulunamadı.`));
 }
 
-// Bilinen hata tiplerini kullanıcıya gösterilebilir bir cevaba çevirir.
 function toApiError(error) {
   if (error instanceof ApiError) return error;
 
@@ -27,19 +25,10 @@ function toApiError(error) {
   return null;
 }
 
-// Express, dört parametreli middleware'i hata yakalayıcı olarak tanır.
-// Route'larda fırlatılan bütün hatalar buraya düşer ve tek bir formatta
-// cevaplanır: { success: false, message }.
-//
-// Beklenmeyen hatalarda (kod hatası, veritabanı kesintisi) gerçek mesajı
-// ve stack trace'i kullanıcıya göndermiyoruz; bunlar tablo adları, dosya
-// yolları gibi saldırgana ipucu verecek bilgiler içerebilir. Detay yalnızca
-// sunucu loguna yazılır.
 export function errorHandler(error, _req, res, _next) {
   const apiError = toApiError(error);
 
   if (!apiError) {
-    if (!env.isTest) console.error(error);
     return res.status(500).json({ success: false, message: 'Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.' });
   }
 

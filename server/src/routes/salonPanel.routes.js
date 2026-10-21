@@ -15,10 +15,6 @@ import { createServiceSchema, serviceIdParams, updateServiceSchema } from '../va
 
 const router = Router();
 
-// Bu router'daki her uç için sırasıyla: giriş yapılmış mı (authenticate),
-// rol SALON mı (authorize), kullanıcının salonu hangisi (attachSalon).
-// Kontroller router seviyesinde tanımlandığı için yeni eklenen bir uçta
-// yetki kontrolünü unutmak mümkün değildir.
 router.use(salonOnly);
 
 router.get('/', controller.getMySalon);

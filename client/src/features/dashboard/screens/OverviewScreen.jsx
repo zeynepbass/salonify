@@ -25,7 +25,7 @@ function StatCard({ stat }) {
         <Icon name={stat.icon} />
         {stat.label}
       </span>
-      <span className={cn("text-[52px] leading-none font-extrabold tracking-[-0.03em]", stat.alert && "text-accent-700")}>
+      <span className={cn("text-[52px] leading-none font-extrabold", stat.alert && "text-accent-700")}>
         {stat.value}
       </span>
       <span className="text-[12px] text-neutral-700">{stat.caption}</span>

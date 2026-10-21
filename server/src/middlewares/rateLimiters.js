@@ -18,6 +18,4 @@ export const apiLimiter = createLimiter(600, 'Çok fazla istek gönderildi. Lüt
 
 export const uploadLimiter = createLimiter(60, 'Çok fazla dosya yüklendi. Lütfen biraz sonra tekrar deneyin.');
 
-// Giriş ve kayıt uçları şifre deneme (brute force) saldırılarının hedefidir;
-// bu yüzden genel limitten çok daha sıkı bir limit uyguluyoruz.
 export const authLimiter = createLimiter(20, 'Çok fazla deneme yapıldı. Lütfen 15 dakika sonra tekrar deneyin.');

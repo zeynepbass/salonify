@@ -13,8 +13,6 @@ import { createReviewSchema } from '../validators/review.validator.js';
 
 const router = Router();
 
-// Bu uçlar müşterinin kendi randevuları içindir. Salonlar randevularını
-// /api/salon/me/appointments üzerinden yönetir.
 router.use(customerOnly);
 
 router.post('/', validate(bookAppointmentSchema), controller.book);

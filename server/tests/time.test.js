@@ -25,7 +25,6 @@ describe('time utils', () => {
   });
 
   it('"şu an"ı salonun saat dilimine göre hesaplar', () => {
-    // UTC 22:30 -> İstanbul'da (UTC+3) ertesi gün 01:30.
     const now = getSalonNow(new Date('2026-10-07T22:30:00Z'));
     assert.deepEqual(now, { date: '2026-10-08', time: '01:30', minutes: 90 });
   });

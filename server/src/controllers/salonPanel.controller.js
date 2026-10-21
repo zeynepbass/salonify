@@ -6,11 +6,6 @@ import * as salonService from '../services/salon.service.js';
 import * as scheduleService from '../services/schedule.service.js';
 import { sendSuccess } from '../utils/response.js';
 
-// Salon paneli uçları (/api/salon/me/...). Hangi salon üzerinde işlem
-// yapılacağı her zaman req.salon'dan gelir; bu değeri attachSalon middleware'i
-// giriş yapan kullanıcıdan türetir. Controller'lar salon kimliğini istekten
-// hiçbir zaman okumaz.
-
 export async function getMySalon(req, res) {
   sendSuccess(res, req.salon);
 }
@@ -22,8 +17,6 @@ export async function updateMySalon(req, res) {
 export async function dashboard(req, res) {
   sendSuccess(res, await getDashboard(req.salon));
 }
-
-// --- Hizmetler ---
 
 export async function listServices(req, res) {
   sendSuccess(res, await catalogService.listSalonServices(req.salon._id));
@@ -42,8 +35,6 @@ export async function deleteService(req, res) {
   sendSuccess(res, { message: 'Hizmet silindi.' });
 }
 
-// --- Çalışma saatleri ve kapalı günler ---
-
 export async function updateWorkingHours(req, res) {
   sendSuccess(res, await scheduleService.updateWorkingHours(req.salon._id, req.body.days));
 }
@@ -56,8 +47,6 @@ export async function deleteBlockedDate(req, res) {
   await scheduleService.removeBlockedDate(req.salon._id, req.params.id);
   sendSuccess(res, { message: 'Kapalı gün kaldırıldı.' });
 }
-
-// --- Randevular ---
 
 export async function listAppointments(req, res) {
   sendSuccess(res, await appointmentService.listSalonAppointments({ salonId: req.salon._id, ...req.query }));
@@ -77,8 +66,6 @@ export async function cancelAppointment(req, res) {
     await appointmentService.cancelSalonAppointment(req.salon._id, req.params.appointmentId, req.body.reason),
   );
 }
-
-// --- Portföy ---
 
 export async function listPortfolio(req, res) {
   sendSuccess(res, await portfolioService.listSalonPortfolio(req.salon._id));

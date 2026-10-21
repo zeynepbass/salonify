@@ -6,13 +6,9 @@ import { listNotificationsSchema, notificationIdSchema } from '../validators/not
 
 const router = Router();
 
-// Müşteri de salon da aynı uçları kullanır; herkes yalnızca kendi
-// bildirimlerini görür.
 router.use(authenticate);
 
 router.get('/', validate(listNotificationsSchema), controller.list);
-// Sabit yol, parametreli yoldan önce tanımlanmalı; aksi halde "read-all"
-// bir notificationId gibi yorumlanır.
 router.patch('/read-all', controller.markAllRead);
 router.patch('/:notificationId/read', validate(notificationIdSchema), controller.markRead);
 

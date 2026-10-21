@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
 import { schemaOptions } from '../utils/schemaOptions.js';
 
-// Haftalık düzenin dışında, salonun tamamen kapalı olduğu tek seferlik günler
-// (tatil, eğitim vb.).
 const blockedDateSchema = new mongoose.Schema(
   {
     salon: { type: mongoose.Schema.Types.ObjectId, ref: 'Salon', required: true },

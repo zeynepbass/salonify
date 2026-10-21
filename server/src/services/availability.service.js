@@ -18,7 +18,6 @@ const BLOCK_MESSAGES = {
   TAKEN: SLOT_TAKEN_MESSAGE,
 };
 
-// Haftalık çalışma kaydını ve kapalı gün bilgisini hesaplamaya uygun hale getirir.
 function buildSchedule(hours, blocked) {
   if (!hours || hours.isClosed || blocked) return { closed: true };
 
@@ -30,7 +29,6 @@ function buildSchedule(hours, blocked) {
   };
 }
 
-// Salonun belirli bir gündeki çalışma düzeni: haftalık saatler + kapalı günler.
 async function getDaySchedule(salonId, date) {
   const [hours, blocked] = await Promise.all([
     WorkingHours.findOne({ salon: salonId, dayOfWeek: getDayOfWeek(date) }),
@@ -39,9 +37,6 @@ async function getDaySchedule(salonId, date) {
   return buildSchedule(hours, blocked);
 }
 
-// O güne ait dolu aralıklar. Yalnızca BOOKED randevular saati meşgul eder;
-// iptal edilen randevunun saati yeniden müsaittir. Bir randevu düzenlenirken
-// kendi saatinin "dolu" sayılmaması için excludeAppointmentId kullanılır.
 async function getBusyRanges(salonId, date, excludeAppointmentId) {
   const filter = { salon: salonId, date, status: APPOINTMENT_STATUS.BOOKED };
   if (excludeAppointmentId) filter._id = { $ne: excludeAppointmentId };
@@ -50,16 +45,10 @@ async function getBusyRanges(salonId, date, excludeAppointmentId) {
   return appointments.map((item) => [timeToMinutes(item.startTime), timeToMinutes(item.endTime)]);
 }
 
-// Tek bir zaman aralığının neden alınamayacağını döndürür; alınabiliyorsa null.
-// Hem müsaitlik listesi hem de randevu oluşturma aynı fonksiyonu kullanır.
-// Kurallar tek yerde durduğu için "listede müsait görünen saat kayıtta
-// reddedildi" gibi tutarsızlıklar oluşmaz.
 function getBlockReason({ date, start, end, schedule, busy, now }) {
   if (date < now.date) return 'PAST';
   if (date > addDays(now.date, MAX_BOOKING_DAYS_AHEAD)) return 'TOO_FAR';
   if (schedule.closed) return 'CLOSED';
-  // Hizmetin tamamı kapanıştan önce bitmeli: 18:30'da başlayan 60 dakikalık
-  // bir hizmet, 19:00'da kapanan salonda alınamaz.
   if (start < schedule.open || end > schedule.close) return 'OUTSIDE_HOURS';
   if (schedule.breaks.some(([breakStart, breakEnd]) => rangesOverlap(start, end, breakStart, breakEnd))) return 'BREAK';
   if (date === now.date && start <= now.minutes) return 'PAST';
@@ -67,9 +56,6 @@ function getBlockReason({ date, start, end, schedule, busy, now }) {
   return null;
 }
 
-// Bir gün için, verilen süreye sığan bütün başlangıç saatlerini üretir.
-// Açılıştan itibaren 30 dakikalık adımlarla ilerler; hizmetin tamamı
-// kapanıştan önce bitmelidir.
 function listSlots({ date, duration, schedule, busy, now }) {
   if (schedule.closed || date < now.date || date > addDays(now.date, MAX_BOOKING_DAYS_AHEAD)) return [];
 
@@ -82,25 +68,17 @@ function listSlots({ date, duration, schedule, busy, now }) {
   return slots;
 }
 
-// MÜSAİTLİK HESABI
-// Frontend yalnızca sonucu gösterir; hangi saatin alınabilir olduğuna
-// backend karar verir. Aksi halde istemci tarafındaki bir hata ya da
-// kasıtlı bir istek, kapalı güne veya dolu saate randevu yazabilirdi.
 export async function getAvailability({ salonId, serviceId, date, excludeAppointmentId }) {
   if (!(await Salon.exists({ _id: salonId }))) throw new ApiError(404, 'Salon bulunamadı.');
 
-  // 1-2. Hizmeti ve süresini bul (hizmet bu salona ait ve aktif olmalı).
   const service = await Service.findOne({ _id: serviceId, salon: salonId, isActive: true });
   if (!service) throw new ApiError(404, 'Hizmet bulunamadı.');
 
-  // 3-5. Çalışma saatleri, molalar ve kapalı günler.
-  // 6. O günün BOOKED randevuları.
   const [schedule, busy] = await Promise.all([
     getDaySchedule(salonId, date),
     getBusyRanges(salonId, date, excludeAppointmentId),
   ]);
 
-  // 7-8. Çakışan başlangıç saatlerini ele ve sonucu döndür.
   const slots = listSlots({ date, duration: service.duration, schedule, busy, now: getSalonNow() });
 
   return {
@@ -116,8 +94,6 @@ export async function getAvailability({ salonId, serviceId, date, excludeAppoint
   };
 }
 
-// Panel özeti için: salonun o gün kaç dakika açık olduğu ve en kısa
-// randevu dilimi için kaç boş başlangıç saati kaldığı.
 export async function getDayLoad(salonId, date) {
   const [schedule, busy] = await Promise.all([getDaySchedule(salonId, date), getBusyRanges(salonId, date)]);
   if (schedule.closed) return { openMinutes: 0, freeSlotCount: 0 };
@@ -131,13 +107,6 @@ export async function getDayLoad(salonId, date) {
   };
 }
 
-// Arama ekranındaki "Bugün / Yarın / Bu hafta müsait" filtresi için:
-// verilen salonlardan, önümüzdeki `withinDays` gün içinde en az bir boş
-// saati olanları döndürür.
-//
-// Her salon için ayrı ayrı sorgu atmak yerine (N+1) gereken veriyi dört
-// toplu sorguyla çekip hesabı bellekte yapıyoruz. Kullanılan kurallar tek
-// salon müsaitliğindekiyle aynıdır (listSlots).
 export async function filterSalonsWithOpenSlot(salonIds, withinDays) {
   if (salonIds.length === 0) return [];
 
@@ -149,7 +118,6 @@ export async function filterSalonsWithOpenSlot(salonIds, withinDays) {
     WorkingHours.find(inSalons),
     BlockedDate.find({ ...inSalons, date: { $in: dates } }).select('salon date'),
     Appointment.find({ ...inSalons, date: { $in: dates }, status: APPOINTMENT_STATUS.BOOKED }).select('salon date startTime endTime'),
-    // Bir saatin "boş" sayılması için salonun en kısa aktif hizmeti sığmalı.
     Service.aggregate([
       { $match: { ...inSalons, isActive: true } },
       { $group: { _id: '$salon', duration: { $min: '$duration' } } },
@@ -168,7 +136,6 @@ export async function filterSalonsWithOpenSlot(salonIds, withinDays) {
 
   return salonIds.filter((salonId) => {
     const duration = minDuration.get(String(salonId));
-    // Aktif hizmeti olmayan salondan randevu alınamaz.
     if (!duration) return false;
 
     return dates.some((date) => {
@@ -180,9 +147,6 @@ export async function filterSalonsWithOpenSlot(salonIds, withinDays) {
   });
 }
 
-// Randevu oluşturulmadan / taşınmadan hemen önce çağrılır. Müsaitlik listesi
-// birkaç dakika önce alınmış olabilir; bu yüzden kayıt anında kurallar
-// yeniden uygulanır.
 export async function assertSlotAvailable({ salonId, date, startTime, duration, excludeAppointmentId }) {
   const start = timeToMinutes(startTime);
   const end = start + duration;

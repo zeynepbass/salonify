@@ -13,20 +13,13 @@ const ALREADY_REVIEWED = 'Bu randevu için daha önce değerlendirme yapılmış
 export async function createReview(customer, appointmentId, { rating, comment, hairPhoto, hairPhotos, isPublic }) {
   const photos = [...new Set([...(hairPhotos ?? []), ...(hairPhoto ? [hairPhoto] : [])])];
 
-  // 1. Randevu giriş yapan müşteriye mi ait?
-  // Yalnızca gerçekten o salondan hizmet almış kişi değerlendirme yazabilir.
-  // Başkasının randevusu için "bulunamadı" dönüyoruz.
   const appointment = await Appointment.findOne({ _id: appointmentId, customer: customer._id });
   if (!appointment) throw new ApiError(404, 'Randevu bulunamadı.');
 
-  // 2. Randevu tamamlandı mı?
-  // İptal edilen, gelinmeyen veya henüz gerçekleşmemiş bir randevu için
-  // değerlendirme yapılamaz; aksi halde alınmamış bir hizmete puan verilebilirdi.
   if (appointment.status !== APPOINTMENT_STATUS.COMPLETED) {
     throw new ApiError(409, 'Yalnızca tamamlanan randevular değerlendirilebilir.');
   }
 
-  // 3. Daha önce değerlendirme var mı?
   if (appointment.isReviewed) throw new ApiError(409, ALREADY_REVIEWED);
 
   let review;
@@ -42,8 +35,6 @@ export async function createReview(customer, appointmentId, { rating, comment, h
       isPublic,
     });
   } catch (error) {
-    // Aynı anda gelen iki istek üstteki kontrolü birlikte geçebilir; bu
-    // durumda Review.appointment üzerindeki unique index ikincisini reddeder.
     if (isDuplicateKeyError(error, 'appointment')) throw new ApiError(409, ALREADY_REVIEWED);
     throw error;
   }
@@ -51,9 +42,6 @@ export async function createReview(customer, appointmentId, { rating, comment, h
   await Appointment.updateOne({ _id: appointment._id }, { isReviewed: true });
   await refreshSalonRating(appointment.salon);
 
-  // Müşterinin fotoğrafları salonun portföy havuzuna "yayında değil" olarak
-  // düşer. hasConsent müşterinin verdiği izni taşır: izin yoksa salon bu
-  // görselleri hiçbir şekilde yayınlayamaz.
   await Portfolio.insertMany(
     photos.map((image) => ({
       salon: appointment.salon,
@@ -84,13 +72,9 @@ export async function createReview(customer, appointmentId, { rating, comment, h
   return review;
 }
 
-// Salon profilinde gösterilen değerlendirmeler.
 export async function listSalonReviews({ salonId, page, limit }) {
   const salon = await assertSalonExists(salonId);
 
-  // RIZA: Yalnızca müşterinin paylaşım izni verdiği (isPublic: true)
-  // değerlendirmeler listelenir. İzin verilmeyenlerin adı, yorumu ve
-  // fotoğrafı bu uçtan hiçbir koşulda dönmez.
   const filter = { salon: salon._id, isPublic: true };
 
   const [reviews, total, distribution] = await Promise.all([
@@ -100,8 +84,6 @@ export async function listSalonReviews({ salonId, page, limit }) {
       .limit(limit)
       .populate('customer', 'name'),
     Review.countDocuments(filter),
-    // Puan dağılımı bütün değerlendirmelerden hesaplanır; yalnızca sayı
-    // içerdiği için kimseyi tanımlamaz.
     Review.aggregate([{ $match: { salon: salon._id } }, { $group: { _id: '$rating', count: { $sum: 1 } } }]),
   ]);
 
@@ -117,7 +99,6 @@ export async function listSalonReviews({ salonId, page, limit }) {
         return { stars, count, percent: totalCount ? Math.round((count / totalCount) * 100) : 0 };
       }),
     },
-    // Müşteri kaydının tamamı yerine yalnızca gösterilecek alanlar seçilir.
     items: reviews.map((review) => ({
       id: review.id,
       authorName: review.customer?.name ?? 'Müşteri',
@@ -132,7 +113,6 @@ export async function listSalonReviews({ salonId, page, limit }) {
   };
 }
 
-// Müşteri kendi yazdığı bütün değerlendirmeleri (özel olanlar dahil) görür.
 export async function listCustomerReviews({ customerId, page, limit }) {
   const filter = { customer: customerId };
 

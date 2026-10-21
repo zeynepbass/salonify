@@ -12,13 +12,10 @@ import { filterSalonsWithOpenSlot } from './availability.service.js';
 
 const EARTH_RADIUS_KM = 6371;
 const AVAILABILITY_WINDOWS = { today: 0, tomorrow: 1, week: 6 };
-// Müsaitlik filtresi aday salonları bellekte değerlendirir; sınırsız
-// büyümemesi için aday sayısı sınırlanır.
 const MAX_AVAILABILITY_CANDIDATES = 500;
 
 export const toPoint = ({ lat, lng }) => ({ type: 'Point', coordinates: [lng, lat] });
 
-// İki koordinat arasındaki kuş uçuşu mesafe (haversine formülü).
 function distanceInKm(from, to) {
   const toRadians = (degrees) => (degrees * Math.PI) / 180;
   const dLat = toRadians(to.lat - from.lat);
@@ -36,8 +33,6 @@ const SORTS = {
 
 export async function createSalonForOwner(owner, details) {
   const salon = await Salon.create({ ...details, owner: owner._id, email: details.email ?? owner.email });
-  // Yeni salon varsayılan bir haftalık düzenle başlar; aksi halde salon
-  // çalışma saatlerini girene kadar hiçbir gün için müsaitlik hesaplanamaz.
   await WorkingHours.insertMany(DEFAULT_WORKING_HOURS.map((day) => ({ ...day, salon: salon._id })));
   await syncSalonCatalog(salon._id);
   return salon;
@@ -73,14 +68,9 @@ export async function listSalons({
   if (hairStyle?.length) filter.hairStyles = { $in: hairStyle };
   if (rating) filter.rating = { $gte: rating };
   if (search) {
-    // Kullanıcının yazdığı metin regex'e doğrudan verilmez; özel karakterler
-    // kaçırılır. Aksi halde ".*" gibi girdilerle sorgu manipüle edilebilir
-    // veya çok pahalı ifadelerle sunucu yorulabilir (ReDoS).
     filter.searchText = { $regex: escapeRegex(normalizeText(search)) };
   }
 
-  // Mesafe filtresi: kullanıcının konumunu merkez alan daire içindeki
-  // salonlar. $centerSphere yarıçapı radyan cinsinden ister.
   if (origin && distance) {
     filter.location = { $geoWithin: { $centerSphere: [[lng, lat], distance / EARTH_RADIUS_KM] } };
   }
@@ -91,9 +81,6 @@ export async function listSalons({
     filter._id = { $in: await filterSalonsWithOpenSlot(ids, AVAILABILITY_WINDOWS[availability]) };
   }
 
-  // "En yakın" sıralamasında sonuçları MongoDB mesafeye göre sıralı döndürür
-  // ($nearSphere). Bu operatör countDocuments ile kullanılamadığı için toplam
-  // sayı, aynı alanı kapsayan filtreyle ayrıca hesaplanır.
   const countFilter = { ...filter };
   let query;
   if (sort === 'nearest') {
@@ -108,7 +95,6 @@ export async function listSalons({
 
   const [salons, total] = await Promise.all([query.skip((page - 1) * limit).limit(limit), Salon.countDocuments(countFilter)]);
 
-  // Konum gönderildiyse her salonun kullanıcıya uzaklığı da eklenir.
   const items = salons.map((salon) => {
     const item = salon.toJSON();
     if (origin) item.distanceKm = item.coordinates ? distanceInKm(origin, item.coordinates) : null;
@@ -131,31 +117,24 @@ export async function getSalonDetail(salonId) {
   return { ...salon.toJSON(), services, portfolio, workingHours: sortWeek(workingHours), blockedDates };
 }
 
-// Herkese açık portföy: yalnızca salonun yayınladığı VE (müşteri fotoğrafıysa)
-// müşterinin paylaşım izni verdiği görseller.
 export function listPublicPortfolio(salonId) {
   return Portfolio.find({ salon: salonId, isPublished: true, hasConsent: true })
     .sort({ createdAt: -1 })
     .select('image title description customerName rating createdAt');
 }
 
-// Haftayı Pazartesi'den başlatır (0 = Pazar en sona gelir).
 export function sortWeek(days) {
   return [...days].sort((a, b) => ((a.dayOfWeek + 6) % 7) - ((b.dayOfWeek + 6) % 7));
 }
 
 export async function updateSalonProfile(salon, { coordinates, ...changes }) {
   salon.set(changes);
-  // null gönderilirse koordinat kaldırılır.
   if (coordinates !== undefined) salon.location = coordinates ? toPoint(coordinates) : undefined;
   await salon.save();
   await syncSalonCatalog(salon._id);
   return Salon.findById(salon._id);
 }
 
-// Salonun aktif hizmetlerinden türetilen alanları (kategoriler, başlangıç
-// fiyatı, arama metni) günceller. Hizmet veya profil her değiştiğinde
-// çağrılır; böylece listeleme sorguları tek koleksiyondan cevaplanabilir.
 export async function syncSalonCatalog(salonId) {
   const [salon, services] = await Promise.all([
     Salon.findById(salonId),
@@ -178,9 +157,6 @@ export async function syncSalonCatalog(salonId) {
   );
 }
 
-// Ortalama puan bütün değerlendirmelerden (herkese açık olsun olmasın)
-// hesaplanır. Ortalama anonim bir toplamdır ve kimseyi ifşa etmez; yalnızca
-// izin verilen yorumların içeriği gösterilir.
 export async function refreshSalonRating(salonId) {
   const [stats] = await Review.aggregate([
     { $match: { salon: salonId } },

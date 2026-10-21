@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { isValidDateString, TIME_PATTERN } from '../utils/time.js';
 
-// Kimlikler veritabanına gitmeden önce biçim olarak doğrulanır. Geçersiz bir
-// ObjectId ile sorgu atmak Mongoose'un CastError fırlatmasına yol açar;
-// burada yakalayıp anlaşılır bir 400 dönüyoruz.
 export const objectId = (label = 'Kimlik') => z.string(`${label} gerekli.`).regex(/^[0-9a-fA-F]{24}$/, `${label} geçersiz.`);
 
 export const dateString = z.string('Tarih gerekli.').refine(isValidDateString, 'Tarih YYYY-AA-GG biçiminde geçerli bir tarih olmalı.');
@@ -18,8 +15,6 @@ export const phone = z
   .max(20, 'Telefon numarası en fazla 20 karakter olabilir.')
   .regex(/^[0-9+() -]*$/, 'Telefon numarası geçersiz.');
 
-// Görseller URL olarak saklanır. javascript: gibi şemaların img/link içinde
-// çalıştırılmasını önlemek için yalnızca http(s) kabul edilir.
 export const imageUrl = z
   .string('Görsel adresi gerekli.')
   .trim()
@@ -48,7 +43,6 @@ export const coordinates = z.object({
 
 export const booleanQuery = z.enum(['true', 'false']).transform((value) => value === 'true');
 
-// "kesim,boya" -> ["kesim", "boya"]
 export const csvList = z
   .string()
   .transform((value) => value.split(',').map((item) => item.trim()).filter(Boolean));
@@ -65,7 +59,6 @@ export function paginationQuery(maxLimit = 50, defaultLimit = 20) {
   };
 }
 
-// PATCH isteklerinde hiçbir alan gönderilmemesi anlamlı değildir.
 export const atLeastOneField = [(data) => Object.keys(data).length > 0, 'Güncellenecek en az bir alan gönderin.'];
 
 export const salonIdParams = z.object({ salonId: objectId('Salon kimliği') });

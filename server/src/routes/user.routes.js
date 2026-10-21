@@ -16,10 +16,7 @@ router.use(authenticate);
 
 router.get('/me', controller.getMe);
 router.patch('/me', validate(updateProfileSchema), controller.updateMe);
-// Şifre denemesi içerdikleri için giriş uçlarıyla aynı sıkı limite tabidir.
 router.patch('/me/password', authLimiter, validate(changePasswordSchema), controller.updatePassword);
-// Hesap silme frontend'de yalnızca müşteri profilinde bulunur. Salon hesabı
-// silmek salonun bütün verisini etkileyeceği için bu uçla yapılamaz.
 router.delete('/me', authLimiter, customer, validate(deleteAccountSchema), controller.deleteMe);
 router.get('/me/appointments', customer, validate(listCustomerAppointmentsSchema), controller.listMyAppointments);
 router.get('/me/reviews', customer, validate({ query: paginationOnlyQuery }), controller.listMyReviews);
