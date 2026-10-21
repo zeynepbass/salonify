@@ -1,4 +1,4 @@
-import WorkingHoursScreen from "@/features/customer/screens/WorkingHoursScreen";
+import WorkingHoursScreen from "@/features/panel/screens/WorkingHoursScreen";
 
 export const metadata = { title: "Çalışma saatleri" };
 

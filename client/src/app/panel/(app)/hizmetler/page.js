@@ -1,4 +1,4 @@
-import ServicesScreen from "@/features/customer/screens/ServicesScreen";
+import ServicesScreen from "@/features/panel/screens/ServicesScreen";
 
 export const metadata = { title: "Hizmetler" };
 

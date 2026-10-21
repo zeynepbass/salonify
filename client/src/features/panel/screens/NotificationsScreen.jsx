@@ -6,7 +6,7 @@ import Button from "@/components/atoms/Button";
 import SearchInput from "@/components/molecules/SearchInput";
 import StateMessage from "@/components/molecules/StateMessage";
 import NotificationList from "@/components/organisms/NotificationList";
-import { usePanel } from "@/features/customer/PanelProvider";
+import { usePanel } from "@/features/panel/PanelProvider";
 import { useNotifications } from "@/features/notifications/NotificationsProvider";
 
 export default function NotificationsScreen() {

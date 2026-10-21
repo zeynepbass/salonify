@@ -70,7 +70,6 @@ export default function Lightbox({ items, index, onChange, onClose }) {
           key={item.id}
           src={item.image}
           alt={item.title}
-          label="saç fotoğrafı · tam boyut"
           tone="dark"
           stripe={16}
           className="aspect-[4/5] h-[min(72vh,760px)] max-w-full animate-rise sm:max-w-[calc(100vw-168px)]"

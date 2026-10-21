@@ -1,4 +1,4 @@
-import AppointmentsScreen from "@/features/customer/screens/AppointmentsScreen";
+import AppointmentsScreen from "@/features/panel/screens/AppointmentsScreen";
 
 export const metadata = { title: "Randevular" };
 

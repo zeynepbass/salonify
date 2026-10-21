@@ -26,7 +26,6 @@ export default function PortfolioGallery({ items }) {
               <ImagePlaceholder
                 src={item.image}
                 alt={item.title}
-                label="saç fotoğrafı"
                 stripe={12}
                 className="aspect-[4/5] w-full"
                 imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"

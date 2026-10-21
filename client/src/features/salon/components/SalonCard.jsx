@@ -18,7 +18,7 @@ export default function SalonCard({ salon }) {
   return (
     <article className="relative flex flex-col bg-surface transition-shadow duration-150 focus-within:shadow-md hover:shadow-md">
       <div className="relative">
-        <ImagePlaceholder src={salon.coverImage} alt={salon.name} label="salon fotoğrafı" className="aspect-[4/3]" />
+        <ImagePlaceholder src={salon.coverImage} alt={salon.name} className="aspect-[4/3]" />
         <div className="absolute top-0 left-0 flex items-center gap-1.5 bg-canvas px-2.5 py-1.5 text-[14px] font-extrabold">
           <Icon name="star" size={14} filled className="text-accent" />
           {formatRating(salon.rating)}

@@ -5,8 +5,8 @@ import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/customer/PanelProvider";
-import ServiceFormDialog from "@/features/customer/components/ServiceFormDialog";
+import { usePanel } from "@/features/panel/PanelProvider";
+import ServiceFormDialog from "@/features/panel/components/ServiceFormDialog";
 import { getErrorMessage } from "@/lib/api";
 import { formatDuration, formatPrice } from "@/lib/format";
 

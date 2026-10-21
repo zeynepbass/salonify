@@ -32,10 +32,10 @@ Kuaför ve güzellik salonu randevu platformu. Müşteri salonları puan, portf�
 - Günün özeti, doluluk oranı ve yaklaşan randevular
 - Günlük ve haftalık takvim görünümü
 - Elle randevu girme, randevuyu tamamlandı / gelmedi olarak işaretleme
-- Hizmet ekleme, düzenleme, pasife alma
+- Hizmet ekleme, düzenleme, silme
 - Çalışma saatleri ve kapalı günler
 - Portföy yönetimi, müşteri fotoğraflarını izinle yayınlama
-- Salon profili ve bildirimler
+- Salon profili, bildirimleri tek tek veya toptan silme
 
 ## Ekran görüntüleri
 

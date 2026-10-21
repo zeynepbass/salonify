@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Icon from "@/components/atoms/Icon";
-import LogoutButton from "@/features/customer/components/LogoutButton";
-import { PANEL_NAV } from "@/features/customer/panelNav";
+import LogoutButton from "@/features/panel/components/LogoutButton";
+import { PANEL_NAV } from "@/features/panel/panelNav";
 import { cn } from "@/lib/cn";
 import { useBodyScrollLock, useEscapeKey } from "@/lib/hooks";
 
