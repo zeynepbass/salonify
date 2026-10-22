@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import { Input } from "@/components/atoms/Input";
@@ -10,59 +9,39 @@ import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
 import Tabs from "@/components/molecules/Tabs";
 import { demoAccounts } from "@/data/catalog";
-import { useAuth } from "@/features/customer/auth/AuthProvider";
-import { useLogin, useLogout, useRegister } from "@/features/customer/auth/hooks/useAuth";
+import { useRoleGuardedAuth } from "@/features/shared/auth/hooks/useAuthMutations";
+import { useRedirectWhenSignedIn } from "@/features/shared/auth/hooks/useAuthRedirect";
 
 const INITIAL_FORM = { name: "", phone: "", ...demoAccounts.customer };
-
-function getSafeNext(value) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/randevularim";
-}
+const MIN_PASSWORD_LENGTH = 8;
 
 export default function CustomerLoginPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { status, user } = useAuth();
   const [mode, setMode] = useState("login");
   const [form, setForm] = useState(INITIAL_FORM);
-  const [roleError, setRoleError] = useState(null);
-  const logout = useLogout();
-  const rejectSalonAccount = (signedIn) => {
-    if (signedIn.role === "CUSTOMER") return;
-    logout.mutate();
-    setRoleError("Bu hesap bir kuaför hesabı. Kuaför paneli girişini kullanın.");
-  };
-  const loginMutation = useLogin({ onSuccess: rejectSalonAccount });
-  const registerMutation = useRegister({ onSuccess: rejectSalonAccount });
-  const activeMutation = mode === "login" ? loginMutation : registerMutation;
+  const auth = useRoleGuardedAuth("CUSTOMER", "Bu hesap bir kuaför hesabı. Kuaför paneli girişini kullanın.");
+  const activeMutation = mode === "login" ? auth.login : auth.register;
   const submitting = activeMutation.isPending;
 
-  const next = getSafeNext(searchParams.get("next"));
-
-  useEffect(() => {
-    if (status === "authenticated" && user.role === "CUSTOMER") router.replace(next);
-  }, [status, user, next, router]);
+  useRedirectWhenSignedIn("CUSTOMER", { fallback: "/randevularim" });
 
   const setField = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
 
   const changeMode = (value) => {
     setMode(value);
-    setRoleError(null);
-    loginMutation.reset();
-    registerMutation.reset();
+    auth.reset();
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (submitting) return;
-    setRoleError(null);
+    auth.reset();
 
     if (mode === "login") {
-      loginMutation.mutate({ email: form.email.trim(), password: form.password });
+      auth.login.mutate({ email: form.email.trim(), password: form.password });
       return;
     }
 
-    registerMutation.mutate({
+    auth.register.mutate({
       name: form.name.trim(),
       email: form.email.trim(),
       password: form.password,
@@ -98,20 +77,20 @@ export default function CustomerLoginPage() {
         <Field label="E-posta" htmlFor="auth-email">
           <Input id="auth-email" type="email" value={form.email} onChange={setField("email")} autoComplete="email" required className="min-h-11" />
         </Field>
-        <Field label="Şifre" hint={mode === "register" ? "en az 8 karakter" : undefined} htmlFor="auth-password">
+        <Field label="Şifre" hint={mode === "register" ? `en az ${MIN_PASSWORD_LENGTH} karakter` : undefined} htmlFor="auth-password">
           <Input
             id="auth-password"
             type="password"
             value={form.password}
             onChange={setField("password")}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
-            minLength={mode === "register" ? 8 : undefined}
+            minLength={mode === "register" ? MIN_PASSWORD_LENGTH : undefined}
             required
             className="min-h-11"
           />
         </Field>
 
-        <ErrorNotice error={roleError ?? activeMutation.error} />
+        <ErrorNotice error={auth.roleError ?? activeMutation.error} />
 
         <Button type="submit" variant="primary" size="lg" align="between" disabled={submitting}>
           {mode === "login" ? "Giriş yap" : "Kayıt ol"}

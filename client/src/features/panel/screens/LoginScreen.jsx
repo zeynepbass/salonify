@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import { Input } from "@/components/atoms/Input";
@@ -11,40 +10,21 @@ import Spinner from "@/components/atoms/Spinner";
 import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
 import { demoAccounts } from "@/data/catalog";
-import { useAuth } from "@/features/customer/auth/AuthProvider";
-import { useLogin, useLogout } from "@/features/customer/auth/hooks/useAuth";
-
-function getSafeNext(value) {
-  return value?.startsWith("/panel") ? value : "/panel";
-}
+import { useRoleGuardedAuth } from "@/features/shared/auth/hooks/useAuthMutations";
+import { useRedirectWhenSignedIn } from "@/features/shared/auth/hooks/useAuthRedirect";
 
 export default function LoginScreen() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { status, user } = useAuth();
   const [form, setForm] = useState(demoAccounts.salon);
-  const [roleError, setRoleError] = useState(null);
-  const logout = useLogout();
-  const login = useLogin({
-    onSuccess: (signedIn) => {
-      if (signedIn.role === "SALON") return;
-      logout.mutate();
-      setRoleError("Bu hesap bir kuaför hesabı değil. Müşteri girişini kullanın.");
-    },
-  });
-  const submitting = login.isPending;
+  const auth = useRoleGuardedAuth("SALON", "Bu hesap bir kuaför hesabı değil. Müşteri girişini kullanın.");
+  const submitting = auth.login.isPending;
 
-  const next = getSafeNext(searchParams.get("next"));
-
-  useEffect(() => {
-    if (status === "authenticated" && user.role === "SALON") router.replace(next);
-  }, [status, user, next, router]);
+  useRedirectWhenSignedIn("SALON", { prefix: "/panel", fallback: "/panel" });
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (submitting) return;
-    setRoleError(null);
-    login.mutate({ email: form.email.trim(), password: form.password });
+    auth.reset();
+    auth.login.mutate({ email: form.email.trim(), password: form.password });
   };
 
   return (
@@ -81,7 +61,7 @@ export default function LoginScreen() {
               className="min-h-11"
             />
           </Field>
-          <ErrorNotice error={roleError ?? login.error} />
+          <ErrorNotice error={auth.roleError ?? auth.login.error} />
           <Button type="submit" variant="primary" size="lg" align="between" disabled={submitting}>
             Giriş yap
             {submitting ? <Spinner /> : <Icon name="arrowRight" />}
