@@ -6,15 +6,14 @@ import Icon from "@/components/atoms/Icon";
 import { Input, Select } from "@/components/atoms/Input";
 import Switch from "@/components/atoms/Switch";
 import Field from "@/components/molecules/Field";
+import { Cell, HeadCell } from "@/components/molecules/Table";
 import QueryState from "@/components/organisms/QueryState";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { useAddBlockedDate, usePanelSchedule, useRemoveBlockedDate, useSaveWorkingHours } from "@/features/panel/hooks/useSchedule";
 import { getOpenDates, validateHours } from "@/features/panel/scheduling";
-import { getErrorMessage, getResponseMessage } from "@/lib/api";
+import { getResponseMessage } from "@/lib/api";
 import { WEEKDAYS, formatDayWithWeekday } from "@/lib/date";
 
-const HEAD_CELL = "eyebrow border-b border-neutral-400 px-3 py-2.5 text-left text-neutral-700";
-const CELL = "border-b border-line px-3 py-3";
 const DATE_OPTION_COUNT = 30;
 
 function TimeInput({ label, ...props }) {
@@ -28,9 +27,7 @@ function WeeklySchedule({ hours, onChange }) {
         <thead>
           <tr>
             {["Gün", "Durum", "Açılış", "Kapanış", "Mola"].map((heading) => (
-              <th key={heading} scope="col" className={HEAD_CELL}>
-                {heading}
-              </th>
+              <HeadCell key={heading}>{heading}</HeadCell>
             ))}
           </tr>
         </thead>
@@ -40,28 +37,28 @@ function WeeklySchedule({ hours, onChange }) {
             const set = (field) => (event) => onChange(day.weekday, { [field]: event.target.value });
             return (
               <tr key={day.weekday}>
-                <th scope="row" className={`${CELL} text-left font-bold`}>
+                <Cell as="th" scope="row" className="text-left font-bold">
                   {name}
-                </th>
-                <td className={CELL}>
+                </Cell>
+                <Cell>
                   <div className="flex items-center gap-2">
                     <Switch checked={day.open} onChange={(open) => onChange(day.weekday, { open })} aria-label={`${name} açık`} />
                     <span className="text-[13px]">{day.open ? "Açık" : "Kapalı"}</span>
                   </div>
-                </td>
-                <td className={CELL}>
+                </Cell>
+                <Cell>
                   <TimeInput label={`${name} açılış`} value={day.start} disabled={!day.open} onChange={set("start")} />
-                </td>
-                <td className={CELL}>
+                </Cell>
+                <Cell>
                   <TimeInput label={`${name} kapanış`} value={day.end} disabled={!day.open} onChange={set("end")} />
-                </td>
-                <td className={CELL}>
+                </Cell>
+                <Cell>
                   <div className="flex items-center gap-1.5">
                     <TimeInput label={`${name} mola başlangıç`} value={day.breakStart} disabled={!day.open} onChange={set("breakStart")} />
                     <span>–</span>
                     <TimeInput label={`${name} mola bitiş`} value={day.breakEnd} disabled={!day.open} onChange={set("breakEnd")} />
                   </div>
-                </td>
+                </Cell>
               </tr>
             );
           })}
@@ -82,7 +79,7 @@ export default function WorkingHoursScreen() {
 }
 
 function WorkingHours({ salonId, savedHours, closedDays }) {
-  const { showToast } = useToast();
+  const { showToast, showError } = useToast();
   const [draft, setDraft] = useState(null);
   const [date, setDate] = useState(null);
   const [note, setNote] = useState("");
@@ -92,7 +89,6 @@ function WorkingHours({ salonId, savedHours, closedDays }) {
   const hoursError = useMemo(() => validateHours(hours), [hours]);
   const dateOptions = useMemo(() => getOpenDates(savedHours, closedDays, DATE_OPTION_COUNT), [savedHours, closedDays]);
   const selectedDate = dateOptions.includes(date) ? date : dateOptions[0];
-  const showError = (error) => showToast(getErrorMessage(error), { tone: "error" });
 
   const saveHours = useSaveWorkingHours(salonId, {
     onSuccess: () => {

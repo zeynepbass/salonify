@@ -13,7 +13,6 @@ import { useToast } from "@/components/organisms/ToastProvider";
 import { useMySalon, useUpdateSalon, useUploadCover } from "@/features/panel/hooks/useSalonProfile";
 import { usePanelSchedule } from "@/features/panel/hooks/useSchedule";
 import { useServices } from "@/features/panel/hooks/useServices";
-import { getErrorMessage } from "@/lib/api";
 import { WEEKDAYS } from "@/lib/date";
 
 function SummaryCard({ title, actionLabel, href, children }) {
@@ -44,7 +43,7 @@ export default function SalonProfileScreen() {
 }
 
 function SalonProfile({ salon }) {
-  const { showToast } = useToast();
+  const { showToast, showError } = useToast();
   const { data: services = [] } = useServices();
   const { hours } = usePanelSchedule();
   const fileInputRef = useRef(null);
@@ -59,7 +58,7 @@ function SalonProfile({ salon }) {
   const update = useUpdateSalon({ onSuccess: () => showToast("Profil kaydedildi.") });
   const cover = useUploadCover({
     onSuccess: () => showToast("Profil görseli güncellendi."),
-    onError: (error) => showToast(getErrorMessage(error), { tone: "error" }),
+    onError: showError,
   });
   const saving = update.isPending;
   const uploading = cover.isPending;
