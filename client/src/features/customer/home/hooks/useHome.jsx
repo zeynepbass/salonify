@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { salonKeys } from "@/features/customer/search/hooks/useSearch";
 import { api } from "@/lib/api";
+import { salonKeys } from "@/lib/queryKeys";
 
 const SHOWCASE_SIZE = 4;
 

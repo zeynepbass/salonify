@@ -2,14 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { notificationKeys } from "@/lib/queryKeys";
 import { toNotificationView } from "@/lib/notifications";
 
 const NOTIFICATION_LIMIT = 50;
-
-export const notificationKeys = {
-  all: ["notifications"],
-  list: (audience) => ["notifications", audience],
-};
 
 export function useNotificationList({ audience = "customer", enabled = true } = {}) {
   return useQuery({

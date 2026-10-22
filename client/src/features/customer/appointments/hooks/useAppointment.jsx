@@ -2,16 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toAppointmentView } from "@/features/customer/appointments/appointmentView";
-import { notificationKeys } from "@/features/customer/notifications/hooks/useNotifications";
 import { api } from "@/lib/api";
+import { appointmentKeys, notificationKeys } from "@/lib/queryKeys";
 
 const LIST_LIMIT = 50;
-
-export const appointmentKeys = {
-  all: ["appointments"],
-  list: (scope) => ["appointments", "list", scope],
-  detail: (appointmentId) => ["appointments", "detail", appointmentId],
-};
 
 export function useAppointments(scope) {
   return useQuery({

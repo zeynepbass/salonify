@@ -2,12 +2,7 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-
-export const salonKeys = {
-  all: ["salons"],
-  list: (params) => ["salons", "list", params],
-  detail: (salonId) => ["salons", "detail", salonId],
-};
+import { salonKeys } from "@/lib/queryKeys";
 
 export function useSalons(params, options = {}) {
   return useQuery({
