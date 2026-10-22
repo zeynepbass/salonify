@@ -1,16 +1,15 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { appointmentKeys } from "@/features/customer/appointments/hooks/useAppointment";
-import { salonKeys } from "@/features/customer/search/hooks/useSearch";
-import { api, uploadImage } from "@/lib/api";
+import { api } from "@/lib/api";
+import { appointmentKeys, salonKeys } from "@/lib/queryKeys";
 
 export function useCreateReview(appointmentId, options = {}) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ rating, comment, photos = [], isPublic }) => {
-      const uploads = await Promise.all(photos.map((photo) => uploadImage(photo.file)));
+      const uploads = await Promise.all(photos.map((photo) => api.uploadImage(photo.file)));
       return api.post(`/appointments/${appointmentId}/review`, {
         rating,
         comment: comment.trim(),
