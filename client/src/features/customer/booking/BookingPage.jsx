@@ -7,7 +7,6 @@ import Icon from "@/components/atoms/Icon";
 import BackLink from "@/components/molecules/BackLink";
 import ErrorNotice from "@/components/molecules/ErrorNotice";
 import MobileActionBar from "@/components/molecules/MobileActionBar";
-import PageSpinner from "@/components/molecules/PageSpinner";
 import { useAuth } from "@/features/shared/auth/AuthProvider";
 import { BOOKING_MONTHS, SLOT_INTERVAL, createDayAvailability, getBookingMonth } from "@/features/customer/booking/availability";
 import BookingSteps from "@/features/customer/booking/components/BookingSteps";
@@ -16,10 +15,8 @@ import DatePicker from "@/features/customer/booking/components/DatePicker";
 import ServicePicker from "@/features/customer/booking/components/ServicePicker";
 import SlotPicker from "@/features/customer/booking/components/SlotPicker";
 import { useBookAppointment } from "@/features/customer/booking/hooks/useBooking";
+import SalonGate from "@/features/customer/salon/components/SalonGate";
 import { useAvailability } from "@/features/shared/availability/useAvailability";
-import { useSalon } from "@/features/customer/salon/hooks/useSalon";
-import SalonNotFound from "@/features/customer/salon/SalonNotFound";
-import { getErrorMessage, isNotFound } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { toWorkingHours } from "@/lib/schedule";
@@ -39,29 +36,30 @@ function StepSection({ id, title, aside, children }) {
 }
 
 export default function BookingPage({ salonId, initialServiceId }) {
+  return (
+    <SalonGate salonId={salonId}>
+      {(salon) => <BookingForm salon={salon} initialServiceId={initialServiceId} />}
+    </SalonGate>
+  );
+}
+
+function BookingForm({ salon, initialServiceId }) {
   const router = useRouter();
   const pathname = usePathname();
   const { status, user } = useAuth();
-  const salonQuery = useSalon(salonId);
   const [serviceId, setServiceId] = useState(initialServiceId ?? null);
   const [monthOffset, setMonthOffset] = useState(0);
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
 
-  const salon = salonQuery.data;
-  const services = salon?.services ?? [];
+  const services = salon.services;
   const service = services.find((item) => item.id === serviceId) ?? null;
 
-  const slotsQuery = useAvailability(salonId, { serviceId: service?.id, date });
+  const slotsQuery = useAvailability(salon.id, { serviceId: service?.id, date });
   const booking = useBookAppointment({
     onSuccess: (appointment) => router.push(`/randevularim/${appointment.id}/basarili`),
     onError: () => setTime(null),
   });
-
-  if (salonQuery.isPending) return <PageSpinner label="Kuaför yükleniyor" />;
-  if (salonQuery.isError) {
-    return <SalonNotFound description={isNotFound(salonQuery.error) ? undefined : getErrorMessage(salonQuery.error)} />;
-  }
 
   const hours = toWorkingHours(salon.workingHours);
   const getDayAvailability = createDayAvailability(hours, salon.blockedDates);
