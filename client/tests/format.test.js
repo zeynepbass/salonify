@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { addDays, formatRelativeTime, minutesToTime, startOfWeek, timeToMinutes } from "@/lib/date";
 import { formatDuration, formatPrice, formatRating, getInitials, withLocativeSuffix } from "@/lib/format";
+import { isValidPhone } from "@/lib/validation";
 
 describe("withLocativeSuffix", () => {
   it.each([
@@ -64,5 +65,15 @@ describe("date", () => {
     expect(formatRelativeTime("2026-10-22T11:15:00Z", now)).toBe("45 dk önce");
     expect(formatRelativeTime("2026-10-21T11:00:00Z", now)).toBe("Dün");
     expect(formatRelativeTime("2026-10-23T12:00:00Z", now)).toBe("Şimdi");
+  });
+});
+
+describe("validation", () => {
+  it("telefon numarasını biçim ve uzunluğa göre doğrular", () => {
+    expect(isValidPhone("0532 111 22 33")).toBe(true);
+    expect(isValidPhone("+90 (532) 111-22-33")).toBe(true);
+    expect(isValidPhone("123")).toBe(false);
+    expect(isValidPhone("0532abc1122")).toBe(false);
+    expect(isValidPhone(undefined)).toBe(false);
   });
 });
