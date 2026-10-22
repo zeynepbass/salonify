@@ -32,3 +32,7 @@ export const panelKeys = {
   portfolio: () => ["panel", "portfolio"],
   appointments: (range) => ["panel", "appointments", range],
 };
+
+export const authKeys = {
+  session: ["auth", "session"],
+};
