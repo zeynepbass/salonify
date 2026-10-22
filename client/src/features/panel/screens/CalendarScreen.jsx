@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
+import QueryState from "@/components/organisms/QueryState";
 import { usePanel } from "@/features/panel/PanelProvider";
 import CalendarDayView from "@/features/panel/components/CalendarDayView";
 import CalendarWeekView from "@/features/panel/components/CalendarWeekView";
+import { usePanelAppointments } from "@/features/panel/hooks/usePanelAppointments";
+import { usePanelSchedule } from "@/features/panel/hooks/useSchedule";
 import { getBusyRanges, getDayBounds, getGridRange } from "@/features/panel/scheduling";
-import { usePanelAppointments } from "@/features/panel/usePanelAppointments";
+import { combineQueries } from "@/lib/combineQueries";
 import { TODAY } from "@/lib/clock";
 import { addDays, formatDayMonth, formatDayWithWeekday, getDateParts, startOfWeek } from "@/lib/date";
 
@@ -25,12 +28,22 @@ const LEGEND = [
 ];
 
 export default function CalendarScreen() {
+  const appointmentsQuery = usePanelAppointments();
+  const schedule = usePanelSchedule();
+
+  return (
+    <QueryState query={combineQueries(appointmentsQuery, schedule)} errorTitle="Takvim yüklenemedi.">
+      {([appointments]) => <Calendar appointments={appointments} hours={schedule.hours} closedDays={schedule.closedDays} />}
+    </QueryState>
+  );
+}
+
+function Calendar({ appointments, hours, closedDays }) {
   const panel = usePanel();
-  const appointments = usePanelAppointments();
   const [view, setView] = useState("day");
   const [date, setDate] = useState(TODAY);
 
-  const range = getGridRange(panel.hours);
+  const range = useMemo(() => getGridRange(hours), [hours]);
   const weekStart = startOfWeek(date);
   const step = view === "day" ? 1 : 7;
 
@@ -39,12 +52,18 @@ export default function CalendarScreen() {
       ? `${formatDayWithWeekday(date)}, ${getDateParts(date).year}`
       : `${formatDayMonth(weekStart)} – ${formatDayMonth(addDays(weekStart, 6))} ${getDateParts(weekStart).year}`;
 
+  const appointmentsByDate = useMemo(() => {
+    const groups = new Map();
+    appointments.forEach((item) => groups.set(item.date, [...(groups.get(item.date) ?? []), item]));
+    return groups;
+  }, [appointments]);
+
   const weekDays = Array.from({ length: 7 }, (_, index) => {
     const day = addDays(weekStart, index);
-    const list = appointments.filter((item) => item.date === day);
+    const list = appointmentsByDate.get(day) ?? [];
     return {
       date: day,
-      closed: getDayBounds(panel.hours, panel.closedDays, day).closed,
+      closed: getDayBounds(hours, closedDays, day).closed,
       appointments: list,
       activeCount: list.filter((item) => item.status !== "CANCELLED").length,
     };
@@ -78,9 +97,9 @@ export default function CalendarScreen() {
         <CalendarDayView
           date={date}
           range={range}
-          bounds={getDayBounds(panel.hours, panel.closedDays, date)}
-          appointments={appointments.filter((item) => item.date === date)}
-          busyRanges={getBusyRanges(panel.appointments, date)}
+          bounds={getDayBounds(hours, closedDays, date)}
+          appointments={appointmentsByDate.get(date) ?? []}
+          busyRanges={getBusyRanges(appointments, date)}
           selectedId={panel.selectedAppointmentId}
           onSelect={panel.openAppointment}
           onCreate={(time) => panel.openAppointmentForm({ date, time })}
