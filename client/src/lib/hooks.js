@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useDeferredValue, useEffect, useMemo } from "react";
+import { filterBySearch } from "@/lib/search";
 
 export function useEscapeKey(onEscape, active = true) {
   useEffect(() => {
@@ -25,4 +26,11 @@ export function useBodyScrollLock(active = true) {
       document.body.style.overflow = previous;
     };
   }, [active]);
+}
+
+export function useSearchFilter(items, query, getFields) {
+  const deferredQuery = useDeferredValue(query);
+  const results = useMemo(() => filterBySearch(items, deferredQuery, getFields), [items, deferredQuery, getFields]);
+
+  return { results, isStale: deferredQuery !== query };
 }
