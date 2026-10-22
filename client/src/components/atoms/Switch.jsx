@@ -9,7 +9,7 @@ export default function Switch({ checked, onChange, disabled = false, className,
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        "relative h-6 w-11 flex-none transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+        "relative h-6 w-11 flex-none rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60",
         checked ? "bg-accent" : "bg-neutral-400",
         className,
       )}
@@ -17,7 +17,7 @@ export default function Switch({ checked, onChange, disabled = false, className,
     >
       <span
         className={cn(
-          "absolute top-0.5 size-5 bg-canvas transition-[left] duration-150",
+          "absolute top-0.5 size-5 rounded-full bg-canvas shadow-sm transition-[left] duration-150",
           checked ? "left-[22px]" : "left-0.5",
         )}
       />

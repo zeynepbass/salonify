@@ -10,7 +10,7 @@ export default function Tag({ variant = "neutral", className, children }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-[5px] px-2 py-0.5 text-[12px] font-semibold whitespace-nowrap",
+        "inline-flex items-center gap-[5px] rounded-full px-2.5 py-0.5 text-[12px] font-semibold whitespace-nowrap",
         VARIANTS[variant],
         className,
       )}

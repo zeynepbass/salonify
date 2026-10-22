@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 const CONTROL =
-  "w-full min-h-10 border border-line bg-canvas px-3 py-2 text-[14px] text-ink transition-colors hover:border-neutral-500 focus:border-ink disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-500 disabled:hover:border-line aria-invalid:border-accent-700";
+  "w-full min-h-10 rounded-md border border-line bg-canvas px-3 py-2 text-[14px] text-ink transition-colors hover:border-neutral-500 focus:border-accent focus:ring-3 focus:ring-accent-100 focus:outline-none disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-500 disabled:hover:border-line aria-invalid:border-accent-700";
 
 export function Input({ className, ...props }) {
   return <input className={cn(CONTROL, className)} {...props} />;
