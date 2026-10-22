@@ -17,7 +17,7 @@ import PanelMenuSheet from "@/features/panel/components/PanelMenuSheet";
 import PanelSidebar from "@/features/panel/components/PanelSidebar";
 import { PANEL_MOBILE_NAV, PANEL_NAV, getActivePanelItem } from "@/features/panel/panelNav";
 import { toAppointmentView } from "@/features/panel/scheduling";
-import { NotificationsProvider, useNotifications } from "@/features/customer/notifications/NotificationsProvider";
+import { useUnreadNotificationCount } from "@/features/customer/notifications/hooks/useNotifications";
 import { TODAY } from "@/lib/clock";
 import { formatLongDate, getDateParts } from "@/lib/date";
 
@@ -38,7 +38,7 @@ function getSubtitle(href, { services, unreadCount }) {
 function Shell({ children }) {
   const pathname = usePathname();
   const panel = usePanel();
-  const { unreadCount } = useNotifications();
+  const unreadCount = useUnreadNotificationCount("salon");
   const [menuOpen, setMenuOpen] = useState(false);
 
   if (panel.status === "loading") {
@@ -116,11 +116,9 @@ export default function PanelShell({ children }) {
   return (
     <ToastProvider className="bottom-[84px] left-4 md:bottom-6 md:left-24 rail:left-[272px]">
       <AuthGuard role="SALON" loginHref="/panel/giris">
-        <NotificationsProvider audience="salon">
-          <PanelProvider>
-            <Shell>{children}</Shell>
-          </PanelProvider>
-        </NotificationsProvider>
+        <PanelProvider>
+          <Shell>{children}</Shell>
+        </PanelProvider>
       </AuthGuard>
     </ToastProvider>
   );

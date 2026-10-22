@@ -7,16 +7,24 @@ import SearchInput from "@/components/molecules/SearchInput";
 import StateMessage from "@/components/molecules/StateMessage";
 import NotificationList from "@/components/organisms/NotificationList";
 import { usePanel } from "@/features/panel/PanelProvider";
-import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
+import {
+  useDeleteAllNotifications,
+  useDeleteNotification,
+  useMarkNotificationRead,
+  useNotificationList,
+} from "@/features/customer/notifications/hooks/useNotifications";
 
 export default function NotificationsScreen() {
   const router = useRouter();
   const { appointments, openAppointment, requestConfirmation, closeConfirmation } = usePanel();
-  const { notifications, markRead, removeNotification, removeAll } = useNotifications();
+  const { notifications } = useNotificationList("salon");
+  const markRead = useMarkNotificationRead();
+  const removeNotification = useDeleteNotification();
+  const removeAll = useDeleteAllNotifications();
   const [query, setQuery] = useState("");
 
   const handleSelect = (notification) => {
-    markRead(notification.id);
+    if (notification.unread) markRead.mutate(notification.id);
     if (notification.appointmentId && appointments.some((item) => item.id === notification.appointmentId)) {
       openAppointment(notification.appointmentId);
     } else if (notification.href) {
@@ -31,8 +39,8 @@ export default function NotificationsScreen() {
       title: "Tüm bildirimler silinsin mi?",
       body: "Bütün bildirimlerin kalıcı olarak silinir. Bu işlem geri alınamaz.",
       confirmLabel: "Tümünü sil",
-      onConfirm: async () => {
-        await removeAll();
+      onConfirm: () => {
+        removeAll.mutate();
         closeConfirmation();
       },
     });
@@ -52,7 +60,7 @@ export default function NotificationsScreen() {
         <NotificationList
           notifications={notifications}
           onSelect={handleSelect}
-          onDelete={(notification) => removeNotification(notification.id)}
+          onDelete={(notification) => removeNotification.mutate(notification.id)}
         />
       )}
     </div>

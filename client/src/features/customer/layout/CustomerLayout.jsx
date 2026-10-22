@@ -7,7 +7,7 @@ import Navbar from "@/components/organisms/Navbar";
 import { ToastProvider } from "@/components/organisms/ToastProvider";
 import { useAuth } from "@/features/customer/auth/AuthProvider";
 import { LocationProvider } from "@/features/customer/location/LocationProvider";
-import { NotificationsProvider, useNotifications } from "@/features/customer/notifications/NotificationsProvider";
+import { useUnreadNotificationCount } from "@/features/customer/notifications/hooks/useNotifications";
 
 const NAV_ITEMS = [
   { label: "Keşfet", shortLabel: "Keşfet", href: "/", icon: "home", match: (path) => path === "/" },
@@ -27,7 +27,7 @@ const ACTION_BAR_ROUTE = /^\/kuaforler\/[^/]+(\/randevu)?$/;
 
 function Chrome({ children }) {
   const pathname = usePathname();
-  const { unreadCount } = useNotifications();
+  const unreadCount = useUnreadNotificationCount();
   const { status, user } = useAuth();
 
   const navItems = NAV_ITEMS.map((item) => ({ ...item, active: item.match(pathname) }));
@@ -51,11 +51,9 @@ function Chrome({ children }) {
 export default function CustomerLayout({ children }) {
   return (
     <ToastProvider className="bottom-[88px] left-4 md:bottom-6 md:left-6">
-      <NotificationsProvider>
-        <LocationProvider>
-          <Chrome>{children}</Chrome>
-        </LocationProvider>
-      </NotificationsProvider>
+      <LocationProvider>
+        <Chrome>{children}</Chrome>
+      </LocationProvider>
     </ToastProvider>
   );
 }
