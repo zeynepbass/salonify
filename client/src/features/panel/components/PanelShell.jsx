@@ -2,11 +2,10 @@
 
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import Button from "@/components/atoms/Button";
 import BottomNav from "@/components/molecules/BottomNav";
 import ConfirmDialog from "@/components/molecules/ConfirmDialog";
 import PageSpinner from "@/components/molecules/PageSpinner";
-import StateMessage from "@/components/molecules/StateMessage";
+import QueryError from "@/components/molecules/QueryError";
 import { ToastProvider } from "@/components/organisms/ToastProvider";
 import AuthGuard from "@/features/shared/auth/AuthGuard";
 import { useUnreadNotificationCount } from "@/features/shared/notifications/useNotifications";
@@ -20,7 +19,6 @@ import { usePanelAppointments } from "@/features/panel/hooks/usePanelAppointment
 import { useMySalon } from "@/features/panel/hooks/useSalonProfile";
 import { useServices } from "@/features/panel/hooks/useServices";
 import { PANEL_MOBILE_NAV, PANEL_NAV, getActivePanelItem } from "@/features/panel/panelNav";
-import { getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
 import { formatLongDate, getDateParts } from "@/lib/date";
 
@@ -74,11 +72,7 @@ function Shell({ children }) {
   if (salonQuery.isError) {
     return (
       <div className="page-container max-w-[760px] py-12">
-        <StateMessage role="alert" icon="alert" tone="accent" title="Panel yüklenemedi." description={getErrorMessage(salonQuery.error)}>
-          <Button variant="primary" disabled={salonQuery.isFetching} onClick={() => salonQuery.refetch()}>
-            Tekrar dene
-          </Button>
-        </StateMessage>
+        <QueryError query={salonQuery} title="Panel yüklenemedi." />
       </div>
     );
   }

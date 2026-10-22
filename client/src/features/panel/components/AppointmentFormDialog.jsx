@@ -8,7 +8,7 @@ import Dialog, { DialogActions, DialogTitle } from "@/components/molecules/Dialo
 import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
 import PageSpinner from "@/components/molecules/PageSpinner";
-import StateMessage from "@/components/molecules/StateMessage";
+import QueryError from "@/components/molecules/QueryError";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { useAvailability } from "@/features/shared/availability/useAvailability";
 import { useSaveAppointment } from "@/features/panel/hooks/usePanelAppointments";
@@ -16,16 +16,14 @@ import { usePanelSchedule } from "@/features/panel/hooks/useSchedule";
 import { useServices } from "@/features/panel/hooks/useServices";
 import { getOpenDates } from "@/features/panel/scheduling";
 import { combineQueries } from "@/lib/combineQueries";
-import { getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { formatDayWithWeekday } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
+import { isValidPhone } from "@/lib/validation";
 
 const DATE_OPTION_COUNT = 24;
 const TITLE_ID = "appointment-form-title";
-
-const PHONE_PATTERN = /^[0-9+()\s-]{10,20}$/;
 
 export default function AppointmentFormDialog({ draft, onClose }) {
   const servicesQuery = useServices();
@@ -39,9 +37,7 @@ export default function AppointmentFormDialog({ draft, onClose }) {
         {status.isPending ? (
           <PageSpinner className="min-h-[160px]" />
         ) : (
-          <StateMessage role="alert" icon="alert" tone="accent" title="Form yüklenemedi." description={getErrorMessage(status.error)}>
-            <Button onClick={status.refetch}>Tekrar dene</Button>
-          </StateMessage>
+          <QueryError query={status} title="Form yüklenemedi." />
         )}
       </Dialog>
     );
@@ -94,7 +90,7 @@ function AppointmentForm({ draft, salonId, services, hours, closedDays, onClose 
 
   const selectedTime = slots.includes(form.time) ? form.time : null;
 
-  const phoneInvalid = !onlineBooking && !PHONE_PATTERN.test(form.phone.trim());
+  const phoneInvalid = !onlineBooking && !isValidPhone(form.phone);
   const errors = {
     customer: submitted && !form.customer.trim(),
     phone: submitted && phoneInvalid,

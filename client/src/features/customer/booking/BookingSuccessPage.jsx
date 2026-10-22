@@ -3,21 +3,22 @@
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import Tag from "@/components/atoms/Tag";
-import PageSpinner from "@/components/molecules/PageSpinner";
 import Stat from "@/components/molecules/Stat";
-import AppointmentNotFound from "@/features/customer/appointments/components/AppointmentNotFound";
-import { useAppointment } from "@/features/customer/appointments/hooks/useAppointment";
+import AppointmentGate from "@/features/customer/appointments/components/AppointmentGate";
 import { useAddToCalendar } from "@/features/customer/appointments/useAddToCalendar";
-import { getErrorMessage, isNotFound } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 
 export default function BookingSuccessPage({ appointmentId }) {
-  const addToCalendar = useAddToCalendar();
-  const { data: appointment, isPending, error } = useAppointment(appointmentId);
+  return (
+    <AppointmentGate appointmentId={appointmentId}>
+      {(appointment) => <BookingSuccess appointment={appointment} />}
+    </AppointmentGate>
+  );
+}
 
-  if (isPending) return <PageSpinner label="Randevu yükleniyor" />;
-  if (!appointment) return <AppointmentNotFound description={isNotFound(error) ? undefined : getErrorMessage(error)} />;
+function BookingSuccess({ appointment }) {
+  const addToCalendar = useAddToCalendar();
 
   const { salon, service } = appointment;
 

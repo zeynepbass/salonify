@@ -10,7 +10,6 @@ import StateMessage from "@/components/molecules/StateMessage";
 import QueryState from "@/components/organisms/QueryState";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { usePortfolio, useTogglePortfolioItem } from "@/features/panel/hooks/usePortfolio";
-import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 
 const FILTERS = [
@@ -86,7 +85,7 @@ export default function PortfolioScreen() {
 }
 
 function Portfolio({ portfolio }) {
-  const { showToast } = useToast();
+  const { showToast, showError } = useToast();
   const [filter, setFilter] = useState("all");
   const toggle = useTogglePortfolioItem();
 
@@ -95,7 +94,7 @@ function Portfolio({ portfolio }) {
   const handleToggle = (item) =>
     toggle.mutate(item, {
       onSuccess: () => showToast(item.published ? "Profilden kaldırıldı." : "Profilde yayınlandı."),
-      onError: (error) => showToast(getErrorMessage(error), { tone: "error" }),
+      onError: showError,
     });
 
   return (

@@ -3,12 +3,11 @@
 import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/panel/PanelProvider";
 import { useUpdateAppointmentStatus } from "@/features/panel/hooks/usePanelAppointments";
-import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 
 export function useAppointmentActions() {
   const { closeAppointment, closeConfirmation, requestConfirmation, openAppointmentForm } = usePanel();
-  const { showToast } = useToast();
+  const { showToast, showError } = useToast();
   const statusMutation = useUpdateAppointmentStatus();
 
   const updateStatus = (appointment, status, message) => {
@@ -20,7 +19,7 @@ export function useAppointmentActions() {
           closeAppointment();
           showToast(message);
         },
-        onError: (error) => showToast(getErrorMessage(error), { tone: "error" }),
+        onError: showError,
         onSettled: closeConfirmation,
       },
     );

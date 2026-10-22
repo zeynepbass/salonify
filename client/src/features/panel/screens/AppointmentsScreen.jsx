@@ -6,6 +6,7 @@ import Icon from "@/components/atoms/Icon";
 import SearchInput from "@/components/molecules/SearchInput";
 import StateMessage from "@/components/molecules/StateMessage";
 import StatusTag from "@/components/molecules/StatusTag";
+import { Cell, HeadCell } from "@/components/molecules/Table";
 import Tabs from "@/components/molecules/Tabs";
 import QueryState from "@/components/organisms/QueryState";
 import { usePanel } from "@/features/panel/PanelProvider";
@@ -28,8 +29,6 @@ const TABS = [
 
 const getSearchFields = (item) => [item.customer, item.phone, item.service.name, item.reference];
 
-const HEAD_CELL = "eyebrow border-b border-neutral-400 px-3 py-2.5 text-left text-neutral-700";
-const CELL = "border-b border-line px-3 py-3";
 
 function AppointmentTable({ appointments, onView, actions }) {
   return (
@@ -38,33 +37,29 @@ function AppointmentTable({ appointments, onView, actions }) {
         <thead>
           <tr>
             {["Müşteri", "Hizmet", "Tarih", "Saat", "Süre", "Fiyat", "Durum"].map((heading) => (
-              <th key={heading} scope="col" className={HEAD_CELL}>
-                {heading}
-              </th>
+              <HeadCell key={heading}>{heading}</HeadCell>
             ))}
-            <th scope="col" className={cn(HEAD_CELL, "text-right")}>
-              İşlemler
-            </th>
+            <HeadCell className="text-right">İşlemler</HeadCell>
           </tr>
         </thead>
         <tbody>
           {appointments.map((appointment) => (
             <tr key={appointment.id} className={cn(appointment.inactive && "opacity-60")}>
-              <td className={CELL}>
+              <Cell>
                 <div className="font-bold">{appointment.customer}</div>
                 <div className="text-[12px] text-neutral-700">
                   {appointment.phone} · {appointment.source === "manual" ? "Manuel" : "Online"}
                 </div>
-              </td>
-              <td className={CELL}>{appointment.service.name}</td>
-              <td className={CELL}>{formatShortDate(appointment.date)}</td>
-              <td className={cn(CELL, "font-bold")}>{appointment.time}</td>
-              <td className={CELL}>{formatDuration(appointment.service.duration)}</td>
-              <td className={CELL}>{formatPrice(appointment.service.price)}</td>
-              <td className={CELL}>
+              </Cell>
+              <Cell>{appointment.service.name}</Cell>
+              <Cell>{formatShortDate(appointment.date)}</Cell>
+              <Cell className="font-bold">{appointment.time}</Cell>
+              <Cell>{formatDuration(appointment.service.duration)}</Cell>
+              <Cell>{formatPrice(appointment.service.price)}</Cell>
+              <Cell>
                 <StatusTag status={appointment.status} />
-              </td>
-              <td className={CELL}>
+              </Cell>
+              <Cell>
                 <div className="flex justify-end gap-0.5">
                   <Button variant="plain" size="icon" title="Görüntüle" aria-label={`Görüntüle: ${appointment.customer}`} onClick={() => onView(appointment.id)}>
                     <Icon name="eye" />
@@ -101,7 +96,7 @@ function AppointmentTable({ appointments, onView, actions }) {
                     <Icon name="checkCircle" />
                   </Button>
                 </div>
-              </td>
+              </Cell>
             </tr>
           ))}
         </tbody>

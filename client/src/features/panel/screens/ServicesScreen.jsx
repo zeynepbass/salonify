@@ -9,16 +9,15 @@ import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/panel/PanelProvider";
 import ServiceFormDialog from "@/features/panel/components/ServiceFormDialog";
 import { useDeleteService, useSaveService, useServices } from "@/features/panel/hooks/useServices";
-import { getErrorMessage, getResponseMessage } from "@/lib/api";
+import { getResponseMessage } from "@/lib/api";
 import { formatDuration, formatPrice } from "@/lib/format";
 
 export default function ServicesScreen() {
   const { requestConfirmation, closeConfirmation } = usePanel();
-  const { showToast } = useToast();
+  const { showToast, showError } = useToast();
   const servicesQuery = useServices();
   const [form, setForm] = useState(null);
 
-  const showError = (error) => showToast(getErrorMessage(error), { tone: "error" });
   const saveService = useSaveService({
     onSuccess: () => {
       setForm(null);

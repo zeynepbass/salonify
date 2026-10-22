@@ -10,8 +10,7 @@ import { useToast } from "@/components/organisms/ToastProvider";
 import { useLogout } from "@/features/shared/auth/hooks/useAuthMutations";
 import { useChangePassword, useDeleteAccount } from "@/features/customer/profile/hooks/useProfile";
 import { getResponseMessage } from "@/lib/api";
-
-const MIN_PASSWORD_LENGTH = 8;
+import { MIN_PASSWORD_LENGTH } from "@/lib/validation";
 
 function PasswordForm({ onDone }) {
   const { showToast } = useToast();

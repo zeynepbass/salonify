@@ -11,40 +11,41 @@ import Switch from "@/components/atoms/Switch";
 import BackLink from "@/components/molecules/BackLink";
 import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
-import PageSpinner from "@/components/molecules/PageSpinner";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useToast } from "@/components/organisms/ToastProvider";
-import AppointmentNotFound from "@/features/customer/appointments/components/AppointmentNotFound";
-import { useAppointment } from "@/features/customer/appointments/hooks/useAppointment";
+import AppointmentGate from "@/features/customer/appointments/components/AppointmentGate";
 import PhotoPicker from "@/features/customer/reviews/components/PhotoPicker";
 import StarInput from "@/features/customer/reviews/components/StarInput";
 import { useCreateReview } from "@/features/customer/reviews/hooks/useReview";
-import { getErrorMessage, isNotFound } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 
 const MAX_COMMENT_LENGTH = 500;
 const MAX_PHOTOS = 4;
 
 export default function ReviewFormPage({ appointmentId }) {
+  return (
+    <AppointmentGate appointmentId={appointmentId}>
+      {(appointment) => <ReviewForm appointment={appointment} />}
+    </AppointmentGate>
+  );
+}
+
+function ReviewForm({ appointment }) {
   const router = useRouter();
   const commentId = useId();
   const shareLabelId = useId();
   const { showToast } = useToast();
-  const { data: appointment, isPending, error } = useAppointment(appointmentId);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [photos, setPhotos] = useState([]);
   const [share, setShare] = useState(true);
-  const review = useCreateReview(appointmentId, {
+  const review = useCreateReview(appointment.id, {
     onSuccess: () => {
       showToast(share ? "Değerlendirmen gönderildi ve profilde paylaşıldı." : "Değerlendirmen gönderildi.");
       router.push("/randevularim?sekme=gecmis");
     },
   });
   const submitting = review.isPending || review.isSuccess;
-
-  if (isPending) return <PageSpinner label="Randevu yükleniyor" />;
-  if (!appointment) return <AppointmentNotFound description={isNotFound(error) ? undefined : getErrorMessage(error)} />;
 
   if (!appointment.canReview) {
     return (

@@ -11,9 +11,9 @@ import Tabs from "@/components/molecules/Tabs";
 import { demoAccounts } from "@/data/catalog";
 import { useRoleGuardedAuth } from "@/features/shared/auth/hooks/useAuthMutations";
 import { useRedirectWhenSignedIn } from "@/features/shared/auth/hooks/useAuthRedirect";
+import { MIN_PASSWORD_LENGTH } from "@/lib/validation";
 
 const INITIAL_FORM = { name: "", phone: "", ...demoAccounts.customer };
-const MIN_PASSWORD_LENGTH = 8;
 
 export default function CustomerLoginPage() {
   const [mode, setMode] = useState("login");

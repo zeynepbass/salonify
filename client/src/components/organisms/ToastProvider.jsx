@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "@/components/atoms/Icon";
+import { getErrorMessage } from "@/lib/api";
 import { cn } from "@/lib/cn";
 
 const ToastContext = createContext(null);
@@ -18,9 +19,11 @@ export function ToastProvider({ className, children }) {
     timerRef.current = setTimeout(() => setToast(null), DURATION);
   }, []);
 
+  const showError = useCallback((error) => showToast(getErrorMessage(error), { tone: "error" }), [showToast]);
+
   useEffect(() => () => clearTimeout(timerRef.current), []);
 
-  const value = useMemo(() => ({ showToast }), [showToast]);
+  const value = useMemo(() => ({ showToast, showError }), [showToast, showError]);
 
   return (
     <ToastContext.Provider value={value}>

@@ -2,22 +2,21 @@
 
 import { useRouter } from "next/navigation";
 import Button from "@/components/atoms/Button";
-import PageSpinner from "@/components/molecules/PageSpinner";
 import StateMessage from "@/components/molecules/StateMessage";
 import NotificationList from "@/components/organisms/NotificationList";
+import QueryState from "@/components/organisms/QueryState";
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   useNotificationList,
 } from "@/features/shared/notifications/useNotifications";
-import { getErrorMessage } from "@/lib/api";
 
 export default function NotificationsPage() {
   const router = useRouter();
   const notificationsQuery = useNotificationList();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
-  const { notifications, unreadCount } = notificationsQuery;
+  const { unreadCount } = notificationsQuery;
 
   const handleSelect = (notification) => {
     if (notification.unread) markRead.mutate(notification.id);
@@ -32,23 +31,14 @@ export default function NotificationsPage() {
           Tümünü okundu işaretle
         </Button>
       </div>
-      {notificationsQuery.isPending ? (
-        <PageSpinner label="Bildirimler yükleniyor" className="min-h-[30vh]" />
-      ) : notificationsQuery.isError ? (
-        <StateMessage
-          role="alert"
-          icon="alert"
-          tone="accent"
-          title="Bildirimler yüklenemedi."
-          description={getErrorMessage(notificationsQuery.error)}
-        >
-          <Button onClick={() => notificationsQuery.refetch()}>Tekrar dene</Button>
-        </StateMessage>
-      ) : notifications.length === 0 ? (
-        <StateMessage icon="bell" title="Henüz bildirimin yok." description="Randevularınla ilgili gelişmeler burada görünür." />
-      ) : (
-        <NotificationList notifications={notifications} onSelect={handleSelect} />
-      )}
+      <QueryState
+        query={notificationsQuery}
+        errorTitle="Bildirimler yüklenemedi."
+        isEmpty={(data) => data.notifications.length === 0}
+        empty={<StateMessage icon="bell" title="Henüz bildirimin yok." description="Randevularınla ilgili gelişmeler burada görünür." />}
+      >
+        {(data) => <NotificationList notifications={data.notifications} onSelect={handleSelect} />}
+      </QueryState>
     </div>
   );
 }

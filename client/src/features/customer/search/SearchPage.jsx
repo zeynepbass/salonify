@@ -6,6 +6,7 @@ import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
 import StateMessage from "@/components/molecules/StateMessage";
+import QueryState from "@/components/organisms/QueryState";
 import { useLocation } from "@/features/customer/location/LocationProvider";
 import SalonGrid, { SalonGridSkeleton } from "@/features/customer/salon/components/SalonGrid";
 import { useSalons } from "@/features/customer/search/hooks/useSearch";
@@ -14,7 +15,6 @@ import FilterPanel from "@/features/customer/search/components/FilterPanel";
 import Pagination from "@/features/customer/search/components/Pagination";
 import { AVAILABILITY_OPTIONS, DEFAULT_FILTERS, buildSalonParams, getSortOptions } from "@/features/customer/search/salonQuery";
 import { useSalonFilters } from "@/features/customer/search/useSalonFilters";
-import { getErrorMessage } from "@/lib/api";
 import { getCategoryLabel } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 import { withLocativeSuffix } from "@/lib/format";
@@ -139,32 +139,28 @@ export default function SearchPage() {
         </aside>
 
         <div className="min-w-0 flex-1">
-          {salonsQuery.isPending ? (
-            <SalonGridSkeleton density="compact" />
-          ) : salonsQuery.isError ? (
-            <StateMessage
-              role="alert"
-              icon="alert"
-              tone="accent"
-              title="Kuaförler yüklenemedi."
-              description={getErrorMessage(salonsQuery.error)}
-            >
-              <Button onClick={() => salonsQuery.refetch()}>Tekrar dene</Button>
-            </StateMessage>
-          ) : result.salons.length === 0 ? (
-            <StateMessage
-              icon="search"
-              title="Bu kriterlere uygun kuaför bulunamadı."
-              description="Mesafeyi artırmayı ya da bazı filtreleri kaldırmayı dene."
-            >
-              <Button onClick={resetFilters}>Filtreleri temizle</Button>
-            </StateMessage>
-          ) : (
-            <div className={cn("transition-opacity", salonsQuery.isPlaceholderData && "opacity-60")} aria-busy={salonsQuery.isFetching}>
-              <SalonGrid salons={result.salons} density="compact" />
-              <Pagination page={page} pageCount={result.pageCount} onChange={(next) => updateFilters({ page: next })} />
-            </div>
-          )}
+          <QueryState
+            query={salonsQuery}
+            errorTitle="Kuaförler yüklenemedi."
+            loading={<SalonGridSkeleton density="compact" />}
+            isEmpty={(data) => data.salons.length === 0}
+            empty={
+              <StateMessage
+                icon="search"
+                title="Bu kriterlere uygun kuaför bulunamadı."
+                description="Mesafeyi artırmayı ya da bazı filtreleri kaldırmayı dene."
+              >
+                <Button onClick={resetFilters}>Filtreleri temizle</Button>
+              </StateMessage>
+            }
+          >
+            {(data) => (
+              <div className={cn("transition-opacity", salonsQuery.isPlaceholderData && "opacity-60")} aria-busy={salonsQuery.isFetching}>
+                <SalonGrid salons={data.salons} density="compact" />
+                <Pagination page={page} pageCount={data.pageCount} onChange={(next) => updateFilters({ page: next })} />
+              </div>
+            )}
+          </QueryState>
         </div>
       </div>
     </div>
