@@ -50,8 +50,7 @@ export default function Footer() {
       </div>
       <div className="page-container">
         <div className="flex flex-wrap justify-center gap-2 border-t border-line pt-4 pb-6 text-[12px] text-neutral-700">
-          <span>© 2026 SalonaBOX</span>
- 
+          <span>© {new Date().getFullYear()} SalonaBOX</span>
         </div>
       </div>
     </footer>
