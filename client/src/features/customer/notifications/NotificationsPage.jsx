@@ -9,7 +9,7 @@ import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   useNotificationList,
-} from "@/features/customer/notifications/hooks/useNotifications";
+} from "@/features/shared/notifications/useNotifications";
 import { getErrorMessage } from "@/lib/api";
 
 export default function NotificationsPage() {
