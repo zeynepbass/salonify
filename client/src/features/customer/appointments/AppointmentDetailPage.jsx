@@ -4,24 +4,25 @@ import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import BackLink from "@/components/molecules/BackLink";
-import PageSpinner from "@/components/molecules/PageSpinner";
 import StatusTag from "@/components/molecules/StatusTag";
-import AppointmentNotFound from "@/features/customer/appointments/components/AppointmentNotFound";
+import AppointmentGate from "@/features/customer/appointments/components/AppointmentGate";
 import CancelAppointmentDialog from "@/features/customer/appointments/components/CancelAppointmentDialog";
-import { useAppointment } from "@/features/customer/appointments/hooks/useAppointment";
 import { useAddToCalendar } from "@/features/customer/appointments/useAddToCalendar";
-import { getErrorMessage, isNotFound } from "@/lib/api";
 import { STATUS_META } from "@/lib/appointmentStatus";
 import { formatLongDate } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 
 export default function AppointmentDetailPage({ appointmentId }) {
+  return (
+    <AppointmentGate appointmentId={appointmentId}>
+      {(appointment) => <AppointmentDetail appointment={appointment} />}
+    </AppointmentGate>
+  );
+}
+
+function AppointmentDetail({ appointment }) {
   const addToCalendar = useAddToCalendar();
   const [cancelOpen, setCancelOpen] = useState(false);
-  const { data: appointment, isPending, error } = useAppointment(appointmentId);
-
-  if (isPending) return <PageSpinner label="Randevu yükleniyor" />;
-  if (!appointment) return <AppointmentNotFound description={isNotFound(error) ? undefined : getErrorMessage(error)} />;
 
   const { salon, service } = appointment;
   const details = [
