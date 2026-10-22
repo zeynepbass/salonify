@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { salonKeys } from "@/lib/queryKeys";
 
-const SHOWCASE_SIZE = 4;
+export const SHOWCASE_SIZE = 4;
 
 function useShowcaseSalons(params) {
   const fullParams = { ...params, limit: SHOWCASE_SIZE };

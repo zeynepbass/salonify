@@ -2,6 +2,11 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/features/customer/auth/AuthProvider";
+import { authKeys } from "@/lib/queryKeys";
+
+export function removePrivateQueries(queryClient) {
+  queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== authKeys.session[0] });
+}
 
 export function useLogin(options = {}) {
   const { login } = useAuth();
@@ -29,7 +34,7 @@ export function useLogout(options = {}) {
     mutationFn: () => logout(),
     ...options,
     onSettled: (...args) => {
-      queryClient.clear();
+      removePrivateQueries(queryClient);
       options.onSettled?.(...args);
     },
   });

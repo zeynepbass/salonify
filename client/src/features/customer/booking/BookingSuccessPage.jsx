@@ -1,43 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
-import Spinner from "@/components/atoms/Spinner";
 import Tag from "@/components/atoms/Tag";
+import PageSpinner from "@/components/molecules/PageSpinner";
 import Stat from "@/components/molecules/Stat";
 import AppointmentNotFound from "@/features/customer/appointments/components/AppointmentNotFound";
+import { useAppointment } from "@/features/customer/appointments/hooks/useAppointment";
 import { useAddToCalendar } from "@/features/customer/appointments/useAddToCalendar";
-import { toAppointmentView } from "@/features/customer/appointments/appointmentView";
-import { api } from "@/lib/api";
+import { getErrorMessage, isNotFound } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 
 export default function BookingSuccessPage({ appointmentId }) {
   const addToCalendar = useAddToCalendar();
-  const [state, setState] = useState({ status: "loading", appointment: null });
+  const { data: appointment, isPending, error } = useAppointment(appointmentId);
 
-  useEffect(() => {
-    let ignore = false;
-    api
-      .get(`/appointments/${appointmentId}`)
-      .then((appointment) => !ignore && setState({ status: "success", appointment: toAppointmentView(appointment) }))
-      .catch(() => !ignore && setState({ status: "error", appointment: null }));
-    return () => {
-      ignore = true;
-    };
-  }, [appointmentId]);
-
-  if (state.status === "loading") {
-    return (
-      <div aria-busy="true" className="grid min-h-[50vh] place-items-center">
-        <Spinner />
-      </div>
-    );
-  }
-
-  const { appointment } = state;
-  if (!appointment) return <AppointmentNotFound />;
+  if (isPending) return <PageSpinner label="Randevu yükleniyor" />;
+  if (!appointment) return <AppointmentNotFound description={isNotFound(error) ? undefined : getErrorMessage(error)} />;
 
   const { salon, service } = appointment;
 
@@ -48,7 +28,7 @@ export default function BookingSuccessPage({ appointmentId }) {
       </span>
       <h1 className="text-[clamp(32px,4.4vw,52px)]">Randevunuz oluşturuldu.</h1>
       <p className="max-w-[56ch] text-[16px] text-neutral-700">
-        {salon.name} kuaförüne bildirim gönderildi. Randevudan 24 saat önce hatırlatma alacaksın.
+        {salon.name} kuaförüne bildirim gönderildi. Randevunun tüm ayrıntılarını Randevularım sayfasında bulabilirsin.
       </p>
 
       <div className="flex flex-col gap-1 border-t-2 border-ink bg-surface p-6">

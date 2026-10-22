@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
@@ -9,14 +9,17 @@ import { Textarea } from "@/components/atoms/Input";
 import Spinner from "@/components/atoms/Spinner";
 import Switch from "@/components/atoms/Switch";
 import BackLink from "@/components/molecules/BackLink";
+import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
+import PageSpinner from "@/components/molecules/PageSpinner";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { toAppointmentView } from "@/features/customer/appointments/appointmentView";
 import AppointmentNotFound from "@/features/customer/appointments/components/AppointmentNotFound";
+import { useAppointment } from "@/features/customer/appointments/hooks/useAppointment";
 import PhotoPicker from "@/features/customer/reviews/components/PhotoPicker";
 import StarInput from "@/features/customer/reviews/components/StarInput";
-import { api, getErrorMessage } from "@/lib/api";
+import { useCreateReview } from "@/features/customer/reviews/hooks/useReview";
+import { getErrorMessage, isNotFound } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 
 const MAX_COMMENT_LENGTH = 500;
@@ -27,35 +30,21 @@ export default function ReviewFormPage({ appointmentId }) {
   const commentId = useId();
   const shareLabelId = useId();
   const { showToast } = useToast();
-  const [state, setState] = useState({ status: "loading", appointment: null });
+  const { data: appointment, isPending, error } = useAppointment(appointmentId);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [photos, setPhotos] = useState([]);
   const [share, setShare] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const review = useCreateReview(appointmentId, {
+    onSuccess: () => {
+      showToast(share ? "Değerlendirmen gönderildi ve profilde paylaşıldı." : "Değerlendirmen gönderildi.");
+      router.push("/randevularim?sekme=gecmis");
+    },
+  });
+  const submitting = review.isPending || review.isSuccess;
 
-  useEffect(() => {
-    let ignore = false;
-    api
-      .get(`/appointments/${appointmentId}`)
-      .then((appointment) => !ignore && setState({ status: "success", appointment: toAppointmentView(appointment) }))
-      .catch(() => !ignore && setState({ status: "error", appointment: null }));
-    return () => {
-      ignore = true;
-    };
-  }, [appointmentId]);
-
-  if (state.status === "loading") {
-    return (
-      <div aria-busy="true" className="grid min-h-[50vh] place-items-center">
-        <Spinner />
-      </div>
-    );
-  }
-
-  const { appointment } = state;
-  if (!appointment) return <AppointmentNotFound />;
+  if (isPending) return <PageSpinner label="Randevu yükleniyor" />;
+  if (!appointment) return <AppointmentNotFound description={isNotFound(error) ? undefined : getErrorMessage(error)} />;
 
   if (!appointment.canReview) {
     return (
@@ -73,26 +62,10 @@ export default function ReviewFormPage({ appointmentId }) {
     );
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     if (rating === 0 || submitting) return;
-
-    setSubmitting(true);
-    setError(null);
-    try {
-      const uploads = await Promise.all(photos.map((photo) => api.uploadImage(photo.file)));
-      await api.post(`/appointments/${appointment.id}/review`, {
-        rating,
-        comment: comment.trim(),
-        hairPhotos: uploads.map((upload) => upload.url),
-        isPublic: share,
-      });
-      showToast(share ? "Değerlendirmen gönderildi ve profilde paylaşıldı." : "Değerlendirmen gönderildi.");
-      router.push("/randevularim?sekme=gecmis");
-    } catch (requestError) {
-      setError(getErrorMessage(requestError));
-      setSubmitting(false);
-    }
+    review.mutate({ rating, comment, photos, isPublic: share });
   };
 
   return (
@@ -144,12 +117,7 @@ export default function ReviewFormPage({ appointmentId }) {
         </div>
       </div>
 
-      {error && (
-        <p role="alert" className="mt-5 flex gap-2 bg-accent-100 p-3 text-[14px] text-accent-800">
-          <Icon name="alert" size={16} className="mt-0.5" />
-          {error}
-        </p>
-      )}
+      <ErrorNotice error={review.error} className="mt-5" />
 
       <div className="mt-6 flex flex-wrap gap-2">
         <Button type="submit" variant="primary" size="lg" disabled={rating === 0 || submitting} className="gap-3">

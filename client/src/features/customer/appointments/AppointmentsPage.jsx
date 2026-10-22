@@ -1,45 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import StateMessage from "@/components/molecules/StateMessage";
 import Tabs from "@/components/molecules/Tabs";
-import { toAppointmentView } from "@/features/customer/appointments/appointmentView";
 import AppointmentRow, { AppointmentRowSkeleton } from "@/features/customer/appointments/components/AppointmentRow";
 import CancelAppointmentDialog from "@/features/customer/appointments/components/CancelAppointmentDialog";
-import { api, getErrorMessage } from "@/lib/api";
-
-const LIST_LIMIT = 50;
+import { useAppointments } from "@/features/customer/appointments/hooks/useAppointment";
+import { getErrorMessage } from "@/lib/api";
 
 export default function AppointmentsPage({ initialTab = "upcoming" }) {
   const [tab, setTab] = useState(initialTab);
   const [cancelTarget, setCancelTarget] = useState(null);
-  const [state, setState] = useState({ status: "loading", upcoming: [], past: [], counts: { upcoming: 0, past: 0 }, error: null });
-
-  const loadAppointments = useCallback(async () => {
-    try {
-      const [upcoming, past] = await Promise.all([
-        api.get("/appointments", { params: { scope: "upcoming", limit: LIST_LIMIT } }),
-        api.get("/appointments", { params: { scope: "past", limit: LIST_LIMIT } }),
-      ]);
-      setState({
-        status: "success",
-        upcoming: upcoming.items.map(toAppointmentView),
-        past: past.items.map(toAppointmentView),
-        counts: { upcoming: upcoming.pagination.total, past: past.pagination.total },
-        error: null,
-      });
-    } catch (error) {
-      setState((current) => ({ ...current, status: "error", error: getErrorMessage(error) }));
-    }
-  }, []);
-
-  useEffect(() => {
-    loadAppointments();
-  }, [loadAppointments]);
-
-  const list = state[tab];
+  const queries = { upcoming: useAppointments("upcoming"), past: useAppointments("past") };
+  const activeQuery = queries[tab];
+  const list = activeQuery.data?.appointments ?? [];
+  const countLabel = (query) => (query.data ? ` (${query.data.total})` : "");
 
   return (
     <div className="page-container max-w-[1080px] pt-8">
@@ -49,21 +26,28 @@ export default function AppointmentsPage({ initialTab = "upcoming" }) {
         value={tab}
         onChange={setTab}
         tabs={[
-          { value: "upcoming", label: `Yaklaşan (${state.counts.upcoming})` },
-          { value: "past", label: `Geçmiş (${state.counts.past})` },
+          { value: "upcoming", label: `Yaklaşan${countLabel(queries.upcoming)}` },
+          { value: "past", label: `Geçmiş${countLabel(queries.past)}` },
         ]}
         className="mb-2"
       />
 
-      {state.status === "loading" ? (
+      {activeQuery.isPending ? (
         <div aria-busy="true" aria-label="Randevular yükleniyor">
           {[1, 2, 3].map((row) => (
             <AppointmentRowSkeleton key={row} />
           ))}
         </div>
-      ) : state.status === "error" ? (
-        <StateMessage role="alert" icon="alert" tone="accent" title="Randevular yüklenemedi." description={state.error} className="mt-4">
-          <Button onClick={loadAppointments}>Tekrar dene</Button>
+      ) : activeQuery.isError ? (
+        <StateMessage
+          role="alert"
+          icon="alert"
+          tone="accent"
+          title="Randevular yüklenemedi."
+          description={getErrorMessage(activeQuery.error)}
+          className="mt-4"
+        >
+          <Button onClick={() => activeQuery.refetch()}>Tekrar dene</Button>
         </StateMessage>
       ) : list.length === 0 ? (
         <StateMessage
@@ -86,11 +70,7 @@ export default function AppointmentsPage({ initialTab = "upcoming" }) {
       )}
 
       {cancelTarget && (
-        <CancelAppointmentDialog
-          appointment={cancelTarget}
-          onCancelled={loadAppointments}
-          onClose={() => setCancelTarget(null)}
-        />
+        <CancelAppointmentDialog appointment={cancelTarget} onClose={() => setCancelTarget(null)} />
       )}
     </div>
   );

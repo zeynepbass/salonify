@@ -1,16 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
-import Spinner from "@/components/atoms/Spinner";
 import BackLink from "@/components/molecules/BackLink";
+import PageSpinner from "@/components/molecules/PageSpinner";
 import StatusTag from "@/components/molecules/StatusTag";
 import AppointmentNotFound from "@/features/customer/appointments/components/AppointmentNotFound";
 import CancelAppointmentDialog from "@/features/customer/appointments/components/CancelAppointmentDialog";
+import { useAppointment } from "@/features/customer/appointments/hooks/useAppointment";
 import { useAddToCalendar } from "@/features/customer/appointments/useAddToCalendar";
-import { toAppointmentView } from "@/features/customer/appointments/appointmentView";
-import { api } from "@/lib/api";
+import { getErrorMessage, isNotFound } from "@/lib/api";
 import { STATUS_META } from "@/lib/appointmentStatus";
 import { formatLongDate } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
@@ -18,31 +18,10 @@ import { formatDuration, formatPrice } from "@/lib/format";
 export default function AppointmentDetailPage({ appointmentId }) {
   const addToCalendar = useAddToCalendar();
   const [cancelOpen, setCancelOpen] = useState(false);
-  const [state, setState] = useState({ status: "loading", appointment: null });
+  const { data: appointment, isPending, error } = useAppointment(appointmentId);
 
-  const loadAppointment = useCallback(async () => {
-    try {
-      const appointment = await api.get(`/appointments/${appointmentId}`);
-      setState({ status: "success", appointment: toAppointmentView(appointment) });
-    } catch {
-      setState({ status: "error", appointment: null });
-    }
-  }, [appointmentId]);
-
-  useEffect(() => {
-    loadAppointment();
-  }, [loadAppointment]);
-
-  if (state.status === "loading") {
-    return (
-      <div aria-busy="true" className="grid min-h-[50vh] place-items-center">
-        <Spinner />
-      </div>
-    );
-  }
-
-  const { appointment } = state;
-  if (!appointment) return <AppointmentNotFound />;
+  if (isPending) return <PageSpinner label="Randevu yükleniyor" />;
+  if (!appointment) return <AppointmentNotFound description={isNotFound(error) ? undefined : getErrorMessage(error)} />;
 
   const { salon, service } = appointment;
   const details = [
@@ -93,9 +72,7 @@ export default function AppointmentDetailPage({ appointmentId }) {
                 <Icon name="closeCircle" />
                 Randevuyu İptal Et
               </Button>
-              <p className="mt-1 text-[12px] text-neutral-700">
-                Randevudan 24 saat öncesine kadar ücretsiz iptal edebilirsin.
-              </p>
+              <p className="mt-1 text-[12px] text-neutral-700">Randevu saati gelene kadar iptal edebilirsin.</p>
             </>
           )}
           {appointment.canReview && (
@@ -117,7 +94,7 @@ export default function AppointmentDetailPage({ appointmentId }) {
       </div>
 
       {cancelOpen && (
-        <CancelAppointmentDialog appointment={appointment} onCancelled={loadAppointment} onClose={() => setCancelOpen(false)} />
+        <CancelAppointmentDialog appointment={appointment} onClose={() => setCancelOpen(false)} />
       )}
     </div>
   );

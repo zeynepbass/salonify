@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toAppointmentView } from "@/features/customer/appointments/appointmentView";
 import { api } from "@/lib/api";
-import { appointmentKeys, notificationKeys } from "@/lib/queryKeys";
+import { appointmentKeys, notificationKeys, salonKeys } from "@/lib/queryKeys";
 
 const LIST_LIMIT = 50;
 
@@ -34,10 +34,11 @@ export function useCancelAppointment(options = {}) {
     mutationFn: ({ appointmentId, reason }) =>
       api.delete(`/appointments/${appointmentId}`, { data: reason ? { reason } : {} }),
     ...options,
-    onSuccess: (...args) => {
+    onSuccess: (cancelled, ...rest) => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.all });
       queryClient.invalidateQueries({ queryKey: notificationKeys.all });
-      options.onSuccess?.(...args);
+      if (cancelled?.salon?.id) queryClient.invalidateQueries({ queryKey: salonKeys.detail(cancelled.salon.id) });
+      options.onSuccess?.(cancelled, ...rest);
     },
   });
 }

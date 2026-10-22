@@ -6,11 +6,12 @@ import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import { Input } from "@/components/atoms/Input";
 import Spinner from "@/components/atoms/Spinner";
+import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
 import Tabs from "@/components/molecules/Tabs";
 import { demoAccounts } from "@/data/catalog";
 import { useAuth } from "@/features/customer/auth/AuthProvider";
-import { getErrorMessage } from "@/lib/api";
+import { useLogin, useLogout, useRegister } from "@/features/customer/auth/hooks/useAuth";
 
 const INITIAL_FORM = { name: "", phone: "", ...demoAccounts.customer };
 
@@ -21,11 +22,20 @@ function getSafeNext(value) {
 export default function CustomerLoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { status, user, login, register, logout } = useAuth();
+  const { status, user } = useAuth();
   const [mode, setMode] = useState("login");
   const [form, setForm] = useState(INITIAL_FORM);
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [roleError, setRoleError] = useState(null);
+  const logout = useLogout();
+  const rejectSalonAccount = (signedIn) => {
+    if (signedIn.role === "CUSTOMER") return;
+    logout.mutate();
+    setRoleError("Bu hesap bir kuaför hesabı. Kuaför paneli girişini kullanın.");
+  };
+  const loginMutation = useLogin({ onSuccess: rejectSalonAccount });
+  const registerMutation = useRegister({ onSuccess: rejectSalonAccount });
+  const activeMutation = mode === "login" ? loginMutation : registerMutation;
+  const submitting = activeMutation.isPending;
 
   const next = getSafeNext(searchParams.get("next"));
 
@@ -35,31 +45,29 @@ export default function CustomerLoginPage() {
 
   const setField = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
 
-  const handleSubmit = async (event) => {
+  const changeMode = (value) => {
+    setMode(value);
+    setRoleError(null);
+    loginMutation.reset();
+    registerMutation.reset();
+  };
+
+  const handleSubmit = (event) => {
     event.preventDefault();
-    setError(null);
-    setSubmitting(true);
+    if (submitting) return;
+    setRoleError(null);
 
-    try {
-      const signedIn =
-        mode === "login"
-          ? await login({ email: form.email, password: form.password })
-          : await register({
-              name: form.name.trim(),
-              email: form.email,
-              password: form.password,
-              ...(form.phone.trim() && { phone: form.phone.trim() }),
-            });
-
-      if (signedIn.role !== "CUSTOMER") {
-        await logout();
-        setError("Bu hesap bir kuaför hesabı. Kuaför paneli girişini kullanın.");
-      }
-    } catch (requestError) {
-      setError(getErrorMessage(requestError));
-    } finally {
-      setSubmitting(false);
+    if (mode === "login") {
+      loginMutation.mutate({ email: form.email.trim(), password: form.password });
+      return;
     }
+
+    registerMutation.mutate({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      password: form.password,
+      ...(form.phone.trim() && { phone: form.phone.trim() }),
+    });
   };
 
   return (
@@ -68,10 +76,7 @@ export default function CustomerLoginPage() {
       <Tabs
         label="Giriş türü"
         value={mode}
-        onChange={(value) => {
-          setMode(value);
-          setError(null);
-        }}
+        onChange={changeMode}
         tabs={[
           { value: "login", label: "Giriş yap" },
           { value: "register", label: "Kayıt ol" },
@@ -106,12 +111,7 @@ export default function CustomerLoginPage() {
           />
         </Field>
 
-        {error && (
-          <p role="alert" className="flex gap-2 bg-accent-100 p-3 text-[13px] text-accent-800">
-            <Icon name="alert" size={16} />
-            {error}
-          </p>
-        )}
+        <ErrorNotice error={roleError ?? activeMutation.error} />
 
         <Button type="submit" variant="primary" size="lg" align="between" disabled={submitting}>
           {mode === "login" ? "Giriş yap" : "Kayıt ol"}

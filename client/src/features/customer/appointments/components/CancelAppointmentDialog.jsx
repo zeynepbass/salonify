@@ -3,35 +3,27 @@
 import { useId, useState } from "react";
 import { Select } from "@/components/atoms/Input";
 import ConfirmDialog from "@/components/molecules/ConfirmDialog";
+import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { cancellationReasons } from "@/data/catalog";
-import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
-import { api, getErrorMessage } from "@/lib/api";
+import { useCancelAppointment } from "@/features/customer/appointments/hooks/useAppointment";
 import { formatLongDate } from "@/lib/date";
 
 export default function CancelAppointmentDialog({ appointment, onCancelled, onClose }) {
   const reasonId = useId();
   const { showToast } = useToast();
-  const { reloadNotifications } = useNotifications();
   const [reason, setReason] = useState("");
-  const [cancelling, setCancelling] = useState(false);
-  const [error, setError] = useState(null);
-
-  const confirm = async () => {
-    setCancelling(true);
-    setError(null);
-    try {
-      const cancelled = await api.delete(`/appointments/${appointment.id}`, { data: reason ? { reason } : {} });
+  const cancellation = useCancelAppointment({
+    onSuccess: (cancelled) => {
       showToast("Randevun iptal edildi. Kuaföre bildirim gönderildi.");
       onCancelled?.(cancelled);
-      reloadNotifications();
       onClose();
-    } catch (requestError) {
-      setError(getErrorMessage(requestError));
-      setCancelling(false);
-    }
-  };
+    },
+  });
+  const cancelling = cancellation.isPending;
+
+  const confirm = () => cancellation.mutate({ appointmentId: appointment.id, reason });
 
   return (
     <ConfirmDialog
@@ -55,11 +47,7 @@ export default function CancelAppointmentDialog({ appointment, onCancelled, onCl
           ))}
         </Select>
       </Field>
-      {error && (
-        <p role="alert" className="mt-3 text-[13px] text-accent-700">
-          {error}
-        </p>
-      )}
+      <ErrorNotice error={cancellation.error} className="mt-3" />
     </ConfirmDialog>
   );
 }

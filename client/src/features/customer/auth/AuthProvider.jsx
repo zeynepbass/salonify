@@ -1,24 +1,45 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import { api } from "@/lib/api";
+import { authKeys } from "@/lib/queryKeys";
 
 const AuthContext = createContext(null);
 
+const toSession = ({ user, salon = null }) => ({ user, salon });
+
+async function restoreSession() {
+  try {
+    return toSession(await api.refreshSession());
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState({ status: "loading", user: null, salon: null });
+  const queryClient = useQueryClient();
+  const { data: session, isPending } = useQuery({
+    queryKey: authKeys.session,
+    queryFn: restoreSession,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: false,
+  });
 
-  const applySession = useCallback(({ accessToken, user, salon = null }) => {
-    if (accessToken) api.setAccessToken(accessToken);
-    setSession({ status: "authenticated", user, salon });
-    return user;
-  }, []);
+  const applySession = useCallback(
+    (payload) => {
+      if (payload.accessToken) api.setAccessToken(payload.accessToken);
+      queryClient.setQueryData(authKeys.session, toSession(payload));
+      return payload.user;
+    },
+    [queryClient],
+  );
 
-  useEffect(() => {
-    api.refreshSession()
-      .then(applySession)
-      .catch(() => setSession({ status: "guest", user: null, salon: null }));
-  }, [applySession]);
+  const clearSession = useCallback(() => {
+    api.setAccessToken(null);
+    queryClient.setQueryData(authKeys.session, null);
+  }, [queryClient]);
 
   const login = useCallback(
     async (credentials) => applySession(await api.post("/auth/login", credentials)),
@@ -31,16 +52,28 @@ export function AuthProvider({ children }) {
     try {
       await api.post("/auth/logout");
     } finally {
-      api.setAccessToken(null);
-      setSession({ status: "guest", user: null, salon: null });
+      clearSession();
     }
-  }, []);
+  }, [clearSession]);
 
-  const updateSession = useCallback((changes) => setSession((current) => ({ ...current, ...changes })), []);
+  const updateSession = useCallback(
+    (changes) => queryClient.setQueryData(authKeys.session, (current) => (current ? { ...current, ...changes } : current)),
+    [queryClient],
+  );
 
   const value = useMemo(
-    () => ({ ...session, login, register, logout, applySession, updateSession }),
-    [session, login, register, logout, applySession, updateSession],
+    () => ({
+      status: isPending ? "loading" : session?.user ? "authenticated" : "guest",
+      user: session?.user ?? null,
+      salon: session?.salon ?? null,
+      login,
+      register,
+      logout,
+      applySession,
+      updateSession,
+      clearSession,
+    }),
+    [isPending, session, login, register, logout, applySession, updateSession, clearSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
