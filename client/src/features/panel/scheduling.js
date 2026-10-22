@@ -1,6 +1,6 @@
 import { isInactiveStatus } from "@/lib/appointmentStatus";
 import { CURRENT_TIME, TODAY } from "@/lib/clock";
-import { addDays, timeToMinutes } from "@/lib/date";
+import { WEEKDAYS, addDays, timeToMinutes } from "@/lib/date";
 import { getDaySchedule } from "@/lib/schedule";
 
 export const SLOT_INTERVAL = 30;
@@ -59,4 +59,22 @@ export function getOpenDates(hours, closedDays, count) {
     if (!getDaySchedule(hours, closedDays, date).closed) dates.push(date);
   }
   return dates;
+}
+
+export function validateHours(hours) {
+  for (const day of hours) {
+    if (!day.open) continue;
+    const name = WEEKDAYS[day.weekday];
+    if (!day.start || !day.end) return `${name} için açılış ve kapanış saati gerekli.`;
+    if (timeToMinutes(day.start) >= timeToMinutes(day.end)) return `${name}: kapanış saati açılıştan sonra olmalı.`;
+    if (Boolean(day.breakStart) !== Boolean(day.breakEnd)) return `${name}: mola için başlangıç ve bitiş birlikte girilmeli.`;
+    if (day.breakStart) {
+      const [breakStart, breakEnd] = [timeToMinutes(day.breakStart), timeToMinutes(day.breakEnd)];
+      if (breakStart >= breakEnd) return `${name}: mola bitişi başlangıçtan sonra olmalı.`;
+      if (breakStart < timeToMinutes(day.start) || breakEnd > timeToMinutes(day.end)) {
+        return `${name}: mola çalışma saatleri içinde olmalı.`;
+      }
+    }
+  }
+  return null;
 }
