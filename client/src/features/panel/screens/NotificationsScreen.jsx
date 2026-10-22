@@ -6,6 +6,7 @@ import Button from "@/components/atoms/Button";
 import SearchInput from "@/components/molecules/SearchInput";
 import StateMessage from "@/components/molecules/StateMessage";
 import NotificationList from "@/components/organisms/NotificationList";
+import { useSearchFilter } from "@/lib/hooks";
 import { usePanelAppointments } from "@/features/panel/hooks/usePanelAppointments";
 import { usePanel } from "@/features/panel/PanelProvider";
 import {
@@ -14,6 +15,8 @@ import {
   useMarkNotificationRead,
   useNotificationList,
 } from "@/features/customer/notifications/hooks/useNotifications";
+
+const getSearchFields = (notification) => [notification.title, notification.body];
 
 export default function NotificationsScreen() {
   const router = useRouter();
@@ -24,6 +27,7 @@ export default function NotificationsScreen() {
   const removeNotification = useDeleteNotification();
   const removeAll = useDeleteAllNotifications();
   const [query, setQuery] = useState("");
+  const { results } = useSearchFilter(notifications, query, getSearchFields);
 
   const handleSelect = (notification) => {
     if (notification.unread) markRead.mutate(notification.id);
@@ -58,9 +62,11 @@ export default function NotificationsScreen() {
       </div>
       {notifications.length === 0 ? (
         <StateMessage icon="bell" title="Henüz bildirim yok." />
+      ) : results.length === 0 ? (
+        <StateMessage icon="search" title="Aramanla eşleşen bildirim yok." />
       ) : (
         <NotificationList
-          notifications={notifications}
+          notifications={results}
           onSelect={handleSelect}
           onDelete={(notification) => removeNotification.mutate(notification.id)}
         />
