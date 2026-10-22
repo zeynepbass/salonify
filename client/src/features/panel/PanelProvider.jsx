@@ -1,10 +1,12 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/features/customer/auth/AuthProvider";
 import { api, getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
 import { addDays } from "@/lib/date";
+import { notificationKeys } from "@/lib/queryKeys";
 import { toWorkingHours, toWorkingHoursPayload } from "@/lib/schedule";
 
 const PanelContext = createContext(null);
@@ -47,6 +49,7 @@ const sortByDate = (list) => [...list].sort((a, b) => a.date.localeCompare(b.dat
 
 export function PanelProvider({ children }) {
   const { updateSession } = useAuth();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
   const [salon, setSalon] = useState(null);
@@ -105,7 +108,8 @@ export function PanelProvider({ children }) {
         ? await api.delete(`/salon/me/appointments/${id}`, { data: {} })
         : await api.patch(`/salon/me/appointments/${id}`, { status: nextStatus });
     setAppointments((current) => replaceById(current, toPanelAppointment(updated)));
-  }, []);
+    queryClient.invalidateQueries({ queryKey: notificationKeys.all });
+  }, [queryClient]);
 
   const saveAppointment = useCallback(async (draft) => {
     const payload = {
@@ -121,8 +125,9 @@ export function PanelProvider({ children }) {
       : await api.post("/salon/me/appointments", payload);
     const view = toPanelAppointment(saved);
     setAppointments((current) => (draft.id ? replaceById(current, view) : [...current, view]));
+    queryClient.invalidateQueries({ queryKey: notificationKeys.all });
     return view;
-  }, []);
+  }, [queryClient]);
 
   const saveService = useCallback(async (draft) => {
     const payload = { name: draft.name, duration: draft.duration, price: draft.price };

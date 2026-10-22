@@ -1,14 +1,12 @@
 "use client";
 
 import { useToast } from "@/components/organisms/ToastProvider";
-import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
 import { usePanel } from "@/features/panel/PanelProvider";
 import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 
 export function useAppointmentActions() {
   const { setAppointmentStatus, closeAppointment, closeConfirmation, requestConfirmation, openAppointmentForm } = usePanel();
-  const { reloadNotifications } = useNotifications();
   const { showToast } = useToast();
 
   const updateStatus = async (appointment, status, message) => {
@@ -16,7 +14,6 @@ export function useAppointmentActions() {
       await setAppointmentStatus(appointment.id, status);
       closeAppointment();
       showToast(message);
-      reloadNotifications();
     } catch (error) {
       showToast(getErrorMessage(error), { tone: "error" });
     } finally {

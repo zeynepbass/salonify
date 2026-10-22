@@ -9,7 +9,6 @@ import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/panel/PanelProvider";
 import { getOpenDates } from "@/features/panel/scheduling";
-import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
 import { api, getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
@@ -21,7 +20,6 @@ const TITLE_ID = "appointment-form-title";
 
 export default function AppointmentFormDialog({ draft, onClose }) {
   const { salon, services, hours, closedDays, saveAppointment } = usePanel();
-  const { reloadNotifications } = useNotifications();
   const { showToast } = useToast();
   const dateOptions = getOpenDates(hours, closedDays, DATE_OPTION_COUNT);
 
@@ -88,7 +86,6 @@ export default function AppointmentFormDialog({ draft, onClose }) {
         note: form.note.trim(),
       });
       showToast(editing ? "Randevu güncellendi. Müşteriye bildirim gönderildi." : "Randevu oluşturuldu.");
-      reloadNotifications();
       onClose();
     } catch (requestError) {
       setError(getErrorMessage(requestError));

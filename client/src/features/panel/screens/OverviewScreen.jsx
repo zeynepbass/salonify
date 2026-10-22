@@ -12,7 +12,7 @@ import { usePanel } from "@/features/panel/PanelProvider";
 import { getDayBounds } from "@/features/panel/scheduling";
 import { useAppointmentActions } from "@/features/panel/useAppointmentActions";
 import { usePanelAppointments } from "@/features/panel/usePanelAppointments";
-import { useNotifications } from "@/features/customer/notifications/NotificationsProvider";
+import { useNotificationList } from "@/features/customer/notifications/hooks/useNotifications";
 import { api, getErrorMessage } from "@/lib/api";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
@@ -79,7 +79,7 @@ export default function OverviewScreen() {
   const panel = usePanel();
   const actions = useAppointmentActions();
   const appointments = usePanelAppointments();
-  const { notifications } = useNotifications();
+  const { notifications } = useNotificationList("salon");
   const [dashboard, setDashboard] = useState({ status: "loading", data: null, error: null });
 
   useEffect(() => {
