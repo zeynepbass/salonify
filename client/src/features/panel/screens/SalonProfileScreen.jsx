@@ -9,7 +9,7 @@ import Tag from "@/components/atoms/Tag";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/panel/PanelProvider";
-import { getErrorMessage, uploadImage } from "@/lib/api";
+import { api, getErrorMessage } from "@/lib/api";
 import { WEEKDAYS } from "@/lib/date";
 
 function SummaryCard({ title, actionLabel, href, children }) {
@@ -69,7 +69,7 @@ export default function SalonProfileScreen() {
 
     setUploading(true);
     try {
-      const upload = await uploadImage(file);
+      const upload = await api.uploadImage(file);
       await updateSalon({ coverImage: upload.url });
       showToast("Profil görseli güncellendi.");
     } catch (error) {

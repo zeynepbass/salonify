@@ -16,7 +16,7 @@ import { toAppointmentView } from "@/features/customer/appointments/appointmentV
 import AppointmentNotFound from "@/features/customer/appointments/components/AppointmentNotFound";
 import PhotoPicker from "@/features/customer/reviews/components/PhotoPicker";
 import StarInput from "@/features/customer/reviews/components/StarInput";
-import { api, getErrorMessage, uploadImage } from "@/lib/api";
+import { api, getErrorMessage } from "@/lib/api";
 import { formatLongDate } from "@/lib/date";
 
 const MAX_COMMENT_LENGTH = 500;
@@ -80,7 +80,7 @@ export default function ReviewFormPage({ appointmentId }) {
     setSubmitting(true);
     setError(null);
     try {
-      const uploads = await Promise.all(photos.map((photo) => uploadImage(photo.file)));
+      const uploads = await Promise.all(photos.map((photo) => api.uploadImage(photo.file)));
       await api.post(`/appointments/${appointment.id}/review`, {
         rating,
         comment: comment.trim(),

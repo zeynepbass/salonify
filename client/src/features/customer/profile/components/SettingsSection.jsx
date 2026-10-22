@@ -7,7 +7,7 @@ import { Input } from "@/components/atoms/Input";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { useAuth } from "@/features/customer/auth/AuthProvider";
-import { api, getErrorMessage, setAccessToken } from "@/lib/api";
+import { api, getErrorMessage } from "@/lib/api";
 
 function PasswordForm({ onDone }) {
   const { applySession } = useAuth();
@@ -81,7 +81,7 @@ function DeleteAccountForm({ onDone }) {
     setError(null);
     try {
       await api.delete("/users/me", { data: { password } });
-      setAccessToken(null);
+      api.setAccessToken(null);
       updateSession({ status: "guest", user: null, salon: null });
       router.replace("/");
     } catch (requestError) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { api, refreshSession, setAccessToken } from "@/lib/api";
+import { api } from "@/lib/api";
 
 const AuthContext = createContext(null);
 
@@ -9,13 +9,13 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState({ status: "loading", user: null, salon: null });
 
   const applySession = useCallback(({ accessToken, user, salon = null }) => {
-    if (accessToken) setAccessToken(accessToken);
+    if (accessToken) api.setAccessToken(accessToken);
     setSession({ status: "authenticated", user, salon });
     return user;
   }, []);
 
   useEffect(() => {
-    refreshSession()
+    api.refreshSession()
       .then(applySession)
       .catch(() => setSession({ status: "guest", user: null, salon: null }));
   }, [applySession]);
@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
     try {
       await api.post("/auth/logout");
     } finally {
-      setAccessToken(null);
+      api.setAccessToken(null);
       setSession({ status: "guest", user: null, salon: null });
     }
   }, []);
