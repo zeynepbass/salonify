@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import Spinner from "@/components/atoms/Spinner";
@@ -9,7 +9,9 @@ import SearchInput from "@/components/molecules/SearchInput";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { cities } from "@/data/catalog";
 import { cn } from "@/lib/cn";
-import { includesText } from "@/lib/format";
+import { useSearchFilter } from "@/lib/hooks";
+
+const getDistrictFields = (district) => [district];
 
 function Option({ selected, onSelect, trailing, children }) {
   return (
@@ -37,8 +39,8 @@ export default function LocationDialog({ current, onApply, onClose }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("idle");
 
-  const districts = cities.find((item) => item.name === city).districts;
-  const visibleDistricts = districts.filter((item) => includesText(item, query));
+  const districts = useMemo(() => cities.find((item) => item.name === city)?.districts ?? [], [city]);
+  const { results: visibleDistricts } = useSearchFilter(districts, query, getDistrictFields);
   const locating = status === "locating";
 
   const selectCity = (name) => {
