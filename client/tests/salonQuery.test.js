@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_FILTERS, buildSalonParams } from "@/features/customer/search/salonQuery";
+import { buildChips } from "@/features/customer/search/filterChips";
 import { buildSearchHref, parseFilters } from "@/features/customer/search/useSalonFilters";
 
 const istanbul = { city: "İstanbul", district: "Kadıköy" };
@@ -44,5 +45,26 @@ describe("arama URL'i", () => {
   it("bozuk URL değerlerinde varsayılanlara döner", () => {
     const filters = parseFilters(new URLSearchParams("puan=abc&sayfa=-3&sirala=xyz&uygunluk=hep&hizmet=,,"));
     expect(filters).toMatchObject({ minRating: 0, page: 1, sort: "puan", availability: "any", serviceIds: [] });
+  });
+});
+
+describe("buildChips", () => {
+  const noop = () => {};
+
+  it("varsayılan filtrelerde etiket üretmez", () => {
+    expect(buildChips(DEFAULT_FILTERS, noop, true)).toEqual([]);
+  });
+
+  it("konum yoksa mesafe etiketini göstermez, aramayı en başa koyar", () => {
+    const filters = { ...DEFAULT_FILTERS, query: "kesim", distance: 10, minRating: 4.5 };
+    expect(buildChips(filters, noop, false).map((chip) => chip.key)).toEqual(["query", "rating"]);
+    expect(buildChips(filters, noop, true).map((chip) => chip.key)).toEqual(["query", "rating", "distance"]);
+  });
+
+  it("etiket kaldırıldığında yalnızca ilgili değeri temizler", () => {
+    const changes = [];
+    const chips = buildChips({ ...DEFAULT_FILTERS, serviceIds: ["kesim", "boya"] }, (change) => changes.push(change), false);
+    chips[0].onRemove();
+    expect(changes).toEqual([{ serviceIds: ["boya"] }]);
   });
 });
