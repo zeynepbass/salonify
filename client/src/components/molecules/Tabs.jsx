@@ -17,7 +17,7 @@ export default function Tabs({ label, tabs, value, onChange, className }) {
             aria-selected={selected}
             onClick={() => onChange(tab.value)}
             className={cn(
-              "border-b-[3px] px-3.5 py-3 text-[15px] font-bold whitespace-nowrap transition-colors",
+              "border-b-[3px] px-3.5 py-3 text-[15px] font-semibold whitespace-nowrap transition-colors",
               selected ? "border-accent text-ink" : "border-transparent text-neutral-700 hover:text-ink",
             )}
           >

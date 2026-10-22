@@ -9,7 +9,7 @@ export default function ErrorNotice({ error, className }) {
   const details = fieldErrors.filter((item) => item.message !== message);
 
   return (
-    <div role="alert" className={cn("flex gap-2.5 bg-accent-100 p-3 text-[13px] text-accent-800", className)}>
+    <div role="alert" className={cn("flex gap-2.5 rounded-md border border-accent-400/40 bg-accent-100 p-3 text-[13px] text-accent-800", className)}>
       <Icon name="alert" size={16} className="mt-0.5 flex-none" />
       <div className="min-w-0">
         <p className="font-semibold">{message}</p>

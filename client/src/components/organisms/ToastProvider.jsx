@@ -27,7 +27,7 @@ export function ToastProvider({ className, children }) {
       {children}
       <div role="status" aria-live="polite" className={cn("pointer-events-none fixed z-95 max-w-[calc(100vw-32px)]", className)}>
         {toast && (
-          <div className="flex animate-rise items-center gap-2.5 bg-neutral-900 px-[18px] py-3.5 text-[14px] text-canvas shadow-lg">
+          <div className="flex animate-rise items-center gap-2.5 rounded-lg bg-neutral-900 px-[18px] py-3.5 text-[14px] text-canvas shadow-lg">
             <Icon name={toast.tone === "error" ? "alert" : "check"} className="text-accent-400" />
             {toast.message}
           </div>
