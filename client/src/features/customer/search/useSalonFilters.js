@@ -19,7 +19,7 @@ const toList = (value) => (value ? value.split(",").filter(Boolean) : []);
 const toNumber = (value, fallback) => (value !== null && !Number.isNaN(Number(value)) ? Number(value) : fallback);
 const toOption = (value, options, fallback) => (options.some((option) => option.value === value) ? value : fallback);
 
-function parseFilters(params) {
+export function parseFilters(params) {
   return {
     query: params.get(PARAMS.query) ?? DEFAULT_FILTERS.query,
     serviceIds: toList(params.get(PARAMS.serviceIds)),
