@@ -6,7 +6,7 @@ const GRID = "grid grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-2";
 
 function Notice({ children }) {
   return (
-    <div className="flex items-center gap-2.5 border border-dashed border-line px-5 py-7 text-[14px] text-neutral-700">
+    <div className="flex items-center gap-2.5 rounded-lg border border-dashed border-neutral-400 px-5 py-7 text-[14px] text-neutral-700">
       <Icon name="calendar" />
       {children}
     </div>
@@ -43,9 +43,9 @@ export default function SlotPicker({ slots, value, loading, hasDate, onChange })
             aria-label={`${slot.time} ${slot.available ? "boş" : "dolu"}`}
             onClick={() => onChange(slot.time)}
             className={cn(
-              "flex flex-col items-start gap-0.5 border px-3 py-2.5 text-left transition-colors",
-              selected && "border-accent bg-accent text-canvas",
-              !selected && slot.available && "border-line bg-canvas hover:border-ink",
+              "flex flex-col items-start gap-0.5 rounded-md border px-3 py-2.5 text-left transition-all",
+              selected && "border-accent bg-accent text-canvas shadow-md",
+              !selected && slot.available && "border-line bg-canvas hover:-translate-y-px hover:border-accent-400",
               !slot.available && "stripes-muted cursor-not-allowed border-neutral-300 text-neutral-600",
             )}
           >

@@ -7,11 +7,11 @@ function Legend() {
   return (
     <div className="mt-3.5 flex flex-wrap gap-4 text-[12px] text-neutral-700">
       <span className="flex items-center gap-1.5">
-        <span className="size-3 border-2 border-ink" />
+        <span className="size-3 rounded-sm border border-neutral-400" />
         Bugün
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="size-3 bg-accent" />
+        <span className="size-3 rounded-sm bg-accent" />
         Seçili
       </span>
       <span className="flex items-center gap-1.5">
@@ -27,7 +27,7 @@ export default function DatePicker({ year, monthIndex, value, getAvailability, o
   const title = `${MONTHS[monthIndex]} ${year}`;
 
   return (
-    <div className="bg-surface p-4 sm:p-5">
+    <div className="rounded-xl bg-surface p-4 sm:p-5">
       <div className="mb-3 flex items-center justify-between">
         <strong className="text-[17px]">{title}</strong>
         <div className="flex gap-1">
@@ -64,11 +64,11 @@ export default function DatePicker({ year, monthIndex, value, getAvailability, o
               aria-label={`${day} ${MONTHS[monthIndex]}${closed ? ", kapalı" : past ? ", geçmiş" : ""}`}
               onClick={() => onChange(date)}
               className={cn(
-                "flex h-12 flex-col items-center justify-center gap-px border text-[15px] transition-colors",
-                selectable && "hover:border-ink",
+                "flex h-12 flex-col items-center justify-center gap-px rounded-md border text-[15px] transition-colors",
+                selectable && "hover:border-accent-400",
                 selected && "border-accent bg-accent font-extrabold text-canvas hover:border-accent",
                 !selected && selectable && "border-transparent bg-canvas font-medium",
-                !selected && today && "border-2 border-ink font-extrabold",
+                !selected && today && "border border-neutral-400 font-extrabold",
                 !selectable && "cursor-not-allowed border-transparent text-neutral-500",
               )}
             >
