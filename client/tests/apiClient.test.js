@@ -12,19 +12,12 @@ describe("ApiClient", () => {
     expect(() => new ApiClient("http://localhost")).toThrow(/tekil/);
   });
 
-  it("token'ı ayarlar ve temizler", () => {
-    api.setAccessToken("abc");
-    expect(api.accessToken).toBe("abc");
-    api.setAccessToken(undefined);
-    expect(api.accessToken).toBeNull();
-  });
-
   it("token varken isteğe Authorization başlığı ekler", async () => {
     api.setAccessToken("token-1");
     const [handler] = api.http.interceptors.request.handlers;
     const config = await handler.fulfilled({ headers: {} });
     expect(config.headers.Authorization).toBe("Bearer token-1");
-    api.setAccessToken(null);
+    api.setAccessToken(undefined);
     const anonymous = await handler.fulfilled({ headers: {} });
     expect(anonymous.headers.Authorization).toBeUndefined();
   });

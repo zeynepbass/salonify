@@ -32,10 +32,6 @@ export function getErrorMessage(error, fallback = FALLBACK_MESSAGE) {
   return status === 0 || message !== FALLBACK_MESSAGE ? message : fallback;
 }
 
-export function getFieldErrors(error) {
-  return toApiError(error).fieldErrors;
-}
-
 export function isNotFound(error) {
   const status = error?.response?.status;
   return status === 404 || status === 400;

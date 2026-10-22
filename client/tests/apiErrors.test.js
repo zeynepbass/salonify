@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getErrorMessage, getFieldErrors, getResponseMessage, isNotFound, toApiError } from "@/lib/api/errors";
+import { getErrorMessage, getResponseMessage, isNotFound, toApiError } from "@/lib/api/errors";
 
 const httpError = (status, data) => ({ isAxiosError: true, response: { status, data } });
 
@@ -32,7 +32,7 @@ describe("toApiError", () => {
   it("gövdesi HTML ya da boş olan yanıtta varsayılan mesajı kullanır", () => {
     expect(getErrorMessage(httpError(502, "<html>Bad Gateway</html>"))).toBe("Bir şeyler ters gitti. Lütfen tekrar deneyin.");
     expect(getErrorMessage(httpError(500, { message: "   " }), "Özel mesaj")).toBe("Özel mesaj");
-    expect(getFieldErrors(httpError(500, null))).toEqual([]);
+    expect(toApiError(httpError(500, null)).fieldErrors).toEqual([]);
   });
 
   it("undefined hata için çökmeden varsayılan döner", () => {

@@ -26,10 +26,6 @@ export class ApiClient {
     );
   }
 
-  get accessToken() {
-    return this.#accessToken;
-  }
-
   setAccessToken(token) {
     this.#accessToken = token ?? null;
   }
