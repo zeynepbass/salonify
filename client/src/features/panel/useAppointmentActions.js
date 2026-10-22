@@ -2,26 +2,32 @@
 
 import { useToast } from "@/components/organisms/ToastProvider";
 import { usePanel } from "@/features/panel/PanelProvider";
+import { useUpdateAppointmentStatus } from "@/features/panel/hooks/usePanelAppointments";
 import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 
 export function useAppointmentActions() {
-  const { setAppointmentStatus, closeAppointment, closeConfirmation, requestConfirmation, openAppointmentForm } = usePanel();
+  const { closeAppointment, closeConfirmation, requestConfirmation, openAppointmentForm } = usePanel();
   const { showToast } = useToast();
+  const statusMutation = useUpdateAppointmentStatus();
 
-  const updateStatus = async (appointment, status, message) => {
-    try {
-      await setAppointmentStatus(appointment.id, status);
-      closeAppointment();
-      showToast(message);
-    } catch (error) {
-      showToast(getErrorMessage(error), { tone: "error" });
-    } finally {
-      closeConfirmation();
-    }
+  const updateStatus = (appointment, status, message) => {
+    if (statusMutation.isPending) return;
+    statusMutation.mutate(
+      { id: appointment.id, status },
+      {
+        onSuccess: () => {
+          closeAppointment();
+          showToast(message);
+        },
+        onError: (error) => showToast(getErrorMessage(error), { tone: "error" }),
+        onSettled: closeConfirmation,
+      },
+    );
   };
 
   return {
+    pending: statusMutation.isPending,
     complete: (appointment) =>
       updateStatus(
         appointment,
