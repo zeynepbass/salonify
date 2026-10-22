@@ -7,7 +7,7 @@ const EMPTY = "—";
 
 const ASSURANCES = [
   "Randevun anında oluşturulur, kuaföre bildirim gider.",
-  "Randevudan 24 saat öncesine kadar ücretsiz iptal.",
+  "Randevu saatine kadar Randevularım sayfasından iptal edebilirsin.",
 ];
 
 export default function BookingSummary({ salon, rows, total, canSubmit, submitting, onSubmit }) {
