@@ -92,7 +92,8 @@ salonify/
 │   │   ├── components/     ortak bileşenler (atoms, molecules, organisms)
 │   │   ├── features/
 │   │   │   ├── customer/   müşteri modülleri, her modülün hooks/ klasörü
-│   │   │   └── panel/      kuaför paneli ekranları ve hooks/ klasörü
+│   │   │   ├── panel/      kuaför paneli ekranları, bileşenleri ve hooks/ klasörü
+│   │   │   └── shared/     iki tarafın ortak kullandığı oturum, bildirim ve müsaitlik modülleri
 │   │   ├── data/           sabit listeler (kategoriler, şehirler)
 │   │   ├── lib/
 │   │   │   ├── api/        ApiClient (singleton) ve hata dönüşümleri
@@ -109,6 +110,12 @@ salonify/
 
 ## Mimari
 
+### Kod ilkeleri
+
+- **SOLID:** Her bileşen tek bir iş yapar. Veri yüklemeyi `AppointmentGate` / `SalonGate`, durum gösterimini `QueryState` üstlenir; sayfa bileşenleri yalnızca kendi içeriğini çizer. `AuthProvider` yalnızca oturum durumunu tutar, giriş/kayıt/çıkış istekleri mutation hook'larındadır. Panel ve müşteri tarafı birbirinin klasörüne bağımlı değildir, ortak kod `features/shared` altındadır.
+- **DRY:** Hata kutusu (`QueryError`), hata bildirimi (`useToast().showError`), tablo hücreleri (`Table`), doğrulama kuralları (`lib/validation.js`), rol kontrollü giriş (`useRoleGuardedAuth`) ve güvenli yönlendirme (`useRedirectWhenSignedIn`) tek yerde tanımlıdır.
+- **KISS / YAGNI:** Yalnızca kullanılan export'lar bırakıldı, saf mantık (`filterChips`, `validateHours`, `search`) bileşenlerin dışında ve testlidir.
+
 ### Veri katmanı
 
 - **`ApiClient` (singleton):** `lib/api/ApiClient.js` tek bir axios örneği tutar. `ApiClient.getInstance()` her yerde aynı nesneyi döner, ikinci bir `new ApiClient()` hata fırlatır. Erişim token'ı bu nesnede saklanır, 401 alan istek bir kez yenilenen token ile tekrar denenir, aynı anda gelen yenileme istekleri tek isteğe indirilir.
@@ -121,10 +128,10 @@ Her sayfa verisini `useQuery` / `useMutation` hook'larından alır, sayfa bileş
 
 | Modül | Hook'lar |
 | --- | --- |
-| Oturum | `AuthProvider` (oturum `useQuery` ile geri yüklenir), `useLogin`, `useRegister`, `useLogout` |
-| Ana sayfa / arama | `useNearbySalons`, `usePopularSalons`, `useTopRatedSalons`, `useSalons` |
+| Oturum | `AuthProvider` (oturum `useQuery` ile geri yüklenir), `useLogin`, `useRegister`, `useLogout`, `useRoleGuardedAuth`, `useRedirectWhenSignedIn` |
+| Ana sayfa / arama | `useSalonShowcase`, `usePopularSalons`, `useTopRatedSalons`, `useSalons` |
 | Salon | `useSalon`, `useSalonReviews` |
-| Randevu alma | `useAvailability`, `useBookAppointment` |
+| Randevu alma | `useAvailability` (panel ile ortak), `useBookAppointment` |
 | Randevularım | `useAppointments`, `useAppointment`, `useCancelAppointment`, `useCreateReview` |
 | Profil | `useMyReviews`, `useUpdateProfile`, `useChangePassword`, `useDeleteAccount` |
 | Bildirimler | `useNotificationList`, `useMarkNotificationRead`, `useMarkAllNotificationsRead`, `useDeleteNotification`, `useDeleteAllNotifications` (iyimser güncelleme, dakikada bir yenileme) |
@@ -173,6 +180,7 @@ npm start
 
 | Sürüm | Değişiklikler |
 | --- | --- |
+| v1.3.0 | SOLID, DRY, KISS ve YAGNI'ye göre yeniden düzenleme: ortak `shared` modülü, sayfa yükleme kapıları, büyük ekranların bileşenlere bölünmesi, kullanılmayan kodun kaldırılması, çıkış sonrası yönlendirme düzeltmesi |
 | v1.2.0 | `useMemo` + `useDeferredValue` ile Türkçe duyarsız arama, Vitest uç durum testleri, çalışmayan özelliklerin kaldırılması, yeni tasarım (sıcak palet, yuvarlak köşeler, renkli görseller), site simgesi |
 | v1.1.1 | Singleton `ApiClient` ve `QueryClient`, tüm sayfaların TanStack Query hook'larına bağlanması, API yanıtlarının ekranda gösterilmesi |
 
@@ -191,7 +199,7 @@ Gerekli ortam değişkenleri ve bütün uçların açıklaması için: [server/R
 
 ```bash
 cd client
-npm test           # Vitest: arama, API istemcisi, hata dönüşümü, tarih, çalışma saatleri, URL filtreleri
+npm test           # Vitest: arama, API istemcisi, hata dönüşümü, tarih, doğrulama, çalışma saatleri, URL filtreleri
 
 cd server
 npm test           # API uçları, örnek veri ve zaman yardımcıları (in-memory MongoDB)
