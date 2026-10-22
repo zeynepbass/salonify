@@ -6,7 +6,7 @@ import { getDaySchedule } from "@/lib/schedule";
 export const SLOT_INTERVAL = 30;
 export const NOW_MINUTES = timeToMinutes(CURRENT_TIME);
 
-export function toAppointmentView(appointment) {
+export function withScheduleState(appointment) {
   const start = timeToMinutes(appointment.time);
   const end = timeToMinutes(appointment.endTime);
   const booked = appointment.status === "BOOKED";

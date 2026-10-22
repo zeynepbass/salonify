@@ -1,7 +1,7 @@
-import { toAppointmentView } from "@/features/panel/scheduling";
+import { withScheduleState } from "@/features/panel/scheduling";
 
 export function toPanelAppointment(appointment) {
-  return toAppointmentView({
+  return withScheduleState({
     id: appointment.id,
     reference: appointment.reference,
     date: appointment.date,
