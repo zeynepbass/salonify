@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/features/customer/auth/AuthProvider";
+import { useAuth } from "@/features/shared/auth/AuthProvider";
 import { api } from "@/lib/api";
 import { panelKeys, salonKeys } from "@/lib/queryKeys";
 

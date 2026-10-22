@@ -5,9 +5,9 @@ import BottomNav from "@/components/molecules/BottomNav";
 import Footer from "@/components/organisms/Footer";
 import Navbar from "@/components/organisms/Navbar";
 import { ToastProvider } from "@/components/organisms/ToastProvider";
-import { useAuth } from "@/features/customer/auth/AuthProvider";
+import { useAuth } from "@/features/shared/auth/AuthProvider";
 import { LocationProvider } from "@/features/customer/location/LocationProvider";
-import { useUnreadNotificationCount } from "@/features/customer/notifications/hooks/useNotifications";
+import { useUnreadNotificationCount } from "@/features/shared/notifications/useNotifications";
 
 const NAV_ITEMS = [
   { label: "Keşfet", shortLabel: "Keşfet", href: "/", icon: "home", match: (path) => path === "/" },

@@ -10,7 +10,7 @@ import Field from "@/components/molecules/Field";
 import PageSpinner from "@/components/molecules/PageSpinner";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { useAvailability } from "@/features/customer/booking/hooks/useBooking";
+import { useAvailability } from "@/features/shared/availability/useAvailability";
 import { useSaveAppointment } from "@/features/panel/hooks/usePanelAppointments";
 import { usePanelSchedule } from "@/features/panel/hooks/useSchedule";
 import { useServices } from "@/features/panel/hooks/useServices";

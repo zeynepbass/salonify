@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useLogout } from "@/features/customer/auth/hooks/useAuth";
+import { useLogout } from "@/features/shared/auth/hooks/useAuthMutations";
 
 export default function LogoutButton({ className, onDone, children }) {
   const router = useRouter();
