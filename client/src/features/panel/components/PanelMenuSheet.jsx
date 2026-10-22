@@ -20,7 +20,7 @@ export default function PanelMenuSheet({ pathname, salonId, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-label="Menü"
-        className="fixed inset-x-0 bottom-0 z-61 flex max-h-[86vh] animate-rise flex-col overflow-y-auto border-t-2 border-ink bg-canvas p-4"
+        className="fixed inset-x-0 bottom-0 z-61 flex max-h-[86vh] animate-rise flex-col overflow-y-auto border-t border-neutral-400 bg-canvas p-4"
       >
         {PANEL_NAV.map((item) => (
           <Link

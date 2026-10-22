@@ -45,7 +45,7 @@ export default function AppointmentDetailPage({ appointmentId }) {
       </div>
 
       <div className="flex flex-wrap items-start gap-10">
-        <dl className="grid min-w-0 flex-[1_1_520px] grid-cols-[repeat(auto-fill,minmax(200px,1fr))] border-t-2 border-ink">
+        <dl className="grid min-w-0 flex-[1_1_520px] grid-cols-[repeat(auto-fill,minmax(200px,1fr))] border-t border-neutral-400">
           {details.map((item) => (
             <div key={item.label} className="border-b border-line py-4 pr-4">
               <dt className="mb-1 text-[12px] text-neutral-700">{item.label}</dt>
@@ -54,7 +54,7 @@ export default function AppointmentDetailPage({ appointmentId }) {
           ))}
         </dl>
 
-        <aside className="flex flex-[1_1_300px] flex-col gap-2 bg-surface p-5">
+        <aside className="flex flex-[1_1_300px] flex-col gap-2 rounded-xl bg-surface p-5">
           <h2 className="eyebrow mb-1 tracking-[0.08em] text-neutral-700 text-center">İşlemler</h2>
           <Button size="md" align="start" className="gap-2.5 px-3" onClick={() => addToCalendar(appointment)}>
             <Icon name="calendarPlus" />

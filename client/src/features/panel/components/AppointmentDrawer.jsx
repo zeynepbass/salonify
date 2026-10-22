@@ -35,7 +35,7 @@ export default function AppointmentDrawer({ appointment, onClose }) {
         aria-labelledby="appointment-drawer-title"
         className="fixed inset-y-0 right-0 z-61 flex w-[min(440px,100vw)] animate-rise flex-col overflow-auto bg-canvas shadow-lg"
       >
-        <div className="flex items-center justify-between border-b-2 border-line px-5 py-4">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <span className="eyebrow text-neutral-700">Randevu detayı</span>
           <Button variant="plain" size="icon" aria-label="Kapat" onClick={onClose}>
             <Icon name="close" />
@@ -58,7 +58,7 @@ export default function AppointmentDrawer({ appointment, onClose }) {
               </a>
             )}
           </div>
-          <dl className="grid grid-cols-2 border-t-2 border-ink">
+          <dl className="grid grid-cols-2 border-t border-neutral-400">
             {details.map((item) => (
               <div key={item.label} className="border-b border-line py-3 pr-3">
                 <dt className="text-[12px] text-neutral-700">{item.label}</dt>
@@ -71,7 +71,7 @@ export default function AppointmentDrawer({ appointment, onClose }) {
             <div className="text-[14px]">{appointment.note || "—"}</div>
           </div>
           {appointment.locked && (
-            <div className="flex gap-2 bg-surface p-3 text-[13px] text-neutral-700">
+            <div className="flex gap-2 rounded-xl bg-surface p-3 text-[13px] text-neutral-700">
               <Icon name="lock" size={14} className="mt-0.5" />
               Bu randevu geçmişte kaldı veya kapandı; düzenlenemez.
             </div>
@@ -79,7 +79,7 @@ export default function AppointmentDrawer({ appointment, onClose }) {
         </div>
 
         {(appointment.canComplete || appointment.canEdit) && (
-          <div className="flex flex-col gap-2 border-t-2 border-line px-5 py-4">
+          <div className="flex flex-col gap-2 border-t border-line px-5 py-4">
             {appointment.canComplete && (
               <>
                 <Button variant="primary" {...ACTION} onClick={() => actions.complete(appointment)}>

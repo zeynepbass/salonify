@@ -30,7 +30,7 @@ function PortfolioCard({ item, busy, onToggle }) {
   const labelId = `portfolio-${item.id}`;
 
   return (
-    <div className="flex flex-col bg-surface">
+    <div className="card flex flex-col overflow-hidden">
       <div className="relative">
         <ImagePlaceholder
           src={item.image}
@@ -39,7 +39,7 @@ function PortfolioCard({ item, busy, onToggle }) {
           className="aspect-[4/5]"
           imageClassName={item.consent ? undefined : "opacity-50"}
         />
-        <Tag variant={visibility.variant} className="absolute top-0 left-0">
+        <Tag variant={visibility.variant} className="absolute top-2.5 left-2.5 shadow-sm">
           {visibility.icon && <Icon name={visibility.icon} size={12} />}
           {visibility.label}
         </Tag>

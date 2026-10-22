@@ -46,7 +46,7 @@ export default function AccountSection({ user }) {
         </div>
       </div>
 
-      <h2 className="mb-4 border-t-2 border-line pt-5 text-[20px]">Hesap bilgilerim</h2>
+      <h2 className="mb-4 border-t border-line pt-5 text-[20px]">Hesap bilgilerim</h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-4">
         <Field label="Ad soyad" htmlFor="profile-name" error={!form.name.trim() && "Ad soyad gerekli."}>
           <Input id="profile-name" value={form.name} onChange={setField("name")} aria-invalid={!form.name.trim()} autoComplete="name" />
