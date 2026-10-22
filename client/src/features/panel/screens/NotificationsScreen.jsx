@@ -14,7 +14,7 @@ import {
   useDeleteNotification,
   useMarkNotificationRead,
   useNotificationList,
-} from "@/features/customer/notifications/hooks/useNotifications";
+} from "@/features/shared/notifications/useNotifications";
 
 const getSearchFields = (notification) => [notification.title, notification.body];
 

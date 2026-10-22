@@ -1,6 +1,6 @@
 import { Fraunces, Inter } from "next/font/google";
 import { QueryProvider } from "@/components/organisms/QueryProvider";
-import { AuthProvider } from "@/features/customer/auth/AuthProvider";
+import { AuthProvider } from "@/features/shared/auth/AuthProvider";
 import "@/styles/globals.css";
 
 const inter = Inter({

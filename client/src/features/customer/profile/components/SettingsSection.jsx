@@ -7,7 +7,7 @@ import { Input } from "@/components/atoms/Input";
 import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { useLogout } from "@/features/customer/auth/hooks/useAuth";
+import { useLogout } from "@/features/shared/auth/hooks/useAuthMutations";
 import { useChangePassword, useDeleteAccount } from "@/features/customer/profile/hooks/useProfile";
 import { getResponseMessage } from "@/lib/api";
 

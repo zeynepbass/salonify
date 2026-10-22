@@ -1,21 +1,8 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { appointmentKeys, notificationKeys, salonKeys } from "@/lib/queryKeys";
-
-export function useAvailability(salonId, { serviceId, date, excludeAppointmentId } = {}, options = {}) {
-  const params = { serviceId, date, ...(excludeAppointmentId && { excludeAppointmentId }) };
-
-  return useQuery({
-    queryKey: salonKeys.availability(salonId, params),
-    queryFn: () => api.get(`/salons/${salonId}/availability`, { params }),
-    select: (data) => data.slots,
-    enabled: Boolean(salonId && serviceId && date),
-    staleTime: 0,
-    ...options,
-  });
-}
 
 export function useBookAppointment(options = {}) {
   const queryClient = useQueryClient();

@@ -13,7 +13,7 @@ import { usePanelAppointments } from "@/features/panel/hooks/usePanelAppointment
 import { usePanelSchedule } from "@/features/panel/hooks/useSchedule";
 import { getDayBounds } from "@/features/panel/scheduling";
 import { useAppointmentActions } from "@/features/panel/useAppointmentActions";
-import { useNotificationList } from "@/features/customer/notifications/hooks/useNotifications";
+import { useNotificationList } from "@/features/shared/notifications/useNotifications";
 import { combineQueries } from "@/lib/combineQueries";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";

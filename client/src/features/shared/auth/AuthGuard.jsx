@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Spinner from "@/components/atoms/Spinner";
-import { useAuth } from "@/features/customer/auth/AuthProvider";
+import { useAuth } from "@/features/shared/auth/AuthProvider";
 
 export default function AuthGuard({ role = "CUSTOMER", loginHref = "/giris", children }) {
   const router = useRouter();

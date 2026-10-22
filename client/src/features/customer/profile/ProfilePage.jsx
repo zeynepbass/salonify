@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import Icon from "@/components/atoms/Icon";
-import { useAuth } from "@/features/customer/auth/AuthProvider";
+import { useAuth } from "@/features/shared/auth/AuthProvider";
 import AccountSection from "@/features/customer/profile/components/AccountSection";
 import MyReviewsSection from "@/features/customer/profile/components/MyReviewsSection";
 import SettingsSection from "@/features/customer/profile/components/SettingsSection";
