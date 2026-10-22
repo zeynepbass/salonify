@@ -7,6 +7,7 @@ import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import StarRating from "@/components/atoms/StarRating";
 import Tag from "@/components/atoms/Tag";
 import StateMessage from "@/components/molecules/StateMessage";
+import QueryState from "@/components/organisms/QueryState";
 import SalonSection from "@/features/customer/salon/components/SalonSection";
 import { formatLongDate } from "@/lib/date";
 import { formatRating } from "@/lib/format";
@@ -62,27 +63,37 @@ function ReviewItem({ review }) {
   );
 }
 
-export default function ReviewsSection({ summary, reviews }) {
+function ReviewList({ reviews }) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? reviews : reviews.slice(0, PREVIEW_COUNT);
 
   return (
+    <div className="flex min-w-0 flex-[1_1_480px] flex-col">
+      {reviews.length === 0 ? (
+        <StateMessage icon="star" title="Henüz değerlendirme yok." description="İlk değerlendirmeyi sen yapabilirsin." />
+      ) : (
+        visible.map((review) => <ReviewItem key={review.id} review={review} />)
+      )}
+      {reviews.length > PREVIEW_COUNT && (
+        <Button className="mt-2 self-start" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>
+          {expanded ? "Daha az göster" : `Tüm değerlendirmeleri gör (${reviews.length})`}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+export default function ReviewsSection({ query }) {
+  return (
     <SalonSection id="degerlendirmeler" title="Değerlendirmeler">
-      <div className="flex flex-wrap items-start gap-10">
-        <RatingSummary summary={summary} />
-        <div className="flex min-w-0 flex-[1_1_480px] flex-col">
-          {reviews.length === 0 ? (
-            <StateMessage icon="star" title="Henüz değerlendirme yok." description="İlk değerlendirmeyi sen yapabilirsin." />
-          ) : (
-            visible.map((review) => <ReviewItem key={review.id} review={review} />)
-          )}
-          {reviews.length > PREVIEW_COUNT && (
-            <Button className="mt-2 self-start" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>
-              {expanded ? "Daha az göster" : `Tüm değerlendirmeleri gör (${reviews.length})`}
-            </Button>
-          )}
-        </div>
-      </div>
+      <QueryState query={query} errorTitle="Değerlendirmeler yüklenemedi.">
+        {(data) => (
+          <div className="flex flex-wrap items-start gap-10">
+            <RatingSummary summary={data.summary} />
+            <ReviewList reviews={data.items} />
+          </div>
+        )}
+      </QueryState>
     </SalonSection>
   );
 }
