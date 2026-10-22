@@ -1,19 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
 import StateMessage from "@/components/molecules/StateMessage";
 import { useLocation } from "@/features/customer/location/LocationProvider";
 import SalonGrid, { SalonGridSkeleton } from "@/features/customer/salon/components/SalonGrid";
+import { useSalons } from "@/features/customer/search/hooks/useSearch";
 import ActiveFilters from "@/features/customer/search/components/ActiveFilters";
 import FilterPanel from "@/features/customer/search/components/FilterPanel";
 import Pagination from "@/features/customer/search/components/Pagination";
 import { AVAILABILITY_OPTIONS, DEFAULT_FILTERS, buildSalonParams, getSortOptions } from "@/features/customer/search/salonQuery";
 import { useSalonFilters } from "@/features/customer/search/useSalonFilters";
-import { api, getErrorMessage } from "@/lib/api";
+import { getErrorMessage } from "@/lib/api";
 import { getCategoryLabel } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 import { withLocativeSuffix } from "@/lib/format";
@@ -69,39 +70,13 @@ export default function SearchPage() {
   const { location, locationLabel, hasCoordinates, openLocationDialog } = useLocation();
   const { filters, updateFilters, resetFilters } = useSalonFilters();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [result, setResult] = useState({ status: "loading", salons: [], total: 0, pageCount: 1, error: null });
-
   const closeDrawer = () => setDrawerOpen(false);
   useEscapeKey(closeDrawer, drawerOpen);
   useBodyScrollLock(drawerOpen);
 
-  const params = buildSalonParams(filters, location, { limit: PAGE_SIZE });
-  const paramsKey = JSON.stringify(params);
-
-  useEffect(() => {
-    let ignore = false;
-    setResult((current) => ({ ...current, status: "loading", error: null }));
-
-    api
-      .get("/salons", { params: JSON.parse(paramsKey) })
-      .then((data) => {
-        if (ignore) return;
-        setResult({
-          status: "success",
-          salons: data.items,
-          total: data.pagination.total,
-          pageCount: data.pagination.totalPages,
-          error: null,
-        });
-      })
-      .catch((error) => {
-        if (!ignore) setResult({ status: "error", salons: [], total: 0, pageCount: 1, error: getErrorMessage(error) });
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [paramsKey]);
+  const params = useMemo(() => buildSalonParams(filters, location, { limit: PAGE_SIZE }), [filters, location]);
+  const salonsQuery = useSalons(params);
+  const result = salonsQuery.data ?? { salons: [], total: 0, pageCount: 1 };
 
   const page = Math.min(filters.page, result.pageCount);
   const chips = buildChips(filters, updateFilters, hasCoordinates);
@@ -164,10 +139,18 @@ export default function SearchPage() {
         </aside>
 
         <div className="min-w-0 flex-1">
-          {result.status === "loading" ? (
+          {salonsQuery.isPending ? (
             <SalonGridSkeleton density="compact" />
-          ) : result.status === "error" ? (
-            <StateMessage role="alert" icon="alert" tone="accent" title="Kuaförler yüklenemedi." description={result.error} />
+          ) : salonsQuery.isError ? (
+            <StateMessage
+              role="alert"
+              icon="alert"
+              tone="accent"
+              title="Kuaförler yüklenemedi."
+              description={getErrorMessage(salonsQuery.error)}
+            >
+              <Button onClick={() => salonsQuery.refetch()}>Tekrar dene</Button>
+            </StateMessage>
           ) : result.salons.length === 0 ? (
             <StateMessage
               icon="search"
@@ -177,10 +160,10 @@ export default function SearchPage() {
               <Button onClick={resetFilters}>Filtreleri temizle</Button>
             </StateMessage>
           ) : (
-            <>
+            <div className={cn("transition-opacity", salonsQuery.isPlaceholderData && "opacity-60")} aria-busy={salonsQuery.isFetching}>
               <SalonGrid salons={result.salons} density="compact" />
               <Pagination page={page} pageCount={result.pageCount} onChange={(next) => updateFilters({ page: next })} />
-            </>
+            </div>
           )}
         </div>
       </div>
