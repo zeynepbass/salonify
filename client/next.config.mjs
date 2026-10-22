@@ -6,6 +6,7 @@ const { combinedEnv } = nextEnv.loadEnvConfig(rootDir, process.env.NODE_ENV !== 
 
 const nextConfig = {
   reactStrictMode: true,
+  agentRules: false,
   env: {
     NEXT_PUBLIC_API_URL: combinedEnv.NEXT_PUBLIC_API_URL,
   },
