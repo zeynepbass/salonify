@@ -6,10 +6,14 @@ import Icon from "@/components/atoms/Icon";
 import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import { Input, Textarea } from "@/components/atoms/Input";
 import Tag from "@/components/atoms/Tag";
+import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
+import QueryState from "@/components/organisms/QueryState";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/panel/PanelProvider";
-import { api, getErrorMessage } from "@/lib/api";
+import { useMySalon, useUpdateSalon, useUploadCover } from "@/features/panel/hooks/useSalonProfile";
+import { usePanelSchedule } from "@/features/panel/hooks/useSchedule";
+import { useServices } from "@/features/panel/hooks/useServices";
+import { getErrorMessage } from "@/lib/api";
 import { WEEKDAYS } from "@/lib/date";
 
 function SummaryCard({ title, actionLabel, href, children }) {
@@ -26,57 +30,70 @@ function SummaryCard({ title, actionLabel, href, children }) {
   );
 }
 
+const MAX_COVER_BYTES = 5 * 1024 * 1024;
+const COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 export default function SalonProfileScreen() {
-  const { salon, services, hours, updateSalon } = usePanel();
+  const salonQuery = useMySalon();
+
+  return (
+    <QueryState query={salonQuery} errorTitle="Salon profili yüklenemedi.">
+      {(salon) => <SalonProfile salon={salon} />}
+    </QueryState>
+  );
+}
+
+function SalonProfile({ salon }) {
   const { showToast } = useToast();
+  const { data: services = [] } = useServices();
+  const { hours } = usePanelSchedule();
   const fileInputRef = useRef(null);
   const [form, setForm] = useState({
-    name: salon.name,
-    email: salon.email,
-    phone: salon.phone,
-    address: salon.address,
-    description: salon.description,
+    name: salon.name ?? "",
+    email: salon.email ?? "",
+    phone: salon.phone ?? "",
+    address: salon.address ?? "",
+    description: salon.description ?? "",
   });
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
+
+  const update = useUpdateSalon({ onSuccess: () => showToast("Profil kaydedildi.") });
+  const cover = useUploadCover({
+    onSuccess: () => showToast("Profil görseli güncellendi."),
+    onError: (error) => showToast(getErrorMessage(error), { tone: "error" }),
+  });
+  const saving = update.isPending;
+  const uploading = cover.isPending;
 
   const setField = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
-  const showError = (error) => showToast(getErrorMessage(error), { tone: "error" });
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    setSaving(true);
-    try {
-      await updateSalon({
-        name: form.name.trim(),
-        ...(form.email.trim() && { email: form.email.trim() }),
-        phone: form.phone.trim(),
-        address: form.address.trim(),
-        description: form.description.trim(),
-      });
-      showToast("Profil kaydedildi.");
-    } catch (error) {
-      showError(error);
-    } finally {
-      setSaving(false);
-    }
+    if (!form.name.trim() || saving) return;
+
+    update.mutate({
+      name: form.name.trim(),
+      ...(form.email.trim() && { email: form.email.trim() }),
+      phone: form.phone.trim(),
+      address: form.address.trim(),
+      description: form.description.trim(),
+    });
   };
 
-  const handleCoverChange = async (event) => {
+  const handleCoverChange = (event) => {
     const [file] = event.target.files;
     event.target.value = "";
     if (!file) return;
 
-    setUploading(true);
-    try {
-      const upload = await api.uploadImage(file);
-      await updateSalon({ coverImage: upload.url });
-      showToast("Profil görseli güncellendi.");
-    } catch (error) {
-      showError(error);
-    } finally {
-      setUploading(false);
+    if (!COVER_TYPES.includes(file.type)) {
+      showToast("Yalnızca JPG, PNG veya WebP görsel yükleyebilirsin.", { tone: "error" });
+      return;
     }
+    if (file.size > MAX_COVER_BYTES) {
+      showToast("Görsel en fazla 5 MB olabilir.", { tone: "error" });
+      return;
+    }
+
+    cover.mutate(file);
   };
 
   return (
@@ -87,7 +104,7 @@ export default function SalonProfileScreen() {
           <div className="flex flex-col gap-1.5">
             <strong className="text-[20px]">Profil görseli</strong>
             <span className="text-[13px] text-neutral-700">En az 1200×900 px, JPG, PNG veya WebP. Siyah-beyaz yayınlanır.</span>
-            <Button className="self-start" disabled={uploading} onClick={() => fileInputRef.current.click()}>
+            <Button className="self-start" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
               <Icon name="camera" />
               {uploading ? "Yükleniyor…" : "Görsel yükle"}
             </Button>
@@ -111,8 +128,9 @@ export default function SalonProfileScreen() {
         <Field label="Hakkında" htmlFor="salon-description">
           <Textarea id="salon-description" value={form.description} onChange={setField("description")} className="min-h-[120px]" />
         </Field>
+        <ErrorNotice error={update.error} />
         <div className="flex flex-wrap gap-2">
-          <Button type="submit" variant="primary" size="md" disabled={saving} className="px-[18px]">
+          <Button type="submit" variant="primary" size="md" disabled={saving || !form.name.trim()} className="px-[18px]">
             {saving ? "Kaydediliyor…" : "Kaydet"}
           </Button>
           <Button size="md" href={`/kuaforler/${salon.id}`} className="px-[18px]">
