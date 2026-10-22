@@ -4,7 +4,7 @@ import { getDaySchedule } from "@/lib/schedule";
 
 export const SLOT_INTERVAL = 30;
 export const BOOKING_MONTHS = 3;
-export const MAX_BOOKING_DAYS_AHEAD = 90;
+const MAX_BOOKING_DAYS_AHEAD = 90;
 
 const LAST_BOOKABLE_DATE = addDays(TODAY, MAX_BOOKING_DAYS_AHEAD);
 

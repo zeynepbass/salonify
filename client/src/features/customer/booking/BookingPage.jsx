@@ -13,6 +13,7 @@ import BookingSteps from "@/features/customer/booking/components/BookingSteps";
 import BookingSummary from "@/features/customer/booking/components/BookingSummary";
 import DatePicker from "@/features/customer/booking/components/DatePicker";
 import ServicePicker from "@/features/customer/booking/components/ServicePicker";
+import StepSection from "@/features/customer/booking/components/StepSection";
 import SlotPicker from "@/features/customer/booking/components/SlotPicker";
 import { useBookAppointment } from "@/features/customer/booking/hooks/useBooking";
 import SalonGate from "@/features/customer/salon/components/SalonGate";
@@ -20,20 +21,6 @@ import { useAvailability } from "@/features/shared/availability/useAvailability"
 import { formatLongDate } from "@/lib/date";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { toWorkingHours } from "@/lib/schedule";
-
-function StepSection({ id, title, aside, children }) {
-  return (
-    <section aria-labelledby={id} className="scroll-mt-[100px]">
-      <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id={id} className="text-[20px]">
-          {title}
-        </h2>
-        {aside && <span className="text-[13px] text-neutral-700">{aside}</span>}
-      </div>
-      {children}
-    </section>
-  );
-}
 
 export default function BookingPage({ salonId, initialServiceId }) {
   return (

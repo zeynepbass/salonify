@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Button from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
@@ -9,7 +8,6 @@ import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
 import { useLogout } from "@/features/shared/auth/hooks/useAuthMutations";
 import { useChangePassword, useDeleteAccount } from "@/features/customer/profile/hooks/useProfile";
-import { getResponseMessage } from "@/lib/api";
 import { MIN_PASSWORD_LENGTH } from "@/lib/validation";
 
 function PasswordForm({ onDone }) {
@@ -71,15 +69,8 @@ function PasswordForm({ onDone }) {
 }
 
 function DeleteAccountForm({ onDone }) {
-  const router = useRouter();
-  const { showToast } = useToast();
   const [password, setPassword] = useState("");
-  const removal = useDeleteAccount({
-    onSuccess: (response) => {
-      showToast(getResponseMessage(response, "Hesabın silindi."));
-      router.replace("/");
-    },
-  });
+  const removal = useDeleteAccount();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -111,9 +102,8 @@ function DeleteAccountForm({ onDone }) {
 }
 
 export default function SettingsSection() {
-  const router = useRouter();
   const [openForm, setOpenForm] = useState(null);
-  const logout = useLogout({ onSettled: () => router.replace("/") });
+  const logout = useLogout({ redirectTo: "/" });
 
   return (
     <section>

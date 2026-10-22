@@ -8,7 +8,7 @@ import { combineQueries } from "@/lib/combineQueries";
 import { panelKeys, salonKeys } from "@/lib/queryKeys";
 import { toWorkingHours, toWorkingHoursPayload } from "@/lib/schedule";
 
-export function useWorkingHours(salonId) {
+function useWorkingHours(salonId) {
   return useQuery({
     queryKey: panelKeys.workingHours(salonId),
     queryFn: () => api.get(`/salons/${salonId}/working-hours`),
@@ -17,7 +17,7 @@ export function useWorkingHours(salonId) {
   });
 }
 
-export function useBlockedDates(salonId) {
+function useBlockedDates(salonId) {
   return useQuery({
     queryKey: panelKeys.blockedDates(salonId),
     queryFn: () => api.get(`/salons/${salonId}/blocked-dates`),

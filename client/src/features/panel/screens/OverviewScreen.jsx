@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import StateMessage from "@/components/molecules/StateMessage";
-import StatusTag from "@/components/molecules/StatusTag";
 import { getNotificationIcon } from "@/components/organisms/NotificationList";
 import QueryState from "@/components/organisms/QueryState";
 import { usePanel } from "@/features/panel/PanelProvider";
+import AgendaRow from "@/features/panel/components/AgendaRow";
+import StatCard from "@/features/panel/components/StatCard";
 import { useDashboard } from "@/features/panel/hooks/useDashboard";
 import { usePanelAppointments } from "@/features/panel/hooks/usePanelAppointments";
 import { usePanelSchedule } from "@/features/panel/hooks/useSchedule";
@@ -18,62 +18,12 @@ import { combineQueries } from "@/lib/combineQueries";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { formatDayMonth } from "@/lib/date";
-import { formatDuration, formatPrice } from "@/lib/format";
 
 const SLOT_MINUTES = 30;
 
 function describeFreeSlots(count) {
   if (count === 0) return "Bugün yeni randevu alınabilecek boş saat kalmadı.";
   return `Bugün yeni randevu alınabilecek ${count} boş zaman dilimi (${SLOT_MINUTES}'ar dakika) kaldı.`;
-}
-
-function StatCard({ stat }) {
-  return (
-    <Link
-      href={stat.href}
-      className="flex flex-col items-center gap-1 border-b border-line px-3 py-5 text-center transition-colors hover:bg-surface"
-    >
-      <span className="flex items-center justify-center gap-2 text-[13px] font-semibold">
-        <Icon name={stat.icon} />
-        {stat.label}
-      </span>
-      <span className={cn("text-[52px] leading-none font-extrabold", stat.alert && "text-accent-700")}>
-        {stat.value}
-      </span>
-      <span className="text-[12px] text-neutral-700">{stat.caption}</span>
-    </Link>
-  );
-}
-
-function AgendaRow({ appointment, completing, onView, onComplete }) {
-  const { service } = appointment;
-
-  return (
-    <div className={cn("flex flex-wrap items-center gap-4 border-b border-line py-3.5", appointment.inactive && "opacity-60")}>
-      <div className="w-16 flex-none">
-        <div className="text-[18px] font-extrabold">{appointment.time}</div>
-        <div className="text-[12px] text-neutral-700">– {appointment.endTime}</div>
-      </div>
-      <div className="min-w-0 flex-[1_1_200px]">
-        <div className="font-bold">{appointment.customer}</div>
-        <div className="text-[13px] text-neutral-700">
-          {service.name} · {formatDuration(service.duration)} · {formatPrice(service.price)}
-        </div>
-      </div>
-      <StatusTag status={appointment.status} />
-      <div className="flex gap-1.5">
-        {appointment.canComplete && (
-          <Button className="gap-1.5" disabled={completing} onClick={onComplete}>
-            <Icon name="check" size={14} />
-            Tamamlandı
-          </Button>
-        )}
-        <Button variant="ghost" aria-label={`${appointment.customer} randevusunu görüntüle`} onClick={onView}>
-          Görüntüle
-        </Button>
-      </div>
-    </div>
-  );
 }
 
 export default function OverviewScreen() {

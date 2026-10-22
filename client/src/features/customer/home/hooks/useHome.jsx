@@ -4,9 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { salonKeys } from "@/lib/queryKeys";
 
-export const SHOWCASE_SIZE = 4;
+const SHOWCASE_SIZE = 4;
 
-function useShowcaseSalons(params) {
+export function useSalonShowcase(params) {
   const fullParams = { ...params, limit: SHOWCASE_SIZE };
 
   return useQuery({
@@ -16,14 +16,10 @@ function useShowcaseSalons(params) {
   });
 }
 
-export function useNearbySalons(params) {
-  return useShowcaseSalons(params);
-}
-
 export function usePopularSalons() {
-  return useShowcaseSalons({ sort: "popular" });
+  return useSalonShowcase({ sort: "popular" });
 }
 
 export function useTopRatedSalons() {
-  return useShowcaseSalons({ sort: "rating", rating: 4.8 });
+  return useSalonShowcase({ sort: "rating", rating: 4.8 });
 }

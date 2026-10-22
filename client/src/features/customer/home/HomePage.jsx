@@ -7,7 +7,7 @@ import SegmentedControl from "@/components/molecules/SegmentedControl";
 import CategoryGrid from "@/features/customer/home/components/CategoryGrid";
 import HeroSearch from "@/features/customer/home/components/HeroSearch";
 import SalonShowcase from "@/features/customer/home/components/SalonShowcase";
-import { SHOWCASE_SIZE, useNearbySalons, usePopularSalons, useTopRatedSalons } from "@/features/customer/home/hooks/useHome";
+import { usePopularSalons, useSalonShowcase, useTopRatedSalons } from "@/features/customer/home/hooks/useHome";
 import { useLocation } from "@/features/customer/location/LocationProvider";
 import { DEFAULT_FILTERS, buildSalonParams, getSortOptions } from "@/features/customer/search/salonQuery";
 import { buildSearchHref } from "@/features/customer/search/useSalonFilters";
@@ -17,11 +17,8 @@ const NEARBY_RADIUS_KM = 5;
 export default function HomePage() {
   const { location, locationLabel, hasCoordinates } = useLocation();
   const [sort, setSort] = useState(DEFAULT_FILTERS.sort);
-  const nearbyParams = useMemo(
-    () => buildSalonParams({ sort, distance: NEARBY_RADIUS_KM }, location, { limit: SHOWCASE_SIZE }),
-    [sort, location],
-  );
-  const nearbySalons = useNearbySalons(nearbyParams);
+  const nearbyParams = useMemo(() => buildSalonParams({ sort, distance: NEARBY_RADIUS_KM }, location), [sort, location]);
+  const nearbySalons = useSalonShowcase(nearbyParams);
   const popularSalons = usePopularSalons();
   const topRatedSalons = useTopRatedSalons();
 
