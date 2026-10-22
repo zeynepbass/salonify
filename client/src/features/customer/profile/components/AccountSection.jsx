@@ -5,44 +5,33 @@ import Avatar from "@/components/atoms/Avatar";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import { Input } from "@/components/atoms/Input";
+import ErrorNotice from "@/components/molecules/ErrorNotice";
 import Field from "@/components/molecules/Field";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { useAuth } from "@/features/customer/auth/AuthProvider";
 import { useLocation } from "@/features/customer/location/LocationProvider";
-import { api, getErrorMessage } from "@/lib/api";
+import { useUpdateProfile } from "@/features/customer/profile/hooks/useProfile";
 import { formatMonthYear } from "@/lib/date";
 
 export default function AccountSection({ user }) {
   const { location, locationLabel, openLocationDialog } = useLocation();
-  const { updateSession } = useAuth();
   const { showToast } = useToast();
-  const [form, setForm] = useState({ name: user.name, email: user.email, phone: user.phone });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
+  const [form, setForm] = useState({ name: user.name, email: user.email, phone: user.phone ?? "" });
+  const update = useUpdateProfile({ onSuccess: () => showToast("Hesap bilgilerin güncellendi.") });
+  const saving = update.isPending;
 
   const setField = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
   const invalid = !form.name.trim() || !form.email.trim();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     if (invalid || saving) return;
 
-    setSaving(true);
-    setError(null);
-    try {
-      const profile = await api.patch("/users/me", {
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        location: { city: location.city, district: location.district },
-      });
-      updateSession({ user: profile.user });
-      showToast("Hesap bilgilerin güncellendi.");
-    } catch (requestError) {
-      setError(getErrorMessage(requestError));
-    } finally {
-      setSaving(false);
-    }
+    update.mutate({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      location: { city: location.city, district: location.district },
+    });
   };
 
   return (
@@ -86,11 +75,7 @@ export default function AccountSection({ user }) {
           </button>
         </Field>
       </div>
-      {error && (
-        <p role="alert" className="mt-4 text-[13px] text-accent-700">
-          {error}
-        </p>
-      )}
+      <ErrorNotice error={update.error} className="mt-4" />
       <Button type="submit" variant="primary" size="md" disabled={invalid || saving} className="mt-5 px-[18px]">
         {saving ? "Kaydediliyor…" : "Kaydet"}
       </Button>
