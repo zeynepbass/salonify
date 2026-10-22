@@ -18,7 +18,7 @@ function RatingSummary({ summary }) {
   const { averageRating: rating, reviewCount, distribution } = summary;
 
   return (
-    <div className="min-w-[240px] flex-[0_1_300px] border-t-2 border-ink pt-5">
+    <div className="min-w-[240px] flex-[0_1_300px] border-t border-neutral-400 pt-5">
       <div className="text-[64px] leading-none font-extrabold">{formatRating(rating)}</div>
       <StarRating value={rating} size={18} className="mt-2.5 mb-1.5 gap-0.5" />
       <div className="text-[14px] text-neutral-700">{reviewCount} değerlendirme</div>

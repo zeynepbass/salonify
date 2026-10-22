@@ -6,7 +6,7 @@ import { formatDuration, formatPrice } from "@/lib/format";
 
 function ServiceItem({ service, bookingHref }) {
   return (
-    <div className="flex flex-col gap-1.5 bg-surface p-5 transition-shadow duration-150 hover:shadow-md">
+    <div className="flex flex-col gap-1.5 rounded-xl bg-surface p-5 transition-shadow duration-150 hover:shadow-md">
       <h3 className="text-[19px]">{service.name}</h3>
       <div className="flex items-center gap-1.5 text-[13px] text-neutral-700">
         <Icon name="clock" size={14} />

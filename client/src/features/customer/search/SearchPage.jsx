@@ -83,7 +83,7 @@ export default function SearchPage() {
 
   return (
     <div className="page-container pt-7">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-line pb-5">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
         <div>
           <nav aria-label="Sayfa yolu" className="flex items-center gap-1.5 text-[12px] text-neutral-700">
             <Link href="/" className="underline hover:text-accent">
