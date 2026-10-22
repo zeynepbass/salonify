@@ -6,6 +6,7 @@ import Button from "@/components/atoms/Button";
 import SearchInput from "@/components/molecules/SearchInput";
 import StateMessage from "@/components/molecules/StateMessage";
 import NotificationList from "@/components/organisms/NotificationList";
+import { usePanelAppointments } from "@/features/panel/hooks/usePanelAppointments";
 import { usePanel } from "@/features/panel/PanelProvider";
 import {
   useDeleteAllNotifications,
@@ -16,7 +17,8 @@ import {
 
 export default function NotificationsScreen() {
   const router = useRouter();
-  const { appointments, openAppointment, requestConfirmation, closeConfirmation } = usePanel();
+  const { openAppointment, requestConfirmation, closeConfirmation } = usePanel();
+  const { data: appointments = [] } = usePanelAppointments();
   const { notifications } = useNotificationList("salon");
   const markRead = useMarkNotificationRead();
   const removeNotification = useDeleteNotification();

@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import { Input, Select } from "@/components/atoms/Input";
 import Switch from "@/components/atoms/Switch";
 import Field from "@/components/molecules/Field";
+import QueryState from "@/components/organisms/QueryState";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/panel/PanelProvider";
-import { getOpenDates } from "@/features/panel/scheduling";
-import { getErrorMessage } from "@/lib/api";
+import { useAddBlockedDate, usePanelSchedule, useRemoveBlockedDate, useSaveWorkingHours } from "@/features/panel/hooks/useSchedule";
+import { getOpenDates, validateHours } from "@/features/panel/scheduling";
+import { getErrorMessage, getResponseMessage } from "@/lib/api";
 import { WEEKDAYS, formatDayWithWeekday } from "@/lib/date";
 
 const HEAD_CELL = "eyebrow border-b-2 border-ink px-3 py-2.5 text-left text-neutral-700";
@@ -71,52 +72,58 @@ function WeeklySchedule({ hours, onChange }) {
 }
 
 export default function WorkingHoursScreen() {
-  const { hours, closedDays, updateHours, saveHours, addClosedDay, removeClosedDay } = usePanel();
+  const schedule = usePanelSchedule();
+
+  return (
+    <QueryState query={schedule} errorTitle="Çalışma saatleri yüklenemedi.">
+      {() => <WorkingHours salonId={schedule.salonId} savedHours={schedule.hours} closedDays={schedule.closedDays} />}
+    </QueryState>
+  );
+}
+
+function WorkingHours({ salonId, savedHours, closedDays }) {
   const { showToast } = useToast();
-  const dateOptions = getOpenDates(hours, closedDays, DATE_OPTION_COUNT);
+  const [draft, setDraft] = useState(null);
   const [date, setDate] = useState(null);
   const [note, setNote] = useState("");
-  const [saving, setSaving] = useState(false);
 
+  const hours = draft ?? savedHours;
+  const dirty = draft !== null;
+  const hoursError = useMemo(() => validateHours(hours), [hours]);
+  const dateOptions = useMemo(() => getOpenDates(savedHours, closedDays, DATE_OPTION_COUNT), [savedHours, closedDays]);
   const selectedDate = dateOptions.includes(date) ? date : dateOptions[0];
   const showError = (error) => showToast(getErrorMessage(error), { tone: "error" });
 
-  const handleSaveHours = async () => {
-    setSaving(true);
-    try {
-      await saveHours();
+  const saveHours = useSaveWorkingHours(salonId, {
+    onSuccess: () => {
+      setDraft(null);
       showToast("Çalışma saatleri kaydedildi.");
-    } catch (error) {
-      showError(error);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleAddClosedDay = async (event) => {
-    event.preventDefault();
-    if (!selectedDate) return;
-
-    try {
-      const saved = await addClosedDay({ date: selectedDate, note: note.trim() || "Kapalı" });
+    },
+    onError: showError,
+  });
+  const addClosedDay = useAddBlockedDate(salonId, {
+    onSuccess: (saved) => {
       setNote("");
       showToast(
         saved.bookedAppointmentCount
           ? `Kapalı gün eklendi. O gün ${saved.bookedAppointmentCount} randevu var — iptal edilmesi gerekiyor.`
           : "Kapalı gün eklendi.",
       );
-    } catch (error) {
-      showError(error);
-    }
-  };
+    },
+    onError: showError,
+  });
+  const removeClosedDay = useRemoveBlockedDate(salonId, {
+    onSuccess: (response) => showToast(getResponseMessage(response, "Kapalı gün kaldırıldı.")),
+    onError: showError,
+  });
 
-  const handleRemoveClosedDay = async (day) => {
-    try {
-      await removeClosedDay(day.id);
-      showToast("Kapalı gün kaldırıldı.");
-    } catch (error) {
-      showError(error);
-    }
+  const updateHours = (weekday, changes) =>
+    setDraft((current) => (current ?? savedHours).map((day) => (day.weekday === weekday ? { ...day, ...changes } : day)));
+
+  const handleAddClosedDay = (event) => {
+    event.preventDefault();
+    if (!selectedDate || addClosedDay.isPending) return;
+    addClosedDay.mutate({ date: selectedDate, note: note.trim() || "Kapalı" });
   };
 
   return (
@@ -124,9 +131,27 @@ export default function WorkingHoursScreen() {
       <section className="min-w-0 flex-[2_1_620px]">
         <h2 className="mb-3 text-[20px]">Haftalık program</h2>
         <WeeklySchedule hours={hours} onChange={updateHours} />
-        <Button variant="primary" size="md" className="mt-4 px-[18px]" disabled={saving} onClick={handleSaveHours}>
-          {saving ? "Kaydediliyor…" : "Değişiklikleri kaydet"}
-        </Button>
+        {dirty && hoursError && (
+          <p role="alert" className="mt-3 text-[13px] text-accent-700">
+            {hoursError}
+          </p>
+        )}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button
+            variant="primary"
+            size="md"
+            className="px-[18px]"
+            disabled={!dirty || Boolean(hoursError) || saveHours.isPending}
+            onClick={() => saveHours.mutate(hours)}
+          >
+            {saveHours.isPending ? "Kaydediliyor…" : "Değişiklikleri kaydet"}
+          </Button>
+          {dirty && (
+            <Button size="md" disabled={saveHours.isPending} onClick={() => setDraft(null)}>
+              Geri al
+            </Button>
+          )}
+        </div>
         <p className="mt-2 text-[12px] text-neutral-700">
           Mevcut randevular etkilenmez; yeni saatler müşterilerin randevu alırken gördüğü uygun saatlere anında yansır.
         </p>
@@ -146,7 +171,8 @@ export default function WorkingHoursScreen() {
                 variant="plain"
                 size="icon"
                 aria-label={`${formatDayWithWeekday(day.date)} kapalı gününü kaldır`}
-                onClick={() => handleRemoveClosedDay(day)}
+                disabled={removeClosedDay.isPending}
+                onClick={() => removeClosedDay.mutate(day.id)}
               >
                 <Icon name="trash" />
               </Button>
@@ -155,7 +181,7 @@ export default function WorkingHoursScreen() {
         </div>
         <form onSubmit={handleAddClosedDay} className="mt-4 flex flex-col gap-2.5 bg-surface p-4">
           <Field label="Tarih" htmlFor="closed-day-date">
-            <Select id="closed-day-date" value={selectedDate} onChange={(event) => setDate(event.target.value)}>
+            <Select id="closed-day-date" value={selectedDate ?? ""} onChange={(event) => setDate(event.target.value)}>
               {dateOptions.map((option) => (
                 <option key={option} value={option}>
                   {formatDayWithWeekday(option)}
@@ -166,7 +192,7 @@ export default function WorkingHoursScreen() {
           <Field label="Açıklama" htmlFor="closed-day-note">
             <Input id="closed-day-note" value={note} onChange={(event) => setNote(event.target.value)} placeholder="Örn. Eğitim günü" />
           </Field>
-          <Button type="submit" align="start">
+          <Button type="submit" align="start" disabled={!selectedDate || addClosedDay.isPending}>
             <Icon name="plus" />
             Kapalı gün ekle
           </Button>

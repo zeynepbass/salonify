@@ -1,19 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import StateMessage from "@/components/molecules/StateMessage";
 import StatusTag from "@/components/molecules/StatusTag";
 import { getNotificationIcon } from "@/components/organisms/NotificationList";
-import Spinner from "@/components/atoms/Spinner";
+import QueryState from "@/components/organisms/QueryState";
 import { usePanel } from "@/features/panel/PanelProvider";
+import { useDashboard } from "@/features/panel/hooks/useDashboard";
+import { usePanelAppointments } from "@/features/panel/hooks/usePanelAppointments";
+import { usePanelSchedule } from "@/features/panel/hooks/useSchedule";
 import { getDayBounds } from "@/features/panel/scheduling";
 import { useAppointmentActions } from "@/features/panel/useAppointmentActions";
-import { usePanelAppointments } from "@/features/panel/usePanelAppointments";
 import { useNotificationList } from "@/features/customer/notifications/hooks/useNotifications";
-import { api, getErrorMessage } from "@/lib/api";
+import { combineQueries } from "@/lib/combineQueries";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { formatDayMonth } from "@/lib/date";
@@ -44,7 +45,7 @@ function StatCard({ stat }) {
   );
 }
 
-function AgendaRow({ appointment, onView, onComplete }) {
+function AgendaRow({ appointment, completing, onView, onComplete }) {
   const { service } = appointment;
 
   return (
@@ -62,7 +63,7 @@ function AgendaRow({ appointment, onView, onComplete }) {
       <StatusTag status={appointment.status} />
       <div className="flex gap-1.5">
         {appointment.canComplete && (
-          <Button className="gap-1.5" onClick={onComplete}>
+          <Button className="gap-1.5" disabled={completing} onClick={onComplete}>
             <Icon name="check" size={14} />
             Tamamlandı
           </Button>
@@ -76,36 +77,22 @@ function AgendaRow({ appointment, onView, onComplete }) {
 }
 
 export default function OverviewScreen() {
+  const dashboardQuery = useDashboard();
+  const appointmentsQuery = usePanelAppointments();
+  const schedule = usePanelSchedule();
+
+  return (
+    <QueryState query={combineQueries(dashboardQuery, appointmentsQuery, schedule)} errorTitle="Özet yüklenemedi.">
+      {([summary, appointments]) => <Overview summary={summary} appointments={appointments} schedule={schedule} />}
+    </QueryState>
+  );
+}
+
+function Overview({ summary, appointments, schedule }) {
   const panel = usePanel();
   const actions = useAppointmentActions();
-  const appointments = usePanelAppointments();
   const { notifications } = useNotificationList("salon");
-  const [dashboard, setDashboard] = useState({ status: "loading", data: null, error: null });
 
-  useEffect(() => {
-    let ignore = false;
-    api
-      .get("/salon/me/dashboard")
-      .then((data) => !ignore && setDashboard({ status: "success", data, error: null }))
-      .catch((error) => !ignore && setDashboard({ status: "error", data: null, error: getErrorMessage(error) }));
-    return () => {
-      ignore = true;
-    };
-  }, [panel.appointments]);
-
-  if (dashboard.status === "loading") {
-    return (
-      <div aria-busy="true" className="grid min-h-[40vh] place-items-center">
-        <Spinner />
-      </div>
-    );
-  }
-
-  if (dashboard.status === "error") {
-    return <StateMessage role="alert" icon="alert" tone="accent" title="Özet yüklenemedi." description={dashboard.error} />;
-  }
-
-  const summary = dashboard.data;
   const todayIds = new Set(summary.todayAppointments.map((item) => item.id));
   const todayList = appointments.filter((item) => todayIds.has(item.id)).sort((a, b) => a.start - b.start);
 
@@ -129,7 +116,7 @@ export default function OverviewScreen() {
     },
   ];
 
-  const bounds = getDayBounds(panel.hours, panel.closedDays, TODAY);
+  const bounds = getDayBounds(schedule.hours, schedule.closedDays, TODAY);
   const { occupancy, freeSlotCount } = summary.today;
 
   return (
@@ -157,6 +144,7 @@ export default function OverviewScreen() {
                   key={appointment.id}
                   appointment={appointment}
                   onView={() => panel.openAppointment(appointment.id)}
+                  completing={actions.pending}
                   onComplete={() => actions.complete(appointment)}
                 />
               ))}

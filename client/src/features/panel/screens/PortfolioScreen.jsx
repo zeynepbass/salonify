@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Icon from "@/components/atoms/Icon";
 import ImagePlaceholder from "@/components/atoms/ImagePlaceholder";
 import Switch from "@/components/atoms/Switch";
 import Tag from "@/components/atoms/Tag";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
 import StateMessage from "@/components/molecules/StateMessage";
+import QueryState from "@/components/organisms/QueryState";
 import { useToast } from "@/components/organisms/ToastProvider";
-import { usePanel } from "@/features/panel/PanelProvider";
+import { usePortfolio, useTogglePortfolioItem } from "@/features/panel/hooks/usePortfolio";
 import { getErrorMessage } from "@/lib/api";
 import { formatDayMonth } from "@/lib/date";
 
@@ -24,7 +25,7 @@ function getVisibility(item) {
   return { label: "Gizli", variant: "neutral" };
 }
 
-function PortfolioCard({ item, onToggle }) {
+function PortfolioCard({ item, busy, onToggle }) {
   const visibility = getVisibility(item);
   const labelId = `portfolio-${item.id}`;
 
@@ -63,7 +64,7 @@ function PortfolioCard({ item, onToggle }) {
           </span>
           <Switch
             checked={item.published && item.consent}
-            disabled={!item.consent}
+            disabled={!item.consent || busy}
             onChange={() => onToggle(item)}
             aria-labelledby={labelId}
             title={item.consent ? "Profilde göster" : "Müşteri paylaşım izni vermedi"}
@@ -75,20 +76,27 @@ function PortfolioCard({ item, onToggle }) {
 }
 
 export default function PortfolioScreen() {
-  const { portfolio, togglePortfolioItem } = usePanel();
+  const portfolioQuery = usePortfolio();
+
+  return (
+    <QueryState query={portfolioQuery} errorTitle="Portföy yüklenemedi.">
+      {(portfolio) => <Portfolio portfolio={portfolio} />}
+    </QueryState>
+  );
+}
+
+function Portfolio({ portfolio }) {
   const { showToast } = useToast();
   const [filter, setFilter] = useState("all");
+  const toggle = useTogglePortfolioItem();
 
-  const items = portfolio.filter(FILTERS.find((option) => option.value === filter).match);
+  const items = useMemo(() => portfolio.filter(FILTERS.find((option) => option.value === filter).match), [portfolio, filter]);
 
-  const handleToggle = async (item) => {
-    try {
-      await togglePortfolioItem(item);
-      showToast(item.published ? "Profilden kaldırıldı." : "Profilde yayınlandı.");
-    } catch (error) {
-      showToast(getErrorMessage(error), { tone: "error" });
-    }
-  };
+  const handleToggle = (item) =>
+    toggle.mutate(item, {
+      onSuccess: () => showToast(item.published ? "Profilden kaldırıldı." : "Profilde yayınlandı."),
+      onError: (error) => showToast(getErrorMessage(error), { tone: "error" }),
+    });
 
   return (
     <div className="flex flex-col gap-4">
@@ -104,7 +112,12 @@ export default function PortfolioScreen() {
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(230px,1fr))] sm:gap-5">
           {items.map((item) => (
-            <PortfolioCard key={item.id} item={item} onToggle={handleToggle} />
+            <PortfolioCard
+              key={item.id}
+              item={item}
+              busy={toggle.isPending && toggle.variables?.id === item.id}
+              onToggle={handleToggle}
+            />
           ))}
         </div>
       )}

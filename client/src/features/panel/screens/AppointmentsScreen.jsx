@@ -1,19 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import SearchInput from "@/components/molecules/SearchInput";
 import StateMessage from "@/components/molecules/StateMessage";
 import StatusTag from "@/components/molecules/StatusTag";
 import Tabs from "@/components/molecules/Tabs";
+import QueryState from "@/components/organisms/QueryState";
 import { usePanel } from "@/features/panel/PanelProvider";
+import { usePanelAppointments } from "@/features/panel/hooks/usePanelAppointments";
 import { useAppointmentActions } from "@/features/panel/useAppointmentActions";
-import { usePanelAppointments } from "@/features/panel/usePanelAppointments";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { formatShortDate } from "@/lib/date";
-import { formatDuration, formatPrice } from "@/lib/format";
+import { formatDuration, formatPrice, includesText } from "@/lib/format";
 
 const chronological = (a, b) => a.date.localeCompare(b.date) || a.start - b.start;
 
@@ -131,14 +132,36 @@ function AppointmentCards({ appointments, onView, actions }) {
 }
 
 export default function AppointmentsScreen({ initialTab = "today" }) {
+  const appointmentsQuery = usePanelAppointments();
+
+  return (
+    <QueryState query={appointmentsQuery} errorTitle="Randevular yüklenemedi.">
+      {(appointments) => <AppointmentList appointments={appointments} initialTab={initialTab} />}
+    </QueryState>
+  );
+}
+
+function AppointmentList({ appointments, initialTab }) {
   const panel = usePanel();
   const actions = useAppointmentActions();
-  const appointments = usePanelAppointments();
   const [tab, setTab] = useState(initialTab);
   const [query, setQuery] = useState("");
 
-  const activeTab = TABS.find((item) => item.value === tab);
-  const list = appointments.filter(activeTab.filter).sort(activeTab.sort);
+  const filteredAppointments = useMemo(
+    () => (query.trim() ? appointments.filter((item) => includesText(item.customer, query)) : appointments),
+    [appointments, query],
+  );
+
+  const tabCounts = useMemo(
+    () => Object.fromEntries(TABS.map((item) => [item.value, filteredAppointments.filter(item.filter).length])),
+    [filteredAppointments],
+  );
+
+  const activeTab = TABS.find((item) => item.value === tab) ?? TABS[0];
+  const list = useMemo(
+    () => filteredAppointments.filter(activeTab.filter).sort(activeTab.sort),
+    [filteredAppointments, activeTab],
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -147,7 +170,7 @@ export default function AppointmentsScreen({ initialTab = "today" }) {
           label="Randevu filtresi"
           value={tab}
           onChange={setTab}
-          tabs={TABS.map((item) => ({ value: item.value, label: `${item.label} (${appointments.filter(item.filter).length})` }))}
+          tabs={TABS.map((item) => ({ value: item.value, label: `${item.label} (${tabCounts[item.value]})` }))}
           className="max-w-full"
         />
         <SearchInput value={query} onChange={setQuery} placeholder="Müşteri ara" className="flex-[0_1_280px] max-sm:flex-1" />

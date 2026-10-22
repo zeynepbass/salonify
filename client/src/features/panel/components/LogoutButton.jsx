@@ -1,20 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/features/customer/auth/AuthProvider";
+import { useLogout } from "@/features/customer/auth/hooks/useAuth";
 
 export default function LogoutButton({ className, onDone, children }) {
   const router = useRouter();
-  const { logout } = useAuth();
-
-  const handleClick = async () => {
-    await logout();
-    onDone?.();
-    router.replace("/panel/giris");
-  };
+  const logout = useLogout({
+    onSettled: () => {
+      onDone?.();
+      router.replace("/panel/giris");
+    },
+  });
 
   return (
-    <button type="button" onClick={handleClick} className={className}>
+    <button type="button" disabled={logout.isPending} onClick={() => logout.mutate()} className={className}>
       {children}
     </button>
   );
