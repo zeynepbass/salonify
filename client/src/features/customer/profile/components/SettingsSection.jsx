@@ -33,7 +33,7 @@ function PasswordForm({ onDone }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3 bg-surface p-4">
+    <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3 rounded-xl bg-surface p-4">
       <Field label="Mevcut şifre" htmlFor="settings-current-password">
         <Input
           id="settings-current-password"
@@ -128,13 +128,13 @@ export default function SettingsSection() {
       </div>
       {openForm === "password" && <PasswordForm onDone={() => setOpenForm(null)} />}
 
-      <div className="mt-8 border-t-2 border-line pt-5">
+      <div className="mt-8 border-t border-line pt-5">
         <Button disabled={logout.isPending} onClick={() => logout.mutate()}>
           {logout.isPending ? "Çıkış yapılıyor…" : "Çıkış yap"}
         </Button>
       </div>
 
-      <div className="mt-8 border-t-2 border-line pt-5">
+      <div className="mt-8 border-t border-line pt-5">
         <div className="font-bold">Hesabı sil</div>
         <p className="mt-1 mb-3 text-[13px] text-neutral-700">
           Tüm randevu geçmişin ve değerlendirmelerin kalıcı olarak silinir.

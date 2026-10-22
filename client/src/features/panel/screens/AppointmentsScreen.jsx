@@ -28,7 +28,7 @@ const TABS = [
 
 const getSearchFields = (item) => [item.customer, item.phone, item.service.name, item.reference];
 
-const HEAD_CELL = "eyebrow border-b-2 border-ink px-3 py-2.5 text-left text-neutral-700";
+const HEAD_CELL = "eyebrow border-b border-neutral-400 px-3 py-2.5 text-left text-neutral-700";
 const CELL = "border-b border-line px-3 py-3";
 
 function AppointmentTable({ appointments, onView, actions }) {
@@ -114,7 +114,7 @@ function AppointmentCards({ appointments, onView, actions }) {
   return (
     <div className="flex flex-col gap-2.5 md:hidden">
       {appointments.map((appointment) => (
-        <div key={appointment.id} className={cn("flex flex-col gap-2 bg-surface p-4", appointment.inactive && "opacity-60")}>
+        <div key={appointment.id} className={cn("flex flex-col gap-2 rounded-xl bg-surface p-4", appointment.inactive && "opacity-60")}>
           <div className="flex justify-between gap-2">
             <strong>{appointment.customer}</strong>
             <StatusTag status={appointment.status} />

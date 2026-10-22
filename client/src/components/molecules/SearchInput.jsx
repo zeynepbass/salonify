@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 
 export default function SearchInput({ value, onChange, placeholder, className }) {
   return (
-    <label className={cn("flex items-center gap-2 border border-line bg-surface px-2.5 focus-within:border-ink", className)}>
+    <label className={cn("flex items-center gap-2 rounded-md border border-line bg-canvas px-2.5 transition-colors focus-within:border-accent focus-within:ring-3 focus-within:ring-accent-100", className)}>
       <Icon name="search" className="text-neutral-600" />
       <input
         type="search"

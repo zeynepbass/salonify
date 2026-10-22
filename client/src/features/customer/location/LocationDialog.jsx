@@ -98,7 +98,7 @@ export default function LocationDialog({ current, onApply, onClose }) {
 
       <SearchInput value={query} onChange={setQuery} placeholder="İlçe ara" />
 
-      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] border-t-2 border-line">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] border-t border-line">
         <div role="listbox" aria-label="Şehir" className="flex max-h-[300px] flex-col overflow-auto border-r border-line">
           <div className="eyebrow px-3 pt-2.5 pb-1.5 font-normal text-neutral-700">Şehir</div>
           {cities.map((item) => (

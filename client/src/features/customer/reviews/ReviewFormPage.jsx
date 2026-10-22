@@ -71,7 +71,7 @@ export default function ReviewFormPage({ appointmentId }) {
   return (
     <form onSubmit={handleSubmit} className="page-container max-w-[720px] pt-6">
       <BackLink href="/randevularim">Randevularım</BackLink>
-      <div className="mt-4 mb-8 flex items-center gap-4 bg-surface p-4">
+      <div className="mt-4 mb-8 flex items-center gap-4 rounded-xl bg-surface p-4">
         <ImagePlaceholder src={appointment.salon.coverImage} alt={appointment.salon.name} stripe={8} className="size-14 flex-none" />
         <div>
           <div className="font-extrabold">{appointment.salon.name}</div>
@@ -102,7 +102,7 @@ export default function ReviewFormPage({ appointmentId }) {
         <PhotoPicker photos={photos} max={MAX_PHOTOS} onChange={setPhotos} />
       </div>
 
-      <div className="mt-7 flex flex-wrap items-start gap-4 border-y-2 border-line py-5">
+      <div className="mt-7 flex flex-wrap items-start gap-4 border-y border-line py-5">
         <div className="min-w-[220px] flex-1">
           <div id={shareLabelId} className="text-[15px] font-bold">
             Bu değerlendirmeyi kuaförün profilinde paylaşmak ister misiniz?

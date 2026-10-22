@@ -28,7 +28,7 @@ export default function ProfilePage() {
       <div className="flex flex-wrap items-start gap-x-10 gap-y-8">
         <nav
           aria-label="Profil bölümleri"
-          className="flex w-full border-t-2 border-ink max-md:overflow-x-auto md:max-w-[280px] md:flex-[1_1_220px] md:flex-col"
+          className="flex w-full border-t border-neutral-400 max-md:overflow-x-auto md:max-w-[280px] md:flex-[1_1_220px] md:flex-col"
         >
           {SECTIONS.map((section) =>
             section.href ? (

@@ -8,13 +8,13 @@ const SIZES = {
 };
 
 const TONES = {
-  dark: "bg-ink text-canvas",
+  dark: "bg-gradient-to-br from-accent to-accent-800 text-canvas",
   neutral: "bg-neutral-300 text-ink",
 };
 
 export default function Avatar({ name, size = "md", tone = "neutral", className }) {
   return (
-    <span aria-hidden="true" className={cn("grid flex-none place-items-center font-extrabold", SIZES[size], TONES[tone], className)}>
+    <span aria-hidden="true" className={cn("grid flex-none place-items-center rounded-full font-extrabold", SIZES[size], TONES[tone], className)}>
       {getInitials(name)}
     </span>
   );

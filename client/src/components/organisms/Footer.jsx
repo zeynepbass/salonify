@@ -29,7 +29,7 @@ const COLUMNS = [
 
 export default function Footer() {
   return (
-    <footer className="mt-24 border-t-2 border-line">
+    <footer className="mt-28 border-t border-line bg-surface/60">
       <div className="page-container grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-8 pt-10 pb-6">
         <div className="flex flex-col gap-2.5">
           <Logo size="sm" />

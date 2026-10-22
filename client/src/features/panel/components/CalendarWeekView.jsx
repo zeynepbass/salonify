@@ -10,7 +10,7 @@ export default function CalendarWeekView({ days, range, today, selectedId, onSel
   for (let minutes = range.start; minutes < range.end; minutes += 60) hours.push(minutes);
 
   return (
-    <div className="overflow-x-auto border-t-2 border-ink">
+    <div className="overflow-x-auto border-t border-neutral-400">
       <div className="grid min-w-[880px] grid-cols-[56px_repeat(7,minmax(0,1fr))]">
         <div />
         {days.map((day) => {

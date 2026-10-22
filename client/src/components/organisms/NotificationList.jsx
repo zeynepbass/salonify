@@ -12,7 +12,7 @@ const TYPE_ICONS = {
 
 export default function NotificationList({ notifications, onSelect, onDelete }) {
   return (
-    <ul className="border-t-2 border-ink">
+    <ul className="border-t border-neutral-400">
       {notifications.map((notification) => (
         <li key={notification.id} className="flex items-stretch">
           <button

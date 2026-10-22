@@ -59,7 +59,7 @@ export default function ServicesScreen() {
         }
       >
         {(services) => (
-          <div className="border-t-2 border-ink">
+          <div className="border-t border-neutral-400">
             {services.map((service) => (
               <div key={service.id} className="flex flex-wrap items-center gap-4 border-b border-line py-4">
                 <div className="min-w-0 flex-[1_1_200px]">

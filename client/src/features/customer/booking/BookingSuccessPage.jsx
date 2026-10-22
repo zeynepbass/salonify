@@ -23,7 +23,7 @@ export default function BookingSuccessPage({ appointmentId }) {
 
   return (
     <div role="status" className="page-container flex max-w-[760px] flex-col gap-5 pt-14">
-      <span className="grid size-[50px] place-items-center bg-accent text-canvas">
+      <span className="grid size-[56px] animate-rise place-items-center rounded-full bg-accent text-canvas shadow-md">
         <Icon name="check" size={30} />
       </span>
       <h1 className="text-[clamp(32px,4.4vw,52px)]">Randevunuz oluşturuldu.</h1>
@@ -31,7 +31,7 @@ export default function BookingSuccessPage({ appointmentId }) {
         {salon.name} kuaförüne bildirim gönderildi. Randevunun tüm ayrıntılarını Randevularım sayfasında bulabilirsin.
       </p>
 
-      <div className="flex flex-col gap-1 border-t-2 border-ink bg-surface p-6">
+      <div className="card flex flex-col gap-1 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="text-[12px] text-neutral-700">Randevu no: {appointment.reference}</span>
           <Tag variant="accent" className="gap-1.5">

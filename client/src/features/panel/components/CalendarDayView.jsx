@@ -33,7 +33,7 @@ export default function CalendarDayView({ date, bounds, range, appointments, bus
   }
 
   return (
-    <div className="grid grid-cols-[56px_minmax(0,1fr)] border-t-2 border-ink sm:grid-cols-[64px_minmax(0,1fr)]">
+    <div className="grid grid-cols-[56px_minmax(0,1fr)] border-t border-neutral-400 sm:grid-cols-[64px_minmax(0,1fr)]">
       <div>
         {hours.map((minutes) => (
           <div key={minutes} className="pt-1 text-[12px] text-neutral-700" style={{ height: HOUR_HEIGHT }}>

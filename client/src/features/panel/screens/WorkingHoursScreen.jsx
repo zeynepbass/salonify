@@ -13,7 +13,7 @@ import { getOpenDates, validateHours } from "@/features/panel/scheduling";
 import { getErrorMessage, getResponseMessage } from "@/lib/api";
 import { WEEKDAYS, formatDayWithWeekday } from "@/lib/date";
 
-const HEAD_CELL = "eyebrow border-b-2 border-ink px-3 py-2.5 text-left text-neutral-700";
+const HEAD_CELL = "eyebrow border-b border-neutral-400 px-3 py-2.5 text-left text-neutral-700";
 const CELL = "border-b border-line px-3 py-3";
 const DATE_OPTION_COUNT = 30;
 
@@ -159,7 +159,7 @@ function WorkingHours({ salonId, savedHours, closedDays }) {
 
       <section className="min-w-0 flex-[1_1_300px]">
         <h2 className="mb-3 text-[20px]">Özel kapalı günler</h2>
-        <div className="border-t-2 border-ink">
+        <div className="border-t border-neutral-400">
           {closedDays.length === 0 && <p className="border-b border-line py-3 text-[13px] text-neutral-700">Tanımlı kapalı gün yok.</p>}
           {closedDays.map((day) => (
             <div key={day.id} className="flex items-center gap-3 border-b border-line py-3">
@@ -179,7 +179,7 @@ function WorkingHours({ salonId, savedHours, closedDays }) {
             </div>
           ))}
         </div>
-        <form onSubmit={handleAddClosedDay} className="mt-4 flex flex-col gap-2.5 bg-surface p-4">
+        <form onSubmit={handleAddClosedDay} className="mt-4 flex flex-col gap-2.5 rounded-xl bg-surface p-4">
           <Field label="Tarih" htmlFor="closed-day-date">
             <Select id="closed-day-date" value={selectedDate ?? ""} onChange={(event) => setDate(event.target.value)}>
               {dateOptions.map((option) => (

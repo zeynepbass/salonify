@@ -16,7 +16,7 @@ export default function BookingSummary({ salon, rows, total, canSubmit, submitti
   return (
     <aside
       aria-label="Randevu özeti"
-      className="flex max-w-full flex-[1_1_320px] flex-col gap-4 bg-surface p-6 lg:sticky lg:top-[92px]"
+      className="flex max-w-full flex-[1_1_320px] flex-col gap-4 rounded-xl bg-surface p-6 lg:sticky lg:top-[92px]"
     >
       <h2 className="eyebrow tracking-[0.08em] text-neutral-700">Randevu özeti</h2>
       <div>
@@ -26,7 +26,7 @@ export default function BookingSummary({ salon, rows, total, canSubmit, submitti
           {salon.address}
         </div>
       </div>
-      <dl className="flex flex-col border-t-2 border-line">
+      <dl className="flex flex-col border-t border-line">
         {rows.map((row) => (
           <div key={row.label} className="flex justify-between gap-3 border-b border-line py-2.5 text-[14px]">
             <dt className="text-neutral-700">{row.label}</dt>

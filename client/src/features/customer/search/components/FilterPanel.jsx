@@ -30,7 +30,7 @@ export default function FilterPanel({
 }) {
   return (
     <div className="flex flex-col">
-      <div className="flex items-center justify-between border-b-2 border-line pb-3 md:hidden">
+      <div className="flex items-center justify-between border-b border-line pb-3 md:hidden">
         <h2 className="text-[20px]">Filtreler</h2>
         <Button variant="plain" size="icon" aria-label="Filtreleri kapat" onClick={onClose}>
           <Icon name="close" />
@@ -41,7 +41,7 @@ export default function FilterPanel({
         <button
           type="button"
           onClick={onChangeLocation}
-          className="flex w-full items-center gap-2 border border-line bg-surface px-3 py-2.5 text-left text-[14px] transition-colors hover:border-ink"
+          className="flex w-full items-center gap-2 rounded-md border border-line bg-canvas px-3 py-2.5 text-left text-[14px] transition-colors hover:border-neutral-500"
         >
           <Icon name="pin" className="text-accent" />
           <span className="flex-1">{locationLabel}</span>
@@ -86,7 +86,7 @@ export default function FilterPanel({
                 onClick={() => onChange({ hairStyles: toggleItem(filters.hairStyles, style) })}
                 className={cn(
                   "border px-2.5 py-1.5 text-[13px] transition-colors",
-                  selected ? "border-ink bg-ink text-canvas" : "border-line hover:border-ink",
+                  selected ? "border-ink bg-ink text-canvas" : "border-line hover:border-neutral-500",
                 )}
               >
                 {style}
@@ -126,7 +126,7 @@ export default function FilterPanel({
         </div>
       </Section>
 
-      <div className="flex gap-2 border-t-2 border-line pt-3">
+      <div className="flex gap-2 border-t border-line pt-3">
         <Button align="start" className="flex-1" onClick={onReset}>
           Temizle
         </Button>

@@ -28,14 +28,17 @@ export default function HeroSearch() {
   return (
     <section className="page-container flex flex-wrap gap-12 pt-[clamp(32px,6vw,72px)] pb-14">
       <div className="flex min-w-0 flex-[1_1_560px] flex-col justify-center gap-6">
-        <p className="eyebrow text-accent-700">Kuaför randevusu · Onay beklemeden</p>
+        <p className="eyebrow flex items-center gap-2 self-start rounded-full border border-accent-400/40 bg-accent-100/70 px-3 py-1 text-accent-700">
+          <span className="size-1.5 rounded-full bg-accent" />
+          Kuaför randevusu · Onay beklemeden
+        </p>
         <h1 className="max-w-[15ch] text-[clamp(38px,5.2vw,68px)] leading-[1.02] text-balance">
           Hayalindeki saç stiline en yakın kuaförü keşfet.
         </h1>
         <p className="max-w-[52ch] text-[18px] text-pretty text-neutral-700">
           Puanları, portföyleri ve gerçek boş saatleri karşılaştır. Uygun saati seç, randevun anında oluşsun.
         </p>
-        <form role="search" onSubmit={handleSubmit} className="flex flex-wrap border border-ink bg-surface">
+        <form role="search" onSubmit={handleSubmit} className="card flex flex-wrap overflow-hidden p-1.5 shadow-md">
           <label className="flex min-h-[60px] flex-[2_1_260px] items-center gap-2.5 border-line px-4 max-sm:border-b sm:border-r">
             <Icon name="search" className="text-neutral-600" />
             <input
@@ -51,13 +54,13 @@ export default function HeroSearch() {
             type="button"
             onClick={openLocationDialog}
             aria-label={`Konum seç, şu an ${locationLabel}`}
-            className="flex min-h-[60px] flex-[1_1_200px] items-center gap-2.5 px-4 text-left text-[15px] transition-colors hover:bg-neutral-200"
+            className="flex min-h-[60px] flex-[1_1_200px] items-center gap-2.5 rounded-lg px-4 text-left text-[15px] transition-colors hover:bg-neutral-100"
           >
             <Icon name="pin" className="text-accent" />
             <span className="flex-1">{locationLabel}</span>
             <Icon name="chevronDown" />
           </button>
-          <Button type="submit" variant="primary" align="start" className="min-h-[60px] gap-3 px-7 text-[16px] max-sm:flex-1">
+          <Button type="submit" variant="primary" align="start" className="min-h-[56px] gap-3 rounded-lg px-7 text-[16px] max-sm:flex-1">
             Ara
             <Icon name="arrowRight" />
           </Button>
@@ -68,7 +71,7 @@ export default function HeroSearch() {
             <Link
               key={item.label}
               href={getPopularHref(item)}
-              className="border border-line px-2.5 py-1 transition-colors hover:border-ink"
+              className="rounded-full border border-line bg-canvas px-3 py-1 transition-colors hover:border-accent-400 hover:text-accent-700"
             >
               {item.label}
             </Link>
@@ -77,10 +80,10 @@ export default function HeroSearch() {
       </div>
       <div
         aria-hidden="true"
-        className="relative min-h-[240px] min-w-0 flex-[1_1_360px] bg-ink bg-cover bg-center bg-no-repeat md:min-h-[360px]"
+        className="relative min-h-[240px] min-w-0 flex-[1_1_360px] overflow-hidden rounded-2xl bg-ink bg-cover bg-center bg-no-repeat shadow-lg md:min-h-[400px]"
         style={{ backgroundImage: "url('/assets/images/login-back.jpg')" }}
       >
-        <div className="absolute inset-0 bg-accent-400/40" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-accent-800/60 via-accent/20 to-transparent" />
       </div>
     </section>
   );

@@ -16,10 +16,10 @@ export default function SalonCard({ salon }) {
   const hasDistance = typeof salon.distanceKm === "number";
 
   return (
-    <article className="relative flex flex-col bg-surface transition-shadow duration-150 focus-within:shadow-md hover:shadow-md">
+    <article className="group card relative flex flex-col overflow-hidden transition-[box-shadow,transform] duration-200 focus-within:shadow-md hover:-translate-y-0.5 hover:shadow-md">
       <div className="relative">
-        <ImagePlaceholder src={salon.coverImage} alt={salon.name} className="aspect-[4/3]" />
-        <div className="absolute top-0 left-0 flex items-center gap-1.5 bg-canvas px-2.5 py-1.5 text-[14px] font-extrabold">
+        <ImagePlaceholder src={salon.coverImage} alt={salon.name} className="aspect-[4/3]" imageClassName="group-hover:scale-[1.04]" />
+        <div className="glass absolute top-3 left-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[14px] font-extrabold shadow-sm">
           <Icon name="star" size={14} filled className="text-accent" />
           {formatRating(salon.rating)}
           <span className="text-[12px] font-normal text-neutral-700">({salon.reviewCount})</span>

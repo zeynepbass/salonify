@@ -6,20 +6,20 @@ import LogoutButton from "@/features/panel/components/LogoutButton";
 import { PANEL_NAV } from "@/features/panel/panelNav";
 import { cn } from "@/lib/cn";
 
-const FOOTER_LINK = "flex items-center gap-3 px-3 py-2.5 text-[13px] transition-colors hover:bg-neutral-200 max-rail:justify-center";
+const FOOTER_LINK = "flex items-center gap-3 rounded-md px-3 py-2.5 text-[13px] transition-colors hover:bg-neutral-200 max-rail:justify-center";
 
 export default function PanelSidebar({ salon, pathname, unreadCount }) {
   return (
     <aside
       aria-label="Panel menüsü"
-      className="sticky top-0 z-25 hidden h-screen w-[72px] flex-none flex-col border-r-2 border-line bg-canvas md:flex rail:w-[248px]"
+      className="sticky top-0 z-25 hidden h-screen w-[72px] flex-none flex-col border-r border-line bg-surface/70 md:flex rail:w-[248px]"
     >
-      <Link href="/panel" aria-label="SalonaBOX kuaför paneli" className="flex h-[72px] flex-none items-center border-b-2 border-line px-5 max-rail:justify-center">
+      <Link href="/panel" aria-label="SalonaBOX kuaför paneli" className="flex h-[72px] flex-none items-center border-b border-line px-5 max-rail:justify-center">
         <Logo size="md" showText={false} className="rail:hidden" />
         <Logo size="md" className="hidden text-[18px] rail:inline-flex" />
       </Link>
       <div className="hidden items-center gap-2.5 border-b border-line px-5 py-4 rail:flex">
-        <ImagePlaceholder src={salon.coverImage} alt={salon.name} stripe={6} className="size-9 flex-none" />
+        <ImagePlaceholder src={salon.coverImage} alt={salon.name} stripe={6} className="size-9 flex-none rounded-full" />
         <div className="min-w-0">
           <div className="truncate text-[14px] font-extrabold">{salon.name}</div>
           <div className="text-[12px] text-neutral-700">
@@ -38,14 +38,14 @@ export default function PanelSidebar({ salon, pathname, unreadCount }) {
               aria-label={item.label}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-11 items-center gap-3 px-3 py-2.5 text-[14px] font-semibold transition-colors max-rail:justify-center",
-                active ? "bg-ink text-canvas" : "hover:bg-neutral-200",
+                "flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-[14px] font-semibold transition-colors max-rail:justify-center",
+                active ? "bg-ink text-canvas shadow-sm" : "text-neutral-800 hover:bg-neutral-200",
               )}
             >
               <Icon name={item.icon} />
               <span className="hidden flex-1 rail:block">{item.label}</span>
               {item.href === "/panel/bildirimler" && unreadCount > 0 && (
-                <span className="hidden h-[18px] min-w-[18px] place-items-center bg-accent px-[5px] text-[11px] font-extrabold text-canvas rail:grid">
+                <span className="hidden h-[18px] min-w-[18px] place-items-center rounded-full bg-accent px-[5px] text-[11px] font-extrabold text-canvas rail:grid">
                   {unreadCount}
                 </span>
               )}

@@ -14,12 +14,12 @@ export default function ServicePicker({ services, value, onChange, labelledBy })
             aria-checked={selected}
             onClick={() => onChange(service.id)}
             className={cn(
-              "flex w-full flex-wrap items-center gap-x-3.5 gap-y-1 border px-4 py-3.5 text-left transition-colors hover:border-ink",
-              selected ? "border-ink bg-surface shadow-[inset_0_0_0_1px_var(--color-ink)]" : "border-line",
+              "flex w-full flex-wrap items-center gap-x-3.5 gap-y-1 rounded-lg border px-4 py-3.5 text-left transition-all hover:border-accent-400",
+              selected ? "border-accent bg-accent-100/50 shadow-[inset_0_0_0_1px_var(--color-accent)]" : "border-line bg-canvas",
             )}
           >
-            <span className={cn("grid size-[18px] flex-none place-items-center border-2", selected ? "border-accent" : "border-neutral-500")}>
-              <span className={cn("size-2", selected && "bg-accent")} />
+            <span className={cn("grid size-[18px] flex-none place-items-center rounded-full border-2", selected ? "border-accent" : "border-neutral-500")}>
+              <span className={cn("size-2 rounded-full", selected && "bg-accent")} />
             </span>
             <span className="min-w-0 text-[15px] font-bold">{service.name}</span>
             <span className="flex-1 text-[13px] text-neutral-700">{formatDuration(service.duration)}</span>

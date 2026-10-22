@@ -5,7 +5,7 @@ const STEPS = ["Hizmet", "Tarih", "Saat", "Özet"];
 
 export default function BookingSteps({ current }) {
   return (
-    <ol aria-label="Adımlar" className="mb-8 grid grid-cols-4 border-t-2 border-line">
+    <ol aria-label="Adımlar" className="mb-8 grid grid-cols-4 border-t border-line">
       {STEPS.map((label, index) => {
         const done = index < current;
         const active = index === current;
@@ -21,7 +21,7 @@ export default function BookingSteps({ current }) {
           >
             <span
               className={cn(
-                "grid size-[26px] flex-none place-items-center border text-[12px] font-extrabold",
+                "grid size-[26px] flex-none place-items-center rounded-full border text-[12px] font-extrabold",
                 done && "border-ink bg-ink text-canvas",
                 active && "border-accent bg-accent text-canvas",
                 !done && !active && "border-line text-neutral-700",

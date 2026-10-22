@@ -9,7 +9,7 @@ export default function SalonSectionNav() {
   return (
     <nav
       aria-label="Salon bölümleri"
-      className="sticky top-[68px] z-10 mt-12 flex gap-1 overflow-x-auto border-b-2 border-line bg-canvas"
+      className="sticky top-[68px] z-10 mt-12 flex gap-1 overflow-x-auto border-b border-line bg-canvas"
     >
       {SALON_SECTIONS.map((section) => (
         <a

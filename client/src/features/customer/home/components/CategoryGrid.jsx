@@ -15,9 +15,11 @@ export default function CategoryGrid() {
           <Link
             key={category.id}
             href={buildSearchHref({ serviceIds: [category.id] })}
-            className="group flex min-h-[120px] flex-col items-start justify-between gap-7 border border-transparent bg-surface p-4 text-[15px] font-semibold transition-colors hover:border-ink hover:bg-ink hover:text-canvas"
+            className="group card flex min-h-[120px] flex-col items-start justify-between gap-7 p-4 text-[15px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-400 hover:shadow-md"
           >
-            <Icon name={category.icon} size={26} className="text-accent transition-colors group-hover:text-canvas" />
+            <span className="grid size-11 place-items-center rounded-lg bg-accent-100 text-accent transition-colors group-hover:bg-accent group-hover:text-canvas">
+              <Icon name={category.icon} size={22} />
+            </span>
             {category.label}
           </Link>
         ))}

@@ -121,7 +121,7 @@ function Overview({ summary, appointments, schedule }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-2 gap-x-5 border-t-2 border-ink lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-5 border-t border-neutral-400 lg:grid-cols-4">
         {stats.map((stat) => (
           <StatCard key={stat.label} stat={stat} />
         ))}
@@ -138,7 +138,7 @@ function Overview({ summary, appointments, schedule }) {
           {todayList.length === 0 ? (
             <StateMessage icon="calendar" title="Bugün için randevu yok." description="Yeni bir randevu ekleyebilir ya da takvimi kontrol edebilirsin." />
           ) : (
-            <div className="border-t-2 border-line">
+            <div className="border-t border-line">
               {todayList.map((appointment) => (
                 <AgendaRow
                   key={appointment.id}
@@ -153,7 +153,7 @@ function Overview({ summary, appointments, schedule }) {
         </section>
 
         <aside className="flex min-w-0 flex-[1_1_300px] flex-col gap-6">
-          <div className="bg-surface p-5">
+          <div className="rounded-xl bg-surface p-5">
             <h2 className="eyebrow mb-3 text-neutral-700">Bugünün doluluğu</h2>
             <div className="text-[36px] leading-none font-extrabold">%{occupancy}</div>
             <div className="mt-3 mb-2 h-2 bg-neutral-200" role="progressbar" aria-valuenow={occupancy} aria-valuemin={0} aria-valuemax={100} aria-label="Bugünün doluluğu">

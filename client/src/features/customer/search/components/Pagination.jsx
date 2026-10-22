@@ -6,7 +6,7 @@ export default function Pagination({ page, pageCount, onChange }) {
   if (pageCount <= 1) return null;
 
   return (
-    <nav aria-label="Sayfalar" className="mt-10 flex flex-wrap items-center gap-1 border-t-2 border-line pt-5">
+    <nav aria-label="Sayfalar" className="mt-10 flex flex-wrap items-center gap-1 border-t border-line pt-5">
       <Button size="icon" aria-label="Önceki sayfa" disabled={page === 1} onClick={() => onChange(page - 1)}>
         <Icon name="chevronLeft" />
       </Button>

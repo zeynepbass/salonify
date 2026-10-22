@@ -18,7 +18,7 @@ import { WEEKDAYS } from "@/lib/date";
 
 function SummaryCard({ title, actionLabel, href, children }) {
   return (
-    <div className="bg-surface p-5">
+    <div className="rounded-xl bg-surface p-5">
       <div className="flex items-baseline justify-between">
         <h2 className="eyebrow text-neutral-700">{title}</h2>
         <Button variant="ghost" href={href}>
@@ -111,7 +111,7 @@ function SalonProfile({ salon }) {
             <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={handleCoverChange} />
           </div>
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-4 border-t-2 border-line pt-5">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-4 border-t border-line pt-5">
           <Field label="Salon / kuaför adı" htmlFor="salon-name">
             <Input id="salon-name" value={form.name} onChange={setField("name")} required />
           </Field>

@@ -11,7 +11,7 @@ export default function BottomNav({ label, items, className }) {
   return (
     <nav
       aria-label={label}
-      className={cn("fixed inset-x-0 bottom-0 z-40 grid border-t-2 border-line bg-canvas", COLUMNS[items.length], className)}
+      className={cn("glass fixed inset-x-0 bottom-0 z-40 grid border-t border-line", COLUMNS[items.length], className)}
     >
       {items.map((item) => {
         const Component = item.href ? Link : "button";

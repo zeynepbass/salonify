@@ -34,7 +34,7 @@ export default function Dialog({
 
   return (
     <div
-      className="fixed inset-0 z-80 grid place-items-center bg-neutral-900/50 p-4"
+      className="fixed inset-0 z-80 grid animate-fade place-items-center bg-neutral-900/45 p-4 backdrop-blur-[2px]"
       onMouseDown={handleBackdropMouseDown}
     >
       <Component
@@ -44,7 +44,7 @@ export default function Dialog({
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          "flex max-h-[92vh] w-full animate-rise flex-col gap-4 overflow-auto bg-canvas p-6 shadow-lg outline-none",
+          "flex max-h-[92vh] w-full animate-rise flex-col gap-4 overflow-auto rounded-2xl bg-canvas p-6 shadow-lg outline-none",
           SIZES[size],
           className,
         )}
