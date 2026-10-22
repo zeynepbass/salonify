@@ -1,56 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import SegmentedControl from "@/components/molecules/SegmentedControl";
 import CategoryGrid from "@/features/customer/home/components/CategoryGrid";
 import HeroSearch from "@/features/customer/home/components/HeroSearch";
 import SalonShowcase from "@/features/customer/home/components/SalonShowcase";
+import { SHOWCASE_SIZE, useNearbySalons, usePopularSalons, useTopRatedSalons } from "@/features/customer/home/hooks/useHome";
 import { useLocation } from "@/features/customer/location/LocationProvider";
 import { DEFAULT_FILTERS, buildSalonParams, getSortOptions } from "@/features/customer/search/salonQuery";
 import { buildSearchHref } from "@/features/customer/search/useSalonFilters";
-import { api } from "@/lib/api";
 
 const NEARBY_RADIUS_KM = 5;
-const SHOWCASE_SIZE = 4;
 
 export default function HomePage() {
   const { location, locationLabel, hasCoordinates } = useLocation();
   const [sort, setSort] = useState(DEFAULT_FILTERS.sort);
-  const [nearbySalons, setNearbySalons] = useState(null);
-  const [popularSalons, setPopularSalons] = useState(null);
-  const [topRatedSalons, setTopRatedSalons] = useState(null);
-
-  const nearbyParams = JSON.stringify(
-    buildSalonParams({ sort, distance: NEARBY_RADIUS_KM }, location, { limit: SHOWCASE_SIZE }),
+  const nearbyParams = useMemo(
+    () => buildSalonParams({ sort, distance: NEARBY_RADIUS_KM }, location, { limit: SHOWCASE_SIZE }),
+    [sort, location],
   );
-
-  useEffect(() => {
-    let ignore = false;
-    api
-      .get("/salons", { params: JSON.parse(nearbyParams) })
-      .then((data) => !ignore && setNearbySalons(data.items))
-      .catch(() => !ignore && setNearbySalons([]));
-    return () => {
-      ignore = true;
-    };
-  }, [nearbyParams]);
-
-  useEffect(() => {
-    let ignore = false;
-    const load = (params, setSalons) =>
-      api
-        .get("/salons", { params: { ...params, limit: SHOWCASE_SIZE } })
-        .then((data) => !ignore && setSalons(data.items))
-        .catch(() => !ignore && setSalons([]));
-
-    load({ sort: "popular" }, setPopularSalons);
-    load({ sort: "rating", rating: 4.8 }, setTopRatedSalons);
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  const nearbySalons = useNearbySalons(nearbyParams);
+  const popularSalons = usePopularSalons();
+  const topRatedSalons = useTopRatedSalons();
 
   return (
     <>
@@ -60,7 +33,7 @@ export default function HomePage() {
       <SalonShowcase
         title="Yakınındaki Kuaförler"
         subtitle={hasCoordinates ? `${locationLabel} · ${NEARBY_RADIUS_KM} km içinde` : locationLabel}
-        salons={nearbySalons}
+        query={nearbySalons}
         emptyText={`${locationLabel} için henüz kuaför yok.`}
         actions={
           <div className="flex max-w-full flex-wrap gap-2">
@@ -87,7 +60,7 @@ export default function HomePage() {
       <SalonShowcase
         title="Popüler Salonlar"
         subtitle="En çok değerlendirilen kuaförler"
-        salons={popularSalons}
+        query={popularSalons}
         actions={
           <Button variant="ghost" href={buildSearchHref({ sort: "populer" })}>
             Tümünü gör
@@ -98,7 +71,7 @@ export default function HomePage() {
       <SalonShowcase
         title="Yüksek Puanlı Salonlar"
         subtitle="Müşteri değerlendirmelerinde öne çıkanlar"
-        salons={topRatedSalons}
+        query={topRatedSalons}
         actions={
           <Button variant="ghost" href={buildSearchHref({ minRating: 4.8 })}>
             Tümünü gör
