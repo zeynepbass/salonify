@@ -10,6 +10,10 @@ export function removePrivateQueries(queryClient) {
   queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== authKeys.session[0] });
 }
 
+export function leaveTo(path) {
+  window.location.replace(path);
+}
+
 function useSessionMutation(request, options) {
   const { applySession } = useAuth();
 
@@ -27,17 +31,16 @@ export function useRegister(options = {}) {
   return useSessionMutation((payload) => api.post("/auth/register", payload), options);
 }
 
-export function useLogout(options = {}) {
+export function useLogout({ redirectTo } = {}) {
   const { clearSession } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: () => api.post("/auth/logout"),
-    ...options,
-    onSettled: (...args) => {
+    onSettled: () => {
+      if (redirectTo) return leaveTo(redirectTo);
       clearSession();
       removePrivateQueries(queryClient);
-      options.onSettled?.(...args);
     },
   });
 }

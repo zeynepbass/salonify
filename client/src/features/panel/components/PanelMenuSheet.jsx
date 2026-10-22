@@ -38,7 +38,7 @@ export default function PanelMenuSheet({ pathname, salonId, onClose }) {
           <Icon name="external" />
           Müşteri sitesini aç
         </Link>
-        <LogoutButton onDone={onClose} className={cn(ITEM, "border-b-0 text-left")}>
+        <LogoutButton className={cn(ITEM, "border-b-0 text-left")}>
           <Icon name="logout" />
           Çıkış yap
         </LogoutButton>

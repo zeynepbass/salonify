@@ -1,8 +1,8 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/features/shared/auth/AuthProvider";
-import { removePrivateQueries } from "@/features/shared/auth/hooks/useAuthMutations";
+import { leaveTo } from "@/features/shared/auth/hooks/useAuthMutations";
 import { api } from "@/lib/api";
 import { userKeys } from "@/lib/queryKeys";
 
@@ -42,17 +42,9 @@ export function useChangePassword(options = {}) {
   });
 }
 
-export function useDeleteAccount(options = {}) {
-  const { clearSession } = useAuth();
-  const queryClient = useQueryClient();
-
+export function useDeleteAccount() {
   return useMutation({
     mutationFn: (password) => api.delete("/users/me", { data: { password } }),
-    ...options,
-    onSuccess: (...args) => {
-      clearSession();
-      removePrivateQueries(queryClient);
-      options.onSuccess?.(...args);
-    },
+    onSuccess: () => leaveTo("/"),
   });
 }
