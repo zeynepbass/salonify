@@ -103,7 +103,7 @@ function SalonProfile({ salon }) {
           <ImagePlaceholder src={salon.coverImage} alt={salon.name} stripe={10} className="size-[120px]" />
           <div className="flex flex-col gap-1.5">
             <strong className="text-[20px]">Profil görseli</strong>
-            <span className="text-[13px] text-neutral-700">En az 1200×900 px, JPG, PNG veya WebP. Siyah-beyaz yayınlanır.</span>
+            <span className="text-[13px] text-neutral-700">JPG, PNG veya WebP · en fazla 5 MB.</span>
             <Button className="self-start" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
               <Icon name="camera" />
               {uploading ? "Yükleniyor…" : "Görsel yükle"}

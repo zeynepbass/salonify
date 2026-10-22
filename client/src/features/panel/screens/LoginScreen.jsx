@@ -86,7 +86,6 @@ export default function LoginScreen() {
             Giriş yap
             {submitting ? <Spinner /> : <Icon name="arrowRight" />}
           </Button>
-          <span className="text-[13px] text-neutral-700">Adminden email şifre talep et.</span>
         </form>
       </div>
 
