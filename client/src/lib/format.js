@@ -33,7 +33,3 @@ export function withLocativeSuffix(word) {
   const vowel = "aıou".includes(lastVowel) ? "a" : "e";
   return `${word}'${consonant}${vowel}`;
 }
-
-export function includesText(source, query) {
-  return source.toLocaleLowerCase("tr").includes(query.trim().toLocaleLowerCase("tr"));
-}

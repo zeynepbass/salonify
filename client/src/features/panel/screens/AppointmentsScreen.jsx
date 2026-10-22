@@ -14,7 +14,8 @@ import { useAppointmentActions } from "@/features/panel/useAppointmentActions";
 import { TODAY } from "@/lib/clock";
 import { cn } from "@/lib/cn";
 import { formatShortDate } from "@/lib/date";
-import { formatDuration, formatPrice, includesText } from "@/lib/format";
+import { formatDuration, formatPrice } from "@/lib/format";
+import { useSearchFilter } from "@/lib/hooks";
 
 const chronological = (a, b) => a.date.localeCompare(b.date) || a.start - b.start;
 
@@ -24,6 +25,8 @@ const TABS = [
   { value: "past", label: "Geçmiş", filter: (item) => item.date < TODAY || item.status !== "BOOKED", sort: (a, b) => chronological(b, a) },
   { value: "all", label: "Tümü", filter: () => true, sort: chronological },
 ];
+
+const getSearchFields = (item) => [item.customer, item.phone, item.service.name, item.reference];
 
 const HEAD_CELL = "eyebrow border-b-2 border-ink px-3 py-2.5 text-left text-neutral-700";
 const CELL = "border-b border-line px-3 py-3";
@@ -147,10 +150,7 @@ function AppointmentList({ appointments, initialTab }) {
   const [tab, setTab] = useState(initialTab);
   const [query, setQuery] = useState("");
 
-  const filteredAppointments = useMemo(
-    () => (query.trim() ? appointments.filter((item) => includesText(item.customer, query)) : appointments),
-    [appointments, query],
-  );
+  const { results: filteredAppointments, isStale } = useSearchFilter(appointments, query, getSearchFields);
 
   const tabCounts = useMemo(
     () => Object.fromEntries(TABS.map((item) => [item.value, filteredAppointments.filter(item.filter).length])),
@@ -173,7 +173,7 @@ function AppointmentList({ appointments, initialTab }) {
           tabs={TABS.map((item) => ({ value: item.value, label: `${item.label} (${tabCounts[item.value]})` }))}
           className="max-w-full"
         />
-        <SearchInput value={query} onChange={setQuery} placeholder="Müşteri ara" className="flex-[0_1_280px] max-sm:flex-1" />
+        <SearchInput value={query} onChange={setQuery} placeholder="Müşteri, telefon, hizmet ara" className="flex-[0_1_280px] max-sm:flex-1" />
       </div>
 
       {list.length === 0 ? (
@@ -188,14 +188,14 @@ function AppointmentList({ appointments, initialTab }) {
           </Button>
         </StateMessage>
       ) : (
-        <>
+        <div className={cn("flex flex-col gap-4 transition-opacity", isStale && "opacity-70")}>
           <AppointmentTable appointments={list} onView={panel.openAppointment} actions={actions} />
           <AppointmentCards appointments={list} onView={panel.openAppointment} actions={actions} />
           <p className="flex items-center gap-1.5 text-[12px] text-neutral-700">
             <Icon name="lock" size={14} />
             Geçmiş, tamamlanmış veya iptal edilmiş randevular düzenlenemez ve silinemez.
           </p>
-        </>
+        </div>
       )}
     </div>
   );
